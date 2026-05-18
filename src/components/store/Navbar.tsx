@@ -158,7 +158,7 @@ export default function Navbar() {
         </div>
 
         {/* DESKTOP MENU */}
-        <nav className="hidden md:flex items-center gap-6 h-12 text-sm font-medium">
+        <nav className="hidden md:flex w-full items-center justify-center gap-6 h-12 text-sm font-medium">
           <Link href="/" className="transition hover:text-primary">
             Home
           </Link>
