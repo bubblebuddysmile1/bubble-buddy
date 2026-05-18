@@ -20,7 +20,7 @@ export default function Footer() {
               bubble buddy smile
             </h2>
 
-            <p className="mt-4 text-sm text-muted-foreground leading-6">
+            <p className="mt-4 text-md text-muted-foreground leading-6">
               Discover premium skincare, beauty care,
               and haircare products designed to make
               you glow naturally.
@@ -54,7 +54,7 @@ export default function Footer() {
               Quick Links
             </h3>
 
-            <div className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground">
+            <div className="mt-4 flex flex-col gap-3 text-md text-muted-foreground">
 
               <Link href="/" className="hover:text-primary">
                 Home
@@ -81,7 +81,7 @@ export default function Footer() {
               Categories
             </h3>
 
-            <div className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground">
+            <div className="mt-4 flex flex-col gap-3 text-md text-muted-foreground">
 
               <Link href="/categories/skincare" className="hover:text-primary">
                 Skin Care
@@ -108,7 +108,7 @@ export default function Footer() {
               Stay Updated
             </h3>
 
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className="mt-4 text-md text-muted-foreground">
               Subscribe to get beauty tips and offers.
             </p>
 
@@ -129,7 +129,7 @@ export default function Footer() {
         </div>
 
         {/* BOTTOM */}
-        <div className="border-t border-border mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+        <div className="border-t border-border mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-md text-muted-foreground">
 
           <p>
             © 2025 bubble buddy smile. All rights reserved.
