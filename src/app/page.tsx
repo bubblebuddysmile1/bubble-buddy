@@ -1,3 +1,4 @@
+import CategoriesSection from "@/components/store/CategoriesSection";
 import HeroSection from "@/components/store/HeroSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +7,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
 <HeroSection />
+<CategoriesSection />
       <main className="container mx-auto px-4 py-16">
         {/* Hero */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
