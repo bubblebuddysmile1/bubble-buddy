@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 import Navbar from "@/components/store/Navbar";
+import Footer from "@/components/store/Footer";
 
 export const metadata: Metadata = {
   title: "bubble buddy smile",
@@ -16,8 +17,11 @@ export default function RootLayout({
   return (
     <html
       lang="en">
-       
-      <body>  <Navbar />{children}</body>
+      <body> 
+       <Navbar />
+       {children}
+       <Footer />
+      </body>
     </html>
   );
 }
