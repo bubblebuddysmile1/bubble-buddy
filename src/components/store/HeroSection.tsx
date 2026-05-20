@@ -15,15 +15,21 @@ const banners = [
     id: 1,
     title: "Glow Naturally",
     subtitle: "Premium skincare products for radiant beauty.",
-    image: "/slider/slider1.png",
+    image: "/slider/1.jpg",
   },
 
   {
     id: 2,
     title: "Luxury Hair Care",
     subtitle: "Nourish your hair with organic ingredients.",
-    image: "/slider/slider2.png",
+    image: "/slider/2.jpg",
   },
+  {
+    id: 3,
+    title: "Fragrance Elegance",
+    subtitle: "Experience the art of perfumery with our exclusive collection.",
+    image: "/slider/3.jpg",
+  }
 ];
 
 export default function HeroSection() {
@@ -46,7 +52,7 @@ export default function HeroSection() {
 
           <SwiperSlide key={banner.id}>
 
-            <div className="relative h-105 sm:h-130 md:h-155 lg:h-175 xl:h-190 w-full overflow-hidden">
+            <div className="relative h-65 sm:h-90 md:h-105 lg:h-135 xl:h-150 w-full overflow-hidden">
 
               {/* IMAGE */}
               <Image

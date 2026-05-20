@@ -1,0 +1,210 @@
+datasource db {
+  provider = "mysql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CARD
+  WALLET
+  CASH_ON_DELIVERY
+  BANK_TRANSFER
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+model User {
+  id           Int                     @id @default(autoincrement())
+  email        String                  @unique
+  password     String
+  name         String?
+  phone        String?
+  role         UserRole                @default(CUSTOMER)
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  addresses    Address[]
+  cartItems    CartItem[]
+  orders       Order[]
+  favorites    Favorite[]
+  newsletter   NewsletterSubscription?
+}
+
+model Address {
+  id              Int      @id @default(autoincrement())
+  user            User     @relation(fields: [userId], references: [id])
+  userId          Int
+  label           String   @default("Home")
+  recipient       String?
+  line1           String
+  line2           String?
+  city            String
+  state           String
+  postalCode      String
+  country         String   @default("Pakistan")
+  phone           String?
+  isDefault       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  shippingOrders  Order[]  @relation("ShippingAddress")
+  billingOrders   Order[]  @relation("BillingAddress")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+}
+
+model Product {
+  id             Int             @id @default(autoincrement())
+  sku            String          @unique
+  name           String
+  slug           String          @unique
+  description    String
+  details        String?
+  price          Decimal         @db.Decimal(10, 2)
+  compareAtPrice Decimal?        @db.Decimal(10, 2)
+  currency       String          @default("USD")
+  stockQuantity  Int             @default(0)
+  featured       Boolean         @default(false)
+  isActive       Boolean         @default(true)
+  averageRating  Float?          @default(0)
+  reviewCount    Int             @default(0)
+  category       Category        @relation(fields: [categoryId], references: [id])
+  categoryId     Int
+  thumbnail      String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  images         ProductImage[]
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  favorites      Favorite[]
+}
+
+model ProductImage {
+  id         Int      @id @default(autoincrement())
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  Int
+  url        String
+  altText    String?
+  sortOrder  Int      @default(0)
+}
+
+model CartItem {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  Int
+  quantity   Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Order {
+  id                 Int             @id @default(autoincrement())
+  orderNumber        String          @unique
+  user               User?           @relation(fields: [userId], references: [id])
+  userId             Int?
+  status             OrderStatus     @default(PENDING)
+  paymentStatus      PaymentStatus   @default(PENDING)
+  paymentMethod      PaymentMethod?
+  totalAmount        Decimal         @db.Decimal(10, 2)
+  taxAmount          Decimal         @db.Decimal(10, 2) @default(0)
+  shippingAmount     Decimal         @db.Decimal(10, 2) @default(0)
+  discountAmount     Decimal         @db.Decimal(10, 2) @default(0)
+  shippingAddress    Address?        @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  shippingAddressId  Int?
+  billingAddress     Address?        @relation("BillingAddress", fields: [billingAddressId], references: [id])
+  billingAddressId   Int?
+  placedAt           DateTime?
+  fulfilledAt        DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  items              OrderItem[]
+}
+
+model OrderItem {
+  id            Int      @id @default(autoincrement())
+  order         Order    @relation(fields: [orderId], references: [id])
+  orderId       Int
+  product       Product  @relation(fields: [productId], references: [id])
+  productId     Int
+  name          String
+  sku           String
+  variant       String?
+  quantity      Int      @default(1)
+  unitPrice     Decimal  @db.Decimal(10, 2)
+  totalPrice    Decimal  @db.Decimal(10, 2)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model NewsletterSubscription {
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  isConfirmed    Boolean  @default(false)
+  subscribedAt   DateTime @default(now())
+  unsubscribedAt DateTime?
+  user           User?    @relation(fields: [userId], references: [id])
+  userId         Int?     @unique
+}
+
+model Favorite {
+  id         Int     @id @default(autoincrement())
+  user       User    @relation(fields: [userId], references: [id])
+  userId     Int
+  product    Product @relation(fields: [productId], references: [id])
+  productId  Int
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model Promotion {
+  id             Int        @id @default(autoincrement())
+  code           String     @unique
+  title          String
+  description    String?
+  discountType   DiscountType
+  discountValue  Decimal    @db.Decimal(10, 2)
+  minOrderAmount Decimal    @db.Decimal(10, 2) @default(0)
+  activeFrom     DateTime?
+  activeUntil    DateTime?
+  isActive       Boolean    @default(true)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}

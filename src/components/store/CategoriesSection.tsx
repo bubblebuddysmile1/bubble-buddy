@@ -41,46 +41,34 @@ const categories = [
     image: "/category/2.jpg",
     link: "#",
   },
+  {
+    id: 6,
+    title: "Skin Care",
+    image: "/category/1.jpg",
+    link: "#",
+  },
 ];
 
 export default function CategoriesSection() {
   return (
-    <section className="py-16 bg-background">
+    <section className="py-4 bg-background">
 
-      <div className="container mx-auto px-4">
-
-        {/* HEADING */}
-        <div className="text-center mb-12">
-
-          <p className="text-primary font-medium uppercase tracking-widest">
-            Categories
-          </p>
-
-          <h2 className="text-3xl md:text-5xl font-bold mt-3 text-foreground">
-            Shop By Category
-          </h2>
-
-          <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
-            Explore premium beauty, skincare, and haircare
-            collections crafted for your natural glow.
-          </p>
-
-        </div>
-
+      <div className="w-full mx-auto px-4">
         {/* CAROUSEL */}
         <div className="relative">
           <Swiper
             modules={[Autoplay, Pagination]}
             slidesPerView={1}
-            spaceBetween={16}
+            spaceBetween={12}
             loop
             autoplay={{ delay: 3500, disableOnInteraction: false }}
             pagination={{ clickable: true }}
             breakpoints={{
-              640: { slidesPerView: 1.2, spaceBetween: 18 },
-              768: { slidesPerView: 2, spaceBetween: 20 },
-              1024: { slidesPerView: 2.5, spaceBetween: 24 },
-              1280: { slidesPerView: 3, spaceBetween: 26 },
+              480: { slidesPerView: 2, spaceBetween: 8 },
+              640: { slidesPerView: 2.5, spaceBetween: 10 },
+              768: { slidesPerView: 3.5, spaceBetween: 12 },
+              1024: { slidesPerView: 4.5, spaceBetween: 14 },
+              1280: { slidesPerView: 5, spaceBetween: 16 },
             }}
           >
             {categories.map((category) => (
@@ -91,7 +79,7 @@ export default function CategoriesSection() {
                 >
 
                   {/* IMAGE */}
-                  <div className="relative h-87.5 w-full overflow-hidden rounded-3xl">
+                  <div className="relative h-40 w-full overflow-hidden rounded-2xl">
 
                     <Image
                       src={category.image}
@@ -108,11 +96,11 @@ export default function CategoriesSection() {
                   {/* CONTENT */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
 
-                    <h3 className="text-2xl font-bold">
+                    <h3 className="text-lg font-semibold">
                       {category.title}
                     </h3>
 
-                    <span className="mt-3 text-sm uppercase tracking-widest border-b border-white pb-1">
+                    <span className="mt-2 text-xs uppercase tracking-wider border-b border-white pb-0.5">
                       Shop Now
                     </span>
 
