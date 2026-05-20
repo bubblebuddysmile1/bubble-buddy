@@ -1,22 +1,63 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function AuthForm() {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams?.get("returnTo") ?? "/";
+  const initialMode = searchParams?.get("mode") === "signup" ? "signup" : "signin";
+
+  const [mode, setMode] = useState<"signin" | "signup">(initialMode);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setError("");
     setSuccess("");
-    // fake submit delay
-    await new Promise((r) => setTimeout(r, 900));
+
+    const payload = {
+      email,
+      password,
+      ...(mode === "signup" ? { name } : {}),
+    };
+
+    const response = await fetch(`/api/auth/${mode}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
     setLoading(false);
-    setSuccess(mode === "signin" ? "Signed in successfully" : "Account created successfully");
+
+    if (!response.ok) {
+      setError(data.error || "Unable to process your request. Please try again.");
+      return;
+    }
+
+    if (mode === "signup") {
+      setSuccess("Account created successfully. Please sign in to continue.");
+      setMode("signin");
+      setName("");
+      setPassword("");
+      return;
+    }
+
+    setSuccess("Signed in successfully. Redirecting you back...");
+    setPassword("");
+    router.push(returnTo);
   }
 
   return (
@@ -111,18 +152,38 @@ export default function AuthForm() {
                   {mode === "signup" && (
                     <div className="space-y-2">
                       <label className="block text-xs font-medium text-muted-foreground">Full name / Brand name</label>
-                      <Input placeholder="Your name or brand name" required className="bg-background/90" />
+                      <Input
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                        placeholder="Your name or brand name"
+                        required
+                        className="bg-background/90"
+                      />
                     </div>
                   )}
 
                   <div className="space-y-2">
                     <label className="block text-xs font-medium text-muted-foreground">Email</label>
-                    <Input type="email" placeholder="hello@yourbrand.com" required className="bg-background/90" />
+                    <Input
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      type="email"
+                      placeholder="hello@yourbrand.com"
+                      required
+                      className="bg-background/90"
+                    />
                   </div>
 
                   <div className="space-y-2">
                     <label className="block text-xs font-medium text-muted-foreground">Password</label>
-                    <Input type="password" placeholder="Enter password" required className="bg-background/90" />
+                    <Input
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      type="password"
+                      placeholder="Enter password"
+                      required
+                      className="bg-background/90"
+                    />
                   </div>
                 </div>
 
@@ -141,6 +202,12 @@ export default function AuthForm() {
                 >
                   {loading ? "Working..." : mode === "signin" ? "Sign in" : "Get a free consultation →"}
                 </Button>
+
+                {error && (
+                  <div className="rounded-3xl border border-border bg-destructive/10 p-3 text-sm text-destructive animate-fade-in">
+                    {error}
+                  </div>
+                )}
 
                 {success && (
                   <div className="rounded-3xl border border-border bg-primary/10 p-3 text-sm text-primary animate-pulse">
