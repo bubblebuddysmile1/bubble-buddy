@@ -1,13 +1,21 @@
+import type { Metadata } from "next";
 import type { Prisma } from "@prisma/client";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ProductImageGallery from "@/components/store/ProductImageGallery";
+import RelatedProducts from "@/components/store/RelatedProducts";
 import { prisma } from "@/lib/prisma";
 
 type ProductDetailPayload = Prisma.ProductGetPayload<{
   include: {
     category: { select: { name: true; slug: true } };
     images: true;
+  };
+}>;
+
+type RelatedProduct = Prisma.ProductGetPayload<{
+  include: {
+    category: { select: { name: true } };
   };
 }>;
 
@@ -18,7 +26,25 @@ async function getProductBySlug(slug: string): Promise<ProductDetailPayload | nu
       category: {
         select: { name: true, slug: true },
       },
-      images: true,
+      images: { orderBy: { sortOrder: "asc" } },
+    },
+  });
+}
+
+async function getRelatedProducts(
+  categoryId: number,
+  excludeProductId: number,
+): Promise<RelatedProduct[]> {
+  return prisma.product.findMany({
+    where: {
+      isActive: true,
+      categoryId,
+      id: { not: excludeProductId },
+    },
+    take: 4,
+    orderBy: { createdAt: "desc" },
+    include: {
+      category: { select: { name: true } },
     },
   });
 }
@@ -28,12 +54,58 @@ export async function generateStaticParams() {
   return products.map((product: { slug: string }) => ({ slug: product.slug }));
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const product = await getProductBySlug(params.slug);
+
+  if (!product) {
+    return {
+      title: "Product not found",
+      description: "The product you are looking for could not be found.",
+    };
+  }
+
+  const description =
+    product.description.length > 160
+      ? `${product.description.slice(0, 157)}...`
+      : product.description;
+  const imageUrl = product.thumbnail ?? product.images[0]?.url ?? "/category/1.jpg";
+
+  return {
+    title: product.name,
+    description,
+    keywords: [
+      product.name,
+      product.category?.name ?? "beauty",
+      product.sku,
+      "Bubble Buddy",
+    ],
+    openGraph: {
+      title: product.name,
+      description,
+      type: "website",
+      images: [{ url: imageUrl, alt: product.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description,
+      images: [imageUrl],
+    },
+  };
+}
+
 export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
   const product = await getProductBySlug(params.slug);
 
   if (!product) {
     notFound();
   }
+
+  const relatedProducts = await getRelatedProducts(product.categoryId, product.id);
 
   return (
     <main className="min-h-screen bg-background text-foreground py-12">
@@ -42,7 +114,10 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
           <div>
             <p className="text-xs uppercase tracking-[0.32em] text-primary">Product details</p>
             <h1 className="mt-3 text-4xl font-semibold text-foreground">{product.name}</h1>
-            <p className="mt-3 max-w-2xl text-sm text-muted-foreground">{product.category?.name ?? "Uncategorized"} · ₹{product.price.toString()}</p>
+            <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+              {product.category?.name ?? "Uncategorized"} · {product.currency}{" "}
+              {product.price.toString()}
+            </p>
           </div>
           <Link
             href="/shop"
@@ -54,65 +129,71 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
 
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
-            <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-              <div className="space-y-4">
-                <div className="relative h-96 overflow-hidden rounded-[2rem] bg-muted">
-                  <Image
-                    src={product.thumbnail ?? "/category/1.jpg"}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                {product.images.length > 0 && (
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    {product.images.map((image: { id: number; url: string; altText?: string | null }) => (
-                      <div key={image.id} className="relative h-28 overflow-hidden rounded-3xl bg-muted">
-                        <Image
-                          src={image.url}
-                          alt={image.altText ?? product.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
+            <ProductImageGallery
+              productName={product.name}
+              thumbnail={product.thumbnail}
+              images={product.images}
+            />
+          </section>
+
+          <section className="space-y-6 rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">
+                  Description
+                </p>
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                  {product.description}
+                </p>
               </div>
-
-              <div className="space-y-6 rounded-[2rem] border border-border bg-background/80 p-6">
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">Description</p>
-                    <p className="mt-3 text-sm leading-7 text-muted-foreground">{product.description}</p>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-3xl bg-card p-4">
-                      <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">SKU</p>
-                      <p className="mt-2 text-sm text-foreground">{product.sku}</p>
-                    </div>
-                    <div className="rounded-3xl bg-card p-4">
-                      <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Stock</p>
-                      <p className="mt-2 text-sm text-foreground">{product.stockQuantity} available</p>
-                    </div>
-                  </div>
+              {product.details && (
+                <div>
+                  <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">
+                    Details
+                  </p>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">{product.details}</p>
                 </div>
-
-                <div className="rounded-3xl border border-border bg-card p-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Price</p>
-                      <p className="mt-2 text-3xl font-semibold text-foreground">{product.currency} {product.price.toString()}</p>
-                    </div>
-                    <button className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">
-                      Add to cart
-                    </button>
-                  </div>
+              )}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-3xl bg-background p-4">
+                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">SKU</p>
+                  <p className="mt-2 text-sm text-foreground">{product.sku}</p>
                 </div>
+                <div className="rounded-3xl bg-background p-4">
+                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Stock</p>
+                  <p className="mt-2 text-sm text-foreground">{product.stockQuantity} available</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-border bg-background p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Price</p>
+                  <p className="mt-2 text-3xl font-semibold text-foreground">
+                    {product.currency} {product.price.toString()}
+                  </p>
+                  {product.compareAtPrice && (
+                    <p className="mt-1 text-sm text-muted-foreground line-through">
+                      {product.currency} {product.compareAtPrice.toString()}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                >
+                  Add to cart
+                </button>
               </div>
             </div>
           </section>
         </div>
+
+        <RelatedProducts
+          products={relatedProducts}
+          categoryName={product.category?.name}
+        />
       </div>
     </main>
   );
