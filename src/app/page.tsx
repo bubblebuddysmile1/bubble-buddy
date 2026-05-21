@@ -4,6 +4,7 @@ import BestSellingProducts from "@/components/store/BestSellingProducts";
 import OfferDiscountSection from "@/components/store/OfferDiscountSection";
 import AdvancedPromoSection from "@/components/store/AdvancedPromoSection";
 import ProductList from "@/components/store/ProductList";
+import PromoBannerSection from "@/components/store/PromoBannerSection";
 
 export default function Home() {
   return (
@@ -45,7 +46,7 @@ export default function Home() {
         </p>
       </div>
       <AdvancedPromoSection />
-      
+      <PromoBannerSection/>
     </div>
   );
 }
