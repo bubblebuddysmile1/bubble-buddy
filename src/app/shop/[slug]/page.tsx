@@ -3,8 +3,12 @@ import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductImageGallery from "@/components/store/ProductImageGallery";
+import ProductDetailCart from "@/components/store/ProductDetailCart";
 import RelatedProducts from "@/components/store/RelatedProducts";
+import { parseProductPrice, toCartProduct } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
+
+type PageParams = Promise<{ slug: string }>;
 
 type ProductDetailPayload = Prisma.ProductGetPayload<{
   include: {
@@ -51,15 +55,12 @@ async function getRelatedProducts(
 
 export async function generateStaticParams() {
   const products = await prisma.product.findMany({ select: { slug: true } });
-  return products.map((product: { slug: string }) => ({ slug: product.slug }));
+  return products.map((product) => ({ slug: product.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
-  const product = await getProductBySlug(params.slug);
+export async function generateMetadata({ params }: { params: PageParams }): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     return {
@@ -98,14 +99,19 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
-  const product = await getProductBySlug(params.slug);
+export default async function ProductDetailPage({ params }: { params: PageParams }) {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     notFound();
   }
 
   const relatedProducts = await getRelatedProducts(product.categoryId, product.id);
+  const cartProduct = toCartProduct(product);
+  const compareAtPrice = product.compareAtPrice
+    ? parseProductPrice(product.compareAtPrice)
+    : null;
 
   return (
     <main className="min-h-screen bg-background text-foreground py-12">
@@ -166,27 +172,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
               </div>
             </div>
 
-            <div className="rounded-3xl border border-border bg-background p-5">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Price</p>
-                  <p className="mt-2 text-3xl font-semibold text-foreground">
-                    {product.currency} {product.price.toString()}
-                  </p>
-                  {product.compareAtPrice && (
-                    <p className="mt-1 text-sm text-muted-foreground line-through">
-                      {product.currency} {product.compareAtPrice.toString()}
-                    </p>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
-                >
-                  Add to cart
-                </button>
-              </div>
-            </div>
+            <ProductDetailCart product={cartProduct} compareAtPrice={compareAtPrice} />
           </section>
         </div>
 
