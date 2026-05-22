@@ -25,8 +25,8 @@ export default function CheckoutPage() {
           <p className="text-xs uppercase tracking-[0.32em] text-primary">Secure checkout</p>
           <h1 className="mt-3 text-4xl font-semibold text-foreground">Complete your order</h1>
           <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-            Enter your delivery address and review your bag. All fields are validated with Zod
-            before placing a mock order.
+            Enter your delivery address, review your bag, and pay securely with Razorpay. Address
+            fields are validated with Zod before payment starts.
           </p>
         </div>
 

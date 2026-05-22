@@ -11,6 +11,7 @@ type CheckoutAddressFormProps = {
   onChange: (field: keyof CheckoutAddressForm, value: string) => void;
   onSubmit: () => void;
   isSubmitting: boolean;
+  submitLabel?: string;
 };
 
 export default function CheckoutAddressForm({
@@ -19,6 +20,7 @@ export default function CheckoutAddressForm({
   onChange,
   onSubmit,
   isSubmitting,
+  submitLabel = "Place order",
 }: CheckoutAddressFormProps) {
   return (
     <form
@@ -130,7 +132,7 @@ export default function CheckoutAddressForm({
         disabled={isSubmitting}
         className="w-full rounded-full sm:w-auto sm:min-w-[220px]"
       >
-        {isSubmitting ? "Placing order…" : "Place order"}
+        {isSubmitting ? "Processing…" : submitLabel}
       </Button>
     </form>
   );
