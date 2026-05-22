@@ -4,9 +4,10 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, Heart, Menu, Search, User } from "lucide-react";
+import { ChevronDown, Menu, Search, User } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import CartNavButton from "@/components/cart/CartNavButton";
+import WishlistNavButton from "@/components/wishlist/WishlistNavButton";
 import { Button } from "../ui/button";
 
 // ============================================================
@@ -231,7 +232,7 @@ export default function Navbar() {
 
           {/* RIGHT ICONS */}
           <div className="flex items-center gap-1 md:gap-3">
-            <Button variant="ghost" size="icon" aria-label="Wishlist"><Heart className="h-5 w-5" /></Button>
+            <WishlistNavButton />
             <CartNavButton />
 
             <UserMenu />

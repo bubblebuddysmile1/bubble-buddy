@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import AddToCartButton from "@/components/cart/AddToCartButton";
+import WishlistButton from "@/components/wishlist/WishlistButton";
 import { formatCartMoney } from "@/lib/cart";
 import type { CartProduct } from "@/types/cart";
 
@@ -19,15 +20,18 @@ export default function ShopProductCard({
 }: ShopProductCardProps) {
   return (
     <article className="group overflow-hidden rounded-[2rem] border border-border bg-card p-0 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
-      <Link href={`/shop/${product.slug}`} className="relative block h-80 overflow-hidden bg-muted">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          className="object-cover transition duration-500 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, 33vw"
-        />
-      </Link>
+      <div className="relative h-80 overflow-hidden bg-muted">
+        <Link href={`/shop/${product.slug}`} className="relative block h-full">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-cover transition duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+        </Link>
+        <WishlistButton product={product} variant="overlay" className="absolute right-4 top-4 z-10" />
+      </div>
       <div className="space-y-4 p-6">
         <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.24em] text-primary">
           <span>{product.category ?? "Uncategorized"}</span>
