@@ -43,7 +43,7 @@ export default function CheckoutAddressForm({
         <CheckoutField
           id="fullName"
           label="Full name"
-          placeholder="Ayesha Khan"
+          placeholder="kamyar khan"
           value={values.fullName}
           onChange={(e) => onChange("fullName", e.target.value)}
           error={errors.fullName}
@@ -54,7 +54,7 @@ export default function CheckoutAddressForm({
           id="phone"
           label="Phone"
           type="tel"
-          placeholder="+92 300 1234567"
+        placeholder="+91 "
           value={values.phone}
           onChange={(e) => onChange("phone", e.target.value)}
           error={errors.phone}
@@ -64,7 +64,7 @@ export default function CheckoutAddressForm({
         <CheckoutField
           id="line1"
           label="Address line 1"
-          placeholder="House 12, Street 4, DHA Phase 5"
+          placeholder="House 12, Street 4 ....."
           value={values.line1}
           onChange={(e) => onChange("line1", e.target.value)}
           error={errors.line1}
@@ -84,7 +84,7 @@ export default function CheckoutAddressForm({
         <CheckoutField
           id="city"
           label="City"
-          placeholder="Lahore"
+          placeholder="Gurgaon"
           value={values.city}
           onChange={(e) => onChange("city", e.target.value)}
           error={errors.city}
@@ -93,7 +93,7 @@ export default function CheckoutAddressForm({
         <CheckoutField
           id="state"
           label="State / Province"
-          placeholder="Punjab"
+          placeholder="Haryana"
           value={values.state}
           onChange={(e) => onChange("state", e.target.value)}
           error={errors.state}
@@ -111,7 +111,7 @@ export default function CheckoutAddressForm({
         <CheckoutField
           id="country"
           label="Country"
-          placeholder="Pakistan"
+          placeholder="India"
           value={values.country}
           onChange={(e) => onChange("country", e.target.value)}
           error={errors.country}
