@@ -219,3 +219,108 @@
 .animate-ping-once {
   animation: ping-once 0.45s ease-out;
 }
+
+@keyframes checkout-form-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes checkout-summary-enter {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes checkout-line-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes checkout-error-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes checkout-success-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes checkout-back-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes checkout-field-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+.checkout-form-enter {
+  animation: checkout-form-enter 0.5s ease-out both;
+}
+
+.checkout-summary-enter {
+  animation: checkout-summary-enter 0.55s ease-out both;
+}
+
+.checkout-line-enter {
+  animation: checkout-line-enter 0.35s ease-out both;
+}
+
+.checkout-error-enter {
+  animation: checkout-error-enter 0.25s ease-out both;
+}
+
+.checkout-success-enter {
+  animation: checkout-success-enter 0.55s ease-out both;
+}
+
+.checkout-back-enter {
+  animation: checkout-back-enter 0.35s ease-out both;
+}
+
+.checkout-field-error {
+  animation: checkout-field-shake 0.35s ease-out;
+}

@@ -1,0 +1,37 @@
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
+import CheckoutPageClient from "@/components/checkout/CheckoutPageClient";
+
+export const metadata = {
+  title: "Checkout",
+};
+
+export default function CheckoutPage() {
+  return (
+    <main className="relative min-h-screen overflow-hidden bg-background py-12 text-foreground">
+      <div className="pointer-events-none absolute -left-24 top-0 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 bottom-10 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
+
+      <div className="container relative mx-auto px-4">
+        <Link
+          href="/cart"
+          className="checkout-back-enter mb-6 inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition hover:text-primary"
+        >
+          <ChevronLeft className="size-4" />
+          Back to cart
+        </Link>
+
+        <div className="mb-10">
+          <p className="text-xs uppercase tracking-[0.32em] text-primary">Secure checkout</p>
+          <h1 className="mt-3 text-4xl font-semibold text-foreground">Complete your order</h1>
+          <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+            Enter your delivery address and review your bag. All fields are validated with Zod
+            before placing a mock order.
+          </p>
+        </div>
+
+        <CheckoutPageClient />
+      </div>
+    </main>
+  );
+}

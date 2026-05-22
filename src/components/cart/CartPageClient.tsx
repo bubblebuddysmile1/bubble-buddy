@@ -7,7 +7,8 @@ import { ArrowRight, ShoppingBag, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CartItemRow from "@/components/cart/CartItemRow";
 import { formatCartMoney } from "@/lib/cart";
-import { selectCartSubtotal, useCartStore } from "@/store/cart-store";
+import { getCheckoutTotals } from "@/lib/checkout";
+import { useCartStore } from "@/store/cart-store";
 
 export default function CartPageClient() {
   const items = useCartStore((s) => s.items);
@@ -16,11 +17,7 @@ export default function CartPageClient() {
 
   useEffect(() => setMounted(true), []);
 
-  const subtotal = useCartStore(selectCartSubtotal);
-  const currency = items[0]?.currency ?? "USD";
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const shipping = subtotal > 50 ? 0 : subtotal > 0 ? 4.99 : 0;
-  const total = subtotal + shipping;
+  const { subtotal, shipping, total, currency, itemCount } = getCheckoutTotals(items);
 
   if (!mounted) {
     return (
@@ -113,9 +110,12 @@ export default function CartPageClient() {
               </div>
             </div>
 
-            <Button type="button" size="lg" className="w-full rounded-full">
+            <Link
+              href="/checkout"
+              className="inline-flex h-10 w-full items-center justify-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/80"
+            >
               Proceed to checkout
-            </Button>
+            </Link>
             <Link
               href="/shop"
               className="flex w-full items-center justify-center gap-2 rounded-full border border-border px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-muted"
@@ -130,7 +130,7 @@ export default function CartPageClient() {
             <Image src={items[0].image} alt="" fill className="object-cover" sizes="56px" />
           </div>
           <p className="text-xs leading-5 text-muted-foreground">
-            Secure checkout coming soon. Your cart is saved on this device.
+            Your cart is saved on this device. Checkout uses Zod-validated address forms.
           </p>
         </div>
       </aside>
