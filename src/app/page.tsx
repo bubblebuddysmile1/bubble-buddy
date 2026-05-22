@@ -14,7 +14,7 @@ export default function Home() {
       <BestSellingProducts />
       <OfferDiscountSection />
       <ProductList />
-      <div className="mb-10 flex flex-col gap-3 rounded-[1.125rem] border border-[#ddd6c8] bg-[#f5f0e8] px-9 py-7">
+      <div className="container mx-auto px-4 mb-10 flex flex-col gap-3 rounded-[1.125rem] border border-[#ddd6c8] bg-[#f5f0e8] px-9 py-7">
         {/* Top row — badge + subtitle */}
         <div className="flex items-center gap-4">
           <span className="rounded-full border border-[#b8956a] px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8c6d3f]">

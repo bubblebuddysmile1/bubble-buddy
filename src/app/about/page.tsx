@@ -1,6 +1,5 @@
 import BestSellingProducts from '@/components/store/BestSellingProducts'
 import PromoBannerSection from '@/components/store/PromoBannerSection'
-import React from 'react'
 
 export default function AboutPage() {
   return (
