@@ -3,6 +3,7 @@ import type { CartItem } from "@/types/cart";
 const FREE_SHIPPING_THRESHOLD = 50;
 const STANDARD_SHIPPING = 4.99;
 
+
 export type CheckoutTotals = {
   subtotal: number;
   shipping: number;

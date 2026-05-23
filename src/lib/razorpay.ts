@@ -13,10 +13,12 @@ export function isMockPaymentMode(): boolean {
   return process.env.MOCK_PAYMENTS === "true" || !isRazorpayConfigured();
 }
 
+// Get the Razorpay key ID
 export function getRazorpayKeyId(): string {
   return process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? process.env.RAZORPAY_KEY_ID ?? "";
 }
 
+// Create a Razorpay client
 export function createRazorpayClient(): Razorpay {
   const keyId = process.env.RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;

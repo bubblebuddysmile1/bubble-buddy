@@ -1,5 +1,6 @@
 import BestSellingProducts from '@/components/store/BestSellingProducts'
 import PromoBannerSection from '@/components/store/PromoBannerSection'
+import OfferDiscountSection from '@/components/store/OfferDiscountSection'
 
 export default function AboutPage() {
   return (
@@ -17,8 +18,10 @@ export default function AboutPage() {
         </div>
       </div>
     
+    
         <BestSellingProducts/>
         <PromoBannerSection/>
+        <OfferDiscountSection/>
     </main>
   )
 }
