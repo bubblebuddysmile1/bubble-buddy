@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import ProfileEditForm from "@/components/profile/ProfileEditForm";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -25,6 +26,7 @@ async function getProfileData() {
       role: true,
       phone: true,
       createdAt: true,
+      _count: { select: { orders: true, favorites: true } },
       orders: {
         select: { id: true, orderNumber: true, status: true, totalAmount: true, placedAt: true },
         orderBy: { placedAt: "desc" },
@@ -93,16 +95,21 @@ export default async function ProfilePage() {
                 <p className="mt-3 text-xl font-semibold text-foreground">{createdAt}</p>
               </div>
               <div className="rounded-3xl border border-border bg-background/80 p-5 text-center">
-                <p className="text-sm text-muted-foreground">Recent orders</p>
-                <p className="mt-3 text-xl font-semibold text-foreground">{user.orders.length}</p>
+                <p className="text-sm text-muted-foreground">Total orders</p>
+                <p className="mt-3 text-xl font-semibold text-foreground">{user._count.orders}</p>
               </div>
               <div className="rounded-3xl border border-border bg-background/80 p-5 text-center">
                 <p className="text-sm text-muted-foreground">Wishlist items</p>
-                <p className="mt-3 text-xl font-semibold text-foreground">{user.favorites.length}</p>
+                <p className="mt-3 text-xl font-semibold text-foreground">{user._count.favorites}</p>
               </div>
             </div>
 
             <div className="space-y-6">
+              <ProfileEditForm
+                initialName={user.name ?? ""}
+                initialPhone={user.phone ?? ""}
+              />
+
               <div className="rounded-[1.75rem] border border-border bg-background/80 p-6">
                 <h2 className="text-xl font-semibold">Account details</h2>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -124,6 +131,42 @@ export default async function ProfilePage() {
                   </div>
                 </div>
               </div>
+
+              {user.orders.length > 0 && (
+                <div className="rounded-[1.75rem] border border-border bg-background/80 p-6">
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="text-xl font-semibold">Recent orders</h2>
+                    <Link href="/orders" className="text-sm font-semibold text-primary hover:underline">
+                      View all
+                    </Link>
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    {user.orders.map((order) => (
+                      <div
+                        key={order.id}
+                        className="flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-card p-4 shadow-sm"
+                      >
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">#{order.orderNumber}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {order.placedAt
+                              ? new Date(order.placedAt).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })
+                              : "—"}
+                          </p>
+                        </div>
+                        <div className="text-right text-sm">
+                          <p className="font-semibold text-foreground">${order.totalAmount.toString()}</p>
+                          <p className="text-muted-foreground">{order.status}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="rounded-[1.75rem] border border-border bg-background/80 p-6">
                 <h2 className="text-xl font-semibold">Quick summary</h2>
@@ -164,7 +207,7 @@ export default async function ProfilePage() {
                   user.favorites.map((favorite) => (
                     <div key={favorite.product.id} className="rounded-3xl bg-background/80 p-4">
                       <p className="text-sm font-semibold text-foreground">{favorite.product.name}</p>
-                      <p className="mt-1 text-sm text-muted-foreground">₹{favorite.product.price.toString()}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">${favorite.product.price.toString()}</p>
                     </div>
                   ))
                 ) : (

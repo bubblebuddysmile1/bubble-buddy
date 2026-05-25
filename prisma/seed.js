@@ -1,7 +1,19 @@
+const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
+  const adminPassword = await bcrypt.hash("Admin@123", 12);
+  await prisma.user.upsert({
+    where: { email: "admin@bubblebuddy.com" },
+    update: { role: "ADMIN", name: "Bubble Buddy Admin" },
+    create: {
+      email: "admin@bubblebuddy.com",
+      password: adminPassword,
+      name: "Bubble Buddy Admin",
+      role: "ADMIN",
+    },
+  });
   await prisma.promotion.upsert({
     where: { code: "WELCOME10" },
     update: {},

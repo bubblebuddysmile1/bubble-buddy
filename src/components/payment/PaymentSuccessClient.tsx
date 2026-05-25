@@ -13,6 +13,7 @@ export default function PaymentSuccessClient() {
   const [copied, setCopied] = useState(false);
 
   const orderId = searchParams.get("order_id") ?? "";
+  const orderNumber = searchParams.get("order_number") ?? "";
   const paymentId = searchParams.get("payment_id") ?? "";
   const mock = searchParams.get("mock") === "1";
 
@@ -41,13 +42,15 @@ export default function PaymentSuccessClient() {
             </span>
           )}
           Your payment was verified successfully. We will deliver to your shipping address soon.
-          {orderId && (
+          {(orderNumber || orderId) && (
             <span className="mt-4 block rounded-2xl bg-muted/60 px-4 py-3 font-mono text-xs text-foreground">
-              Order: {orderId}
+              {orderNumber && <>Order #: {orderNumber}</>}
+              {orderNumber && orderId && <br />}
+              {orderId && <>Payment ref: {orderId}</>}
               {paymentId && (
                 <>
                   <br />
-                  Payment: {paymentId}
+                  Transaction: {paymentId}
                 </>
               )}
             </span>

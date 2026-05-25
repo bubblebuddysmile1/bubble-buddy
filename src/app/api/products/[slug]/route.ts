@@ -1,7 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin-auth";
 
 type ProductWithCategoryAndImages = Prisma.ProductGetPayload<{
   include: {
@@ -45,20 +45,6 @@ function normalizeProduct(product: ProductWithCategoryAndImages) {
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
   };
-}
-
-function getAuthPayload(req: NextRequest) {
-  const token = req.cookies.get(COOKIE_NAME)?.value;
-  if (!token) return null;
-  return verifyAuthToken(token);
-}
-
-async function requireAdmin(req: NextRequest) {
-  const payload = getAuthPayload(req);
-  if (!payload || payload.role !== "ADMIN") {
-    return NextResponse.json({ error: "Admin access required." }, { status: 403 });
-  }
-  return payload;
 }
 
 export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {

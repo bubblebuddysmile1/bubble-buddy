@@ -57,11 +57,27 @@ export default function CheckoutPageClient() {
     }
   };
 
-  const verifyAndRedirect = async (payload: RazorpayHandlerResponse, mock: boolean) => {
+  const verifyAndRedirect = async (
+    payload: RazorpayHandlerResponse,
+    mock: boolean,
+    address: CheckoutAddressForm,
+  ) => {
     const verifyRes = await fetch("/api/payments/verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        ...payload,
+        address,
+        items: items.map(({ id, slug, name, price, currency, quantity, stockQuantity }) => ({
+          id,
+          slug,
+          name,
+          price,
+          currency,
+          quantity,
+          stockQuantity,
+        })),
+      }),
     });
 
     const verifyData = await verifyRes.json();
@@ -75,6 +91,7 @@ export default function CheckoutPageClient() {
       order_id: verifyData.orderId,
       payment_id: verifyData.paymentId,
     });
+    if (verifyData.orderNumber) params.set("order_number", verifyData.orderNumber);
     if (mock) params.set("mock", "1");
 
     router.push(`/payment/success?${params.toString()}`);
@@ -132,6 +149,7 @@ export default function CheckoutPageClient() {
             razorpay_signature: "mock_signature",
           },
           true,
+          result.data,
         );
         return;
       }
@@ -156,7 +174,7 @@ export default function CheckoutPageClient() {
         theme: { color: "#a67c52" },
         handler: async (response) => {
           setIsSubmitting(true);
-          await verifyAndRedirect(response, false);
+          await verifyAndRedirect(response, false, result.data);
           setIsSubmitting(false);
         },
         modal: {

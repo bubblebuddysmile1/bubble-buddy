@@ -22,6 +22,8 @@ export const verifyPaymentSchema = z.object({
   razorpay_order_id: z.string().min(1),
   razorpay_payment_id: z.string().min(1),
   razorpay_signature: z.string().min(1),
+  address: checkoutAddressSchema,
+  items: z.array(cartItemSchema).min(1, "Cart cannot be empty"),
 });
 
 export type VerifyPaymentInput = z.infer<typeof verifyPaymentSchema>;

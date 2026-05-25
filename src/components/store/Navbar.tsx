@@ -32,7 +32,9 @@ const NAV_LINKS = [
 function UserMenu() {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<{ name?: string | null; email: string } | null | undefined>(undefined);
+  const [user, setUser] = useState<
+    { name?: string | null; email: string; role?: string } | null | undefined
+  >(undefined);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -119,6 +121,15 @@ function UserMenu() {
             >
               Wishlist
             </button>
+            {user.role === "ADMIN" && (
+              <button
+                type="button"
+                onClick={() => router.push("/admin/products")}
+                className="w-full rounded-2xl px-4 py-3 text-left text-sm text-foreground transition hover:bg-muted hover:text-primary"
+              >
+                Admin · Product images
+              </button>
+            )}
             <div className="border-t border-border pt-2">
               <button
                 type="button"
