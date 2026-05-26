@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
-import Navbar from "@/components/store/Navbar";
-import Footer from "@/components/store/Footer";
+import AppChrome from "@/components/layout/AppChrome";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
@@ -22,10 +21,8 @@ export default function RootLayout({
   return (
     <html
       lang="en">
-      <body> 
-       <Navbar />
-       {children}
-       <Footer />
+      <body>
+        <AppChrome>{children}</AppChrome>
       </body>
     </html>
   );

@@ -1,19 +1,41 @@
+require("dotenv").config();
 const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { PrismaMariaDb } = require("@prisma/adapter-mariadb");
+
+const ADMIN_EMAIL = "admin@bubblebuddy.com";
+const ADMIN_PASSWORD = "Admin@chirag";
+
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL is missing. Add it to your .env file.");
+}
+
+const adapter = new PrismaMariaDb(databaseUrl);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const adminPassword = await bcrypt.hash("Admin@123", 12);
+  const adminPasswordHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
+
   await prisma.user.upsert({
-    where: { email: "admin@bubblebuddy.com" },
-    update: { role: "ADMIN", name: "Bubble Buddy Admin" },
+    where: { email: ADMIN_EMAIL },
+    update: {
+      role: "ADMIN",
+      name: "Bubble Buddy Admin",
+      password: adminPasswordHash,
+    },
     create: {
-      email: "admin@bubblebuddy.com",
-      password: adminPassword,
+      email: ADMIN_EMAIL,
+      password: adminPasswordHash,
       name: "Bubble Buddy Admin",
       role: "ADMIN",
     },
   });
+
+  console.log("Admin login:");
+  console.log(`  Email:    ${ADMIN_EMAIL}`);
+  console.log(`  Password: ${ADMIN_PASSWORD}`);
+
   await prisma.promotion.upsert({
     where: { code: "WELCOME10" },
     update: {},

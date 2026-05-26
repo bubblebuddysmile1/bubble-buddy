@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AdminHeader from "@/components/admin/AdminHeader";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminProductsPage() {
@@ -16,16 +17,13 @@ export default async function AdminProductsPage() {
   });
 
   return (
-    <main className="py-10">
-      <div className="container mx-auto px-4">
-        <div className="mb-8 rounded-[2rem] border border-border bg-card p-8 shadow-lg">
-          <h2 className="text-3xl font-bold text-foreground">Product image upload</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Select a product to upload images to Cloudinary and attach them as the thumbnail and
-            gallery.
-          </p>
-        </div>
+    <>
+      <AdminHeader
+        title="Product images"
+        description="Upload images to Cloudinary and attach them as thumbnails and gallery photos."
+      />
 
+      <div className="space-y-8 p-6">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {products.map((product) => (
             <Link
@@ -61,6 +59,6 @@ export default async function AdminProductsPage() {
           ))}
         </div>
       </div>
-    </main>
+    </>
   );
 }
