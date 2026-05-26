@@ -1,4 +1,5 @@
 import {
+  FolderTree,
   ImageIcon,
   LayoutDashboard,
   Package,
@@ -16,8 +17,9 @@ export type AdminNavItem = {
 
 export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard, exact: true },
-  { label: "Product images", href: "/admin/products", icon: ImageIcon },
-  { label: "All products", href: "/shop", icon: Package, external: true },
+  { label: "Products", href: "/admin/products", icon: Package },
+  { label: "Categories", href: "/admin/categories", icon: FolderTree },
+  { label: "Product images", href: "/admin/products/images", icon: ImageIcon },
   { label: "Orders", href: "/orders", icon: ShoppingBag, external: true },
   { label: "View store", href: "/", icon: Store, external: true },
 ];

@@ -1,63 +1,48 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import AdminHeader from "@/components/admin/AdminHeader";
+import ProductManageTable, { type AdminProductRow } from "@/components/admin/ProductManageTable";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminProductsPage() {
   const products = await prisma.product.findMany({
-    orderBy: { name: "asc" },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      sku: true,
-      thumbnail: true,
-      isActive: true,
-      _count: { select: { images: true } },
-    },
+    orderBy: { updatedAt: "desc" },
+    include: { category: { select: { name: true, slug: true } } },
   });
+
+  const rows: AdminProductRow[] = products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    sku: product.sku,
+    price: product.price.toString(),
+    stockQuantity: product.stockQuantity,
+    isActive: product.isActive,
+    featured: product.featured,
+    thumbnail: product.thumbnail,
+    category: product.category,
+  }));
 
   return (
     <>
       <AdminHeader
-        title="Product images"
-        description="Upload images to Cloudinary and attach them as thumbnails and gallery photos."
+        title="Product management"
+        description="Add, edit, and remove products from your catalog."
       />
 
-      <div className="space-y-8 p-6">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {products.map((product) => (
-            <Link
-              key={product.id}
-              href={`/admin/products/${product.slug}`}
-              className="rounded-[1.75rem] border border-border bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md"
-            >
-              <div className="flex gap-4">
-                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-muted">
-                  {product.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={product.thumbnail}
-                      alt={product.name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
-                      No image
-                    </div>
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-foreground">{product.name}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{product.sku}</p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {product._count.images} gallery image{product._count.images === 1 ? "" : "s"}
-                    {!product.isActive && " · Inactive"}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          ))}
+      <div className="space-y-6 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">{rows.length} product(s) in catalog</p>
+          <Link
+            href="/admin/products/new"
+            className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+          >
+            <Plus className="size-4" />
+            Add product
+          </Link>
         </div>
+
+        <ProductManageTable products={rows} />
       </div>
     </>
   );

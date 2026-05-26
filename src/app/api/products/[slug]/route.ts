@@ -47,8 +47,10 @@ function normalizeProduct(product: ProductWithCategoryAndImages) {
   };
 }
 
-export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
-  const slug = String(params.slug ?? "");
+type RouteContext = { params: Promise<{ slug: string }> };
+
+export async function GET(_req: NextRequest, { params }: RouteContext) {
+  const { slug } = await params;
   const product = await prisma.product.findUnique({
     where: { slug },
     include: {
@@ -64,13 +66,13 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
   return NextResponse.json({ product: normalizeProduct(product) });
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function PATCH(req: NextRequest, { params }: RouteContext) {
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) {
     return auth;
   }
 
-  const slug = String(params.slug ?? "");
+  const { slug } = await params;
   const body = await req.json();
   const updates: Record<string, unknown> = {};
 
@@ -131,13 +133,13 @@ export async function PATCH(req: NextRequest, { params }: { params: { slug: stri
   return NextResponse.json({ product: normalizeProduct(product) });
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function DELETE(req: NextRequest, { params }: RouteContext) {
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) {
     return auth;
   }
 
-  const slug = String(params.slug ?? "");
+  const { slug } = await params;
   const product = await prisma.product.findUnique({ where: { slug } });
   if (!product) {
     return NextResponse.json({ error: "Product not found." }, { status: 404 });
@@ -146,6 +148,10 @@ export async function DELETE(req: NextRequest, { params }: { params: { slug: str
   const updated = await prisma.product.update({
     where: { slug },
     data: { isActive: false },
+    include: {
+      category: { select: { id: true, name: true, slug: true } },
+      images: { orderBy: { sortOrder: "asc" } },
+    },
   });
 
   return NextResponse.json({ product: normalizeProduct(updated) });

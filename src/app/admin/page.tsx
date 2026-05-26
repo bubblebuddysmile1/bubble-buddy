@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { ImageIcon, Package, ShoppingBag, Users } from "lucide-react";
+import { FolderTree, Package, ShoppingBag, Users } from "lucide-react";
 import AdminHeader from "@/components/admin/AdminHeader";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminDashboardPage() {
-  const [productCount, orderCount, userCount, recentOrders] = await Promise.all([
+  const [productCount, orderCount, userCount, categoryCount, recentOrders] = await Promise.all([
     prisma.product.count(),
     prisma.order.count(),
     prisma.user.count(),
+    prisma.category.count(),
     prisma.order.findMany({
       orderBy: { placedAt: "desc" },
       take: 5,
@@ -23,6 +24,7 @@ export default async function AdminDashboardPage() {
 
   const stats = [
     { label: "Products", value: productCount, icon: Package, href: "/admin/products" },
+    { label: "Categories", value: categoryCount, icon: FolderTree, href: "/admin/categories" },
     { label: "Orders", value: orderCount, icon: ShoppingBag, href: "/orders" },
     { label: "Users", value: userCount, icon: Users, href: "/profile" },
   ];
@@ -97,8 +99,15 @@ export default async function AdminDashboardPage() {
                 href="/admin/products"
                 className="flex items-center gap-3 rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm font-semibold text-foreground transition hover:border-primary/40"
               >
-                <ImageIcon className="size-4 text-primary" />
-                Manage product images
+                <Package className="size-4 text-primary" />
+                Manage products
+              </Link>
+              <Link
+                href="/admin/categories"
+                className="flex items-center gap-3 rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm font-semibold text-foreground transition hover:border-primary/40"
+              >
+                <FolderTree className="size-4 text-primary" />
+                Manage categories
               </Link>
               <Link
                 href="/shop"

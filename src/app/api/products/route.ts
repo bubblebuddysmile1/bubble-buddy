@@ -43,22 +43,30 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const query = String(searchParams.get("q") ?? "").trim();
   const categorySlug = String(searchParams.get("category") ?? "").trim();
+  const adminView = searchParams.get("admin") === "1";
+
+  if (adminView) {
+    const auth = await requireAdmin(req);
+    if (auth instanceof NextResponse) {
+      return auth;
+    }
+  }
 
   const where: {
-    isActive: boolean;
+    isActive?: boolean;
     OR?: Array<{
-      name?: { contains: string; mode: "insensitive" };
-      description?: { contains: string; mode: "insensitive" };
-      sku?: { contains: string; mode: "insensitive" };
+      name?: { contains: string };
+      description?: { contains: string };
+      sku?: { contains: string };
     }>;
     category?: { slug: string };
-  } = { isActive: true };
+  } = adminView ? {} : { isActive: true };
 
   if (query) {
     where.OR = [
-      { name: { contains: query, mode: "insensitive" } },
-      { description: { contains: query, mode: "insensitive" } },
-      { sku: { contains: query, mode: "insensitive" } },
+      { name: { contains: query } },
+      { description: { contains: query } },
+      { sku: { contains: query } },
     ];
   }
 
@@ -70,7 +78,7 @@ export async function GET(req: NextRequest) {
     where,
     orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
     include: { category: { select: { id: true, name: true, slug: true } } },
-    take: 100,
+    take: adminView ? 500 : 100,
   });
 
   return NextResponse.json({ products: products.map(normalizeProduct) });

@@ -27,12 +27,12 @@ export default async function AdminProductImagesPage({ params }: PageProps) {
     <>
       <AdminHeader
         title={product.name}
-        description={`${product.category.name} · SKU ${product.sku}`}
+        description={`${product.category.name} · SKU ${product.sku} · Images`}
       />
 
       <div className="mx-auto max-w-4xl space-y-6 p-6">
         <Link href="/admin/products" className="text-sm font-semibold text-primary hover:underline">
-          ← All products
+          ← Back to products
         </Link>
 
         <ProductImageUpload
