@@ -130,7 +130,7 @@ export default function CheckoutAddressForm({
         type="submit"
         size="lg"
         disabled={isSubmitting}
-        className="w-full rounded-full sm:w-auto sm:min-w-[220px]"
+        className="w-full rounded-full sm:w-auto sm:min-w-55"
       >
         {isSubmitting ? "Processing…" : submitLabel}
       </Button>

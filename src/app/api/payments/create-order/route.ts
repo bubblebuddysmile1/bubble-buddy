@@ -8,6 +8,8 @@ import {
   toSmallestCurrencyUnit,
 } from "@/lib/razorpay";
 import { createPaymentOrderSchema } from "@/lib/validations/payment";
+import { prisma } from "@/lib/prisma";
+import { getPromotionByCode, getPromotionDiscountAmount, isPromotionActive } from "@/lib/promotions";
 import type { CartItem } from "@/types/cart";
 
 export async function POST(request: Request) {
@@ -22,13 +24,60 @@ export async function POST(request: Request) {
       );
     }
 
-    const { address, items } = parsed.data;
+    const { address, items, couponCode } = parsed.data;
     const cartItems: CartItem[] = items.map((item) => ({
       ...item,
       image: "",
       category: undefined,
     }));
-    const totals = getCheckoutTotals(cartItems);
+
+    const products = await prisma.product.findMany({
+      where: { id: { in: items.map((item) => item.id) } },
+      select: { id: true, stockQuantity: true },
+    });
+    const productById = new Map(products.map((product) => [product.id, product]));
+
+    for (const item of items) {
+      const product = productById.get(item.id);
+      if (!product) {
+        return NextResponse.json({ error: `Product ${item.name} is no longer available.` }, { status: 400 });
+      }
+      if (product.stockQuantity < item.quantity) {
+        return NextResponse.json(
+          {
+            error: `Insufficient stock for ${item.name}. Only ${product.stockQuantity} left.`,
+          },
+          { status: 400 },
+        );
+      }
+    }
+
+    let promotion;
+    if (couponCode) {
+      promotion = await getPromotionByCode(couponCode);
+      if (!promotion || !isPromotionActive(promotion)) {
+        return NextResponse.json({ error: "Coupon code is invalid or expired." }, { status: 400 });
+      }
+
+      const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const discount = getPromotionDiscountAmount(promotion, subtotal);
+      if (discount <= 0) {
+        return NextResponse.json(
+          {
+            error: "Coupon cannot be applied to this order.",
+            message: `Spend ${Number(promotion.minOrderAmount).toFixed(2)} or more to use this coupon.`,
+          },
+          { status: 400 },
+        );
+      }
+    }
+
+    const totals = getCheckoutTotals(cartItems, promotion && {
+      discountType: promotion.discountType,
+      discountValue: Number(promotion.discountValue),
+      minOrderAmount: Number(promotion.minOrderAmount),
+    });
+
     const currency = getPaymentCurrency(totals.currency);
     const amount = toSmallestCurrencyUnit(totals.total);
     const receipt = `bb_${Date.now()}`;

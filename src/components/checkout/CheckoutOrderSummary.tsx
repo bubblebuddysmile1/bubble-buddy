@@ -13,7 +13,7 @@ type CheckoutOrderSummaryProps = {
 };
 
 export default function CheckoutOrderSummary({ items, totals }: CheckoutOrderSummaryProps) {
-  const { subtotal, shipping, total, currency, itemCount } = totals;
+  const { subtotal, discount, shipping, total, currency, itemCount } = totals;
 
   return (
     <aside className="checkout-summary-enter lg:sticky lg:top-24">
@@ -54,15 +54,21 @@ export default function CheckoutOrderSummary({ items, totals }: CheckoutOrderSum
             <span className="text-muted-foreground">Subtotal</span>
             <span className="font-medium">{formatCartMoney(subtotal, currency)}</span>
           </div>
+          {discount > 0 && (
+            <div className="flex justify-between text-sm text-emerald-700">
+              <span className="text-muted-foreground">Coupon discount</span>
+              <span className="font-medium">-{formatCartMoney(discount, currency)}</span>
+            </div>
+          )}
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Shipping</span>
             <span className="font-medium">
               {shipping === 0 ? "Free" : formatCartMoney(shipping, currency)}
             </span>
           </div>
-          {subtotal > 0 && subtotal < 50 && (
+          {subtotal > 0 && subtotal - discount < 50 && (
             <p className="rounded-2xl bg-primary/10 px-3 py-2 text-xs text-primary">
-              Add {formatCartMoney(50 - subtotal, currency)} more on future orders for free shipping
+              Add {formatCartMoney(50 - Math.max(0, subtotal - discount), currency)} more on future orders for free shipping
             </p>
           )}
           <div className="flex items-end justify-between border-t border-border pt-4">

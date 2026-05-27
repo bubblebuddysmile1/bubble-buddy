@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { getCheckoutTotals } from "@/lib/checkout";
+import { getPromotionByCode, getPromotionDiscountAmount, isPromotionActive } from "@/lib/promotions";
 import { prisma } from "@/lib/prisma";
 import type { AuthTokenPayload } from "@/lib/auth";
 import type { CheckoutAddressForm } from "@/lib/validations/checkout";
@@ -11,6 +12,7 @@ export type PersistOrderInput = {
   address: CheckoutAddressForm;
   items: CreatePaymentOrderInput["items"];
   user?: AuthTokenPayload | null;
+  couponCode?: string;
 };
 
 export function orderNumberFromRazorpay(razorpayOrderId: string): string {
@@ -35,15 +37,36 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
     image: "",
     category: undefined,
   }));
-  const totals = getCheckoutTotals(cartItems);
 
-  const products = await prisma.product.findMany({
+  let promotion;
+  if (input.couponCode) {
+    promotion = await getPromotionByCode(input.couponCode);
+    if (!promotion || !isPromotionActive(promotion)) {
+      throw new Error("Invalid coupon code.");
+    }
+
+    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const discount = getPromotionDiscountAmount(promotion, subtotal);
+    if (discount <= 0) {
+      throw new Error("Coupon code is not eligible for this order.");
+    }
+  }
+
+  const totals = getCheckoutTotals(cartItems, promotion && {
+    discountType: promotion.discountType,
+    discountValue: Number(promotion.discountValue),
+    minOrderAmount: Number(promotion.minOrderAmount),
+  });
+
+  const products = (await prisma.product.findMany({
     where: { id: { in: input.items.map((item) => item.id) } },
     select: { id: true, sku: true },
-  });
-  const productById = new Map(products.map((product) => [product.id, product]));
+  })) as Array<{ id: number; sku: string }>;
+  const productById = new Map<number, { id: number; sku: string }>(
+    products.map((product) => [product.id, product] as const),
+  );
 
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     let shippingAddressId: number | undefined;
     let billingAddressId: number | undefined;
 
@@ -75,7 +98,7 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
         totalAmount: new Prisma.Decimal(totals.total),
         shippingAmount: new Prisma.Decimal(totals.shipping),
         taxAmount: new Prisma.Decimal(0),
-        discountAmount: new Prisma.Decimal(0),
+        discountAmount: new Prisma.Decimal(totals.discount),
         shippingAddressId,
         billingAddressId,
         placedAt: new Date(),

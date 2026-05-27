@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CreditCard, ShoppingBag } from "lucide-react";
 import CheckoutAddressForm from "@/components/checkout/CheckoutAddressForm";
 import CheckoutOrderSummary from "@/components/checkout/CheckoutOrderSummary";
 import { getCheckoutTotals } from "@/lib/checkout";
+import { formatCartMoney } from "@/lib/cart";
 import { loadRazorpayScript, openRazorpayCheckout } from "@/lib/razorpay-client";
 import {
   checkoutAddressDefaultValues,
@@ -26,6 +27,15 @@ type CreateOrderResponse = {
   error?: string;
 };
 
+type AppliedPromotion = {
+  code: string;
+  title: string;
+  discount: number;
+  discountType: string;
+  discountValue: number;
+  minOrderAmount: number;
+};
+
 export default function CheckoutPageClient() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
@@ -34,6 +44,11 @@ export default function CheckoutPageClient() {
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutAddressForm, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMode, setPaymentMode] = useState<"mock" | "razorpay" | null>(null);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [appliedPromotion, setAppliedPromotion] = useState<AppliedPromotion | null>(null);
 
   useEffect(() => setMounted(true), []);
 
@@ -44,7 +59,19 @@ export default function CheckoutPageClient() {
     }
   }, [mounted, items.length, router]);
 
-  const totals = getCheckoutTotals(items);
+  const totals = useMemo(
+    () =>
+      getCheckoutTotals(items,
+        appliedPromotion
+          ? {
+              discountType: appliedPromotion.discountType as "PERCENTAGE" | "FIXED",
+              discountValue: appliedPromotion.discountValue,
+              minOrderAmount: appliedPromotion.minOrderAmount,
+            }
+          : undefined,
+      ),
+    [items, appliedPromotion],
+  );
 
   const handleChange = (field: keyof CheckoutAddressForm, value: string) => {
     setValues((prev) => ({ ...prev, [field]: value }));
@@ -77,6 +104,7 @@ export default function CheckoutPageClient() {
           quantity,
           stockQuantity,
         })),
+        couponCode: appliedPromotion?.code,
       }),
     });
 
@@ -95,6 +123,61 @@ export default function CheckoutPageClient() {
     if (mock) params.set("mock", "1");
 
     router.push(`/payment/success?${params.toString()}`);
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError("Enter a coupon code to apply.");
+      setCouponSuccess(null);
+      setAppliedPromotion(null);
+      return;
+    }
+
+    setCouponError(null);
+    setCouponSuccess(null);
+    setIsApplyingCoupon(true);
+
+    try {
+      const response = await fetch("/api/promotions/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: couponCode,
+          items: items.map(({ id, slug, name, price, currency, quantity, stockQuantity }) => ({
+            id,
+            slug,
+            name,
+            price,
+            currency,
+            quantity,
+            stockQuantity,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setCouponError(data.message ?? data.error ?? "Unable to apply coupon.");
+        setAppliedPromotion(null);
+        return;
+      }
+
+      setAppliedPromotion({
+        code: data.code,
+        title: data.title,
+        discount: data.discount,
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+        minOrderAmount: data.minOrderAmount,
+      });
+      setCouponSuccess(`Coupon applied: ${data.code}`);
+      setCouponError(null);
+    } catch {
+      setCouponError("Unable to apply coupon. Please try again.");
+      setAppliedPromotion(null);
+    } finally {
+      setIsApplyingCoupon(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -128,6 +211,7 @@ export default function CheckoutPageClient() {
             quantity,
             stockQuantity,
           })),
+          couponCode: appliedPromotion?.code,
         }),
       });
 
@@ -229,7 +313,48 @@ export default function CheckoutPageClient() {
           isSubmitting={isSubmitting}
           submitLabel="Pay securely"
         />
-        <CheckoutOrderSummary items={items} totals={totals} />
+        <div className="space-y-4">
+          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.28em] text-primary">Coupon code</p>
+                <h2 className="mt-2 text-lg font-semibold text-foreground">Unlock extra savings</h2>
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+              <input
+                type="text"
+                value={couponCode}
+                onChange={(event) => {
+                  setCouponCode(event.target.value);
+                  setCouponError(null);
+                  setCouponSuccess(null);
+                  if (appliedPromotion && event.target.value.trim().toUpperCase() !== appliedPromotion.code) {
+                    setAppliedPromotion(null);
+                  }
+                }}
+                placeholder="Enter your coupon"
+                className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
+              />
+              <button
+                type="button"
+                onClick={handleApplyCoupon}
+                disabled={isApplyingCoupon}
+                className="inline-flex h-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-background transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isApplyingCoupon ? "Applying…" : "Apply"}
+              </button>
+            </div>
+            {couponError && <p className="mt-3 text-sm text-destructive">{couponError}</p>}
+            {couponSuccess && <p className="mt-3 text-sm text-emerald-700">{couponSuccess}</p>}
+            {appliedPromotion && (
+              <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                {appliedPromotion.title} — saved {appliedPromotion.discountType === "PERCENTAGE" ? `${appliedPromotion.discountValue}%` : formatCartMoney(appliedPromotion.discountValue, totals.currency)} off.
+              </div>
+            )}
+          </section>
+          <CheckoutOrderSummary items={items} totals={totals} />
+        </div>
       </div>
 
       <p className="text-center text-xs text-muted-foreground">

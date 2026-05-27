@@ -15,8 +15,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid payment verification payload." }, { status: 400 });
     }
 
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, address, items } =
-      parsed.data;
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      address,
+      items,
+      couponCode,
+    } = parsed.data;
 
     if (isMockPaymentMode()) {
       if (!razorpay_order_id.startsWith("order_mock_")) {
@@ -47,6 +53,7 @@ export async function POST(request: Request) {
       address,
       items,
       user,
+      couponCode,
     });
 
     return NextResponse.json({

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { checkoutAddressSchema } from "@/lib/validations/checkout";
 
-const cartItemSchema = z.object({
+export const cartItemSchema = z.object({
   id: z.number(),
   slug: z.string(),
   name: z.string(),
@@ -14,6 +14,7 @@ const cartItemSchema = z.object({
 export const createPaymentOrderSchema = z.object({
   address: checkoutAddressSchema,
   items: z.array(cartItemSchema).min(1, "Cart cannot be empty"),
+  couponCode: z.string().trim().optional(),
 });
 
 export type CreatePaymentOrderInput = z.infer<typeof createPaymentOrderSchema>;
@@ -24,6 +25,7 @@ export const verifyPaymentSchema = z.object({
   razorpay_signature: z.string().min(1),
   address: checkoutAddressSchema,
   items: z.array(cartItemSchema).min(1, "Cart cannot be empty"),
+  couponCode: z.string().trim().optional(),
 });
 
 export type VerifyPaymentInput = z.infer<typeof verifyPaymentSchema>;
