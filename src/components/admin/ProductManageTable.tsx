@@ -68,7 +68,7 @@ export default function ProductManageTable({ products }: ProductManageTableProps
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       <div className="overflow-x-auto rounded-[2rem] border border-border bg-card shadow-lg">
-        <table className="w-full min-w-[720px] text-left text-sm">
+        <table className="w-full min-w-180 text-left text-sm">
           <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-5 py-4">Product</th>

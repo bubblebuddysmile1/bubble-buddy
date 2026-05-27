@@ -26,8 +26,8 @@ export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps)
   return (
     <aside
       className={cn(
-        "flex h-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200",
-        collapsed ? "w-[4.5rem]" : "w-64",
+        "flex h-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-width duration-200",
+        collapsed ? "w-18" : "w-64",
       )}
     >
       <div className="flex items-center justify-between gap-2 border-b border-sidebar-border px-4 py-5">

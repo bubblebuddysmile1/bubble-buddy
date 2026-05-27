@@ -25,8 +25,8 @@ export default async function AdminDashboardPage() {
   const stats = [
     { label: "Products", value: productCount, icon: Package, href: "/admin/products" },
     { label: "Categories", value: categoryCount, icon: FolderTree, href: "/admin/categories" },
-    { label: "Orders", value: orderCount, icon: ShoppingBag, href: "/orders" },
-    { label: "Users", value: userCount, icon: Users, href: "/profile" },
+    { label: "Orders", value: orderCount, icon: ShoppingBag, href: "/admin/orders" },
+    { label: "Customers", value: userCount, icon: Users, href: "/admin/customers" },
   ];
 
   return (
@@ -64,7 +64,7 @@ export default async function AdminDashboardPage() {
           <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-xl font-semibold text-foreground">Recent orders</h2>
-              <Link href="/orders" className="text-sm font-semibold text-primary hover:underline">
+              <Link href="/admin/orders" className="text-sm font-semibold text-primary hover:underline">
                 View all
               </Link>
             </div>
