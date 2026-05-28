@@ -1,38 +1,53 @@
 'use client';
-import Image from "next/image";
-import Link from "next/link";
 
-const offerCards = [
-  {
-    id: 1,
-    title: "Up to 80% off | Latest collections from Indian designs",
-    badge: "Trending",
-    images: ["/category/1.jpg", "/category/2.jpg"],
-  },
-  {
-    id: 2,
-    title: "Up to 75% off | Curated products for small business",
-    badge: "Home Decor",
-    images: ["/slider/1.jpg", "/slider/2.jpg"],
-  },
-  {
-    id: 3,
-    title: "One stop shop for all your wedding shopping",
-    badge: "Wedding Sale",
-    actions: [
-      { label: "Shop for her", image: "/slider/2.jpg" },
-      { label: "Shop for him", image: "/slider/3.jpg" },
-    ],
-  },
-  {
-    id: 4,
-    title: "Best Sellers in Clothing & Accessories",
-    badge: "Best Seller",
-    images: ["/category/2.jpg", "/category/4.jpg",],
-  },
-];
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+export type ActivePromotion = {
+  id: number;
+  code: string;
+  title: string;
+  description: string | null;
+  discountType: "PERCENTAGE" | "FIXED";
+  discountValue: number;
+  minOrderAmount: number;
+  activeFrom: string | null;
+  activeUntil: string | null;
+  isActive: boolean;
+};
 
 export default function OfferDiscountSection() {
+  const [promotions, setPromotions] = useState<ActivePromotion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadPromotions() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch("/api/promotions?active=1&limit=4");
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error ?? "Unable to load offers.");
+          setPromotions([]);
+          return;
+        }
+
+        setPromotions(data.promotions ?? []);
+      } catch {
+        setError("Unable to load offers.");
+        setPromotions([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadPromotions();
+  }, []);
+
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
@@ -42,62 +57,78 @@ export default function OfferDiscountSection() {
             Explore limited-time deals across categories
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Find the latest drop, wedding essentials, fashion favorites, and curated home décor offers in one place.
+            Promotion cards now reflect active coupon offers configured from the admin panel.
           </p>
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-4">
-          {offerCards.map((card) => (
-            <article
-              key={card.id}
-              className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-lg shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
-            >
-              <div className="mb-5 flex items-center justify-between gap-3">
-                <div className="text-sm font-bold leading-tight text-foreground">{card.title}</div>
-                <span className="rounded-full border border-border bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.32em] text-primary">
-                  {card.badge}
-                </span>
-              </div>
+        {error ? (
+          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-destructive">
+            {error}
+          </div>
+        ) : loading ? (
+          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            Loading offers...
+          </div>
+        ) : promotions.length === 0 ? (
+          <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            No active promotions available yet. Add coupons in admin to populate this section.
+          </div>
+        ) : (
+          <div className="grid gap-6 xl:grid-cols-4">
+            {promotions.map((promotion) => {
+              const badge = promotion.discountType === "PERCENTAGE"
+                ? `${promotion.discountValue}% off`
+                : `₹${promotion.discountValue} off`;
+              const activeRange = promotion.activeFrom || promotion.activeUntil
+                ? `Valid ${promotion.activeFrom ? promotion.activeFrom.slice(0, 10) : "now"} to ${promotion.activeUntil ? promotion.activeUntil.slice(0, 10) : "end"}`
+                : "Ongoing offer";
 
-              {card.images ? (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {card.images.map((image, index) => (
-                    <div key={index} className="relative overflow-hidden rounded-[1.5rem] bg-muted h-32">
-                      <Image
-                        src={image}
-                        alt={`${card.title} image ${index + 1}`}
-                        fill
-                        className="object-cover transition duration-500 hover:scale-105"
-                      />
-                      {/* <div className="absolute inset-0 bg-linear-to-b from-transparent to-card/70" /> */}
+              return (
+                <article
+                  key={promotion.id}
+                  className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-lg shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                >
+                  <div className="mb-5 flex items-center justify-between gap-3">
+                    <div className="text-sm font-bold leading-tight text-foreground">{promotion.title}</div>
+                    <span className="rounded-full border border-border bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.32em] text-primary">
+                      {promotion.code}
+                    </span>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="rounded-[1.5rem] border border-border bg-muted p-5">
+                      <p className="text-sm text-muted-foreground">
+                        {promotion.description ?? "Use this coupon for instant savings on your order."}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {card.actions.map((action) => (
-                    <Link
-                      key={action.label}
-                      href="/shop"
-                      className="group overflow-hidden rounded-[1.5rem] border border-border bg-muted p-3 text-left transition duration-300 hover:-translate-y-0.5 hover:bg-primary/5"
-                    >
-                      <div className="relative mb-3 h-24 overflow-hidden rounded-[1.5rem] bg-muted">
-                        <Image
-                          src={action.image}
-                          alt={action.label}
-                          fill
-                          className="object-cover transition duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-linear-to-b from-transparent to-card/70" />
-                      </div>
-                      <p className="text-sm font-semibold text-foreground">{action.label}</p>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </article>
-          ))}
-        </div>
+
+                    <div className="rounded-[1.5rem] border border-border bg-background p-5">
+                      <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Offer</p>
+                      <p className="mt-2 text-xl font-semibold text-foreground">{badge}</p>
+                      {promotion.minOrderAmount > 0 && (
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          Minimum order ₹{promotion.minOrderAmount.toFixed(2)}
+                        </p>
+                      )}
+                      <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                        {activeRange}
+                      </p>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <Link
+                        href="/shop"
+                        className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                      >
+                        Use offer
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

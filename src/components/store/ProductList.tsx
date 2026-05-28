@@ -1,122 +1,147 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-const productList = [
-  {
-    id: 1,
-    name: "Radiant Glow Serum",
-    price: "₹1,299",
-    tagline: "Brightening formula with vitamin C.",
-    image: "/category/1.jpg",
-    link: "/shop",
-  },
-  {
-    id: 2,
-    name: "Silk Repair Shampoo",
-    price: "₹899",
-    tagline: "Nourishing shampoo for soft, shiny hair.",
-    image: "/category/2.jpg",
-    link: "/shop",
-  },
-  {
-    id: 3,
-    name: "Glow Matte Foundation",
-    price: "₹1,499",
-    tagline: "Buildable coverage with natural finish.",
-    image: "/category/3.jpg",
-    link: "/shop",
-  },
-  {
-    id: 4,
-    name: "Velvet Parfum Mist",
-    price: "₹1,999",
-    tagline: "Warm scent with floral and amber notes.",
-    image: "/category/4.jpg",
-    link: "/shop",
-  },
-  {
-    id: 5,
-    name: "Nourishing Body Butter",
-    price: "₹890",
-    tagline: "Ultra-hydrating cream for silky skin.",
-    image: "/category/2.jpg",
-    link: "/shop",
-  },
-  {
-    id: 6,
-    name: "Rose Petal Toner",
-    price: "₹720",
-    tagline: "Refresh and soothe with rose water.",
-    image: "/category/1.jpg",
-    link: "/shop",
-  },
-  {
-    id: 7,
-    name: "Herbal Lip Balm",
-    price: "₹399",
-    tagline: "Soft, protected lips with natural oils.",
-    image: "/category/3.jpg",
-    link: "/shop",
-  },
-  {
-    id: 8,
-    name: "Coconut Glow Mask",
-    price: "₹1,150",
-    tagline: "Deep hydration and instant radiance.",
-    image: "/category/4.jpg",
-    link: "/shop",
-  },
-];
+import AddToCartButton from "@/components/cart/AddToCartButton";
+import { toCartProduct } from "@/lib/cart";
+import type { CartProduct } from "@/types/cart";
+
+type ProductListItem = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  price: string | null;
+  currency: string;
+  stockQuantity: number;
+  thumbnail: string | null;
+  category: { name: string; slug: string } | null;
+};
 
 export default function ProductList() {
+  const [products, setProducts] = useState<ProductListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+
+  useEffect(() => {
+    async function loadProducts() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch("/api/products?limit=9");
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error ?? "Unable to load products.");
+          setProducts([]);
+          setHasMore(false);
+          return;
+        }
+
+        const allProducts = (data.products ?? []) as ProductListItem[];
+        setHasMore(allProducts.length > 8);
+        setProducts(allProducts.slice(0, 8));
+      } catch {
+        setError("Unable to load products.");
+        setProducts([]);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProducts();
+  }, []);
+
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="mb-10 flex flex-col items-center gap-4 text-center">
           <p className="text-xs uppercase tracking-[0.32em] text-primary">Product List</p>
           <h2 className="text-3xl font-semibold text-foreground sm:text-4xl">
-            Browse our full product catalog
+            Browse our product collection
           </h2>
           <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
-            Find the right beauty essentials with clean descriptions, pricing, and easy buy buttons.
+            Explore products dynamically pulled from the store. Add items to cart directly or visit the shop for the full catalog.
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {productList.map((product) => (
-            <article
-              key={product.id}
-              className="group overflow-hidden rounded-[2rem] border border-border bg-card p-4 shadow-lg shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
-            >
-              <div className="relative overflow-hidden rounded-[1.75rem] bg-muted">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  width={360}
-                  height={360}
-                  className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
-                />
-              </div>
+        {error ? (
+          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-destructive">
+            {error}
+          </div>
+        ) : loading ? (
+          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            Loading products...
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+              {products.map((product) => {
+                const cartProduct: CartProduct = toCartProduct({
+                  id: product.id,
+                  slug: product.slug,
+                  name: product.name,
+                  price: product.price ?? "0",
+                  currency: product.currency,
+                  thumbnail: product.thumbnail ?? null,
+                  stockQuantity: product.stockQuantity,
+                  category: product.category,
+                });
 
-              <div className="mt-4 space-y-3">
-                <div>
-                  <h3 className="mt-2 text-lg font-semibold text-foreground">{product.name}</h3>
-                </div>
-                <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">{product.tagline}</p>
-              </div>
+                return (
+                  <article
+                    key={product.id}
+                    className="group overflow-hidden rounded-[2rem] border border-border bg-card p-4 shadow-lg shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                  >
+                    <div className="relative overflow-hidden rounded-[1.75rem] bg-muted">
+                      <Link href={`/shop/${product.slug}`} className="block h-52 w-full">
+                        <Image
+                          src={product.thumbnail ?? "/category/1.jpg"}
+                          alt={product.name}
+                          width={360}
+                          height={360}
+                          className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
+                        />
+                      </Link>
+                    </div>
 
-              <div className="mt-5 flex items-center justify-between gap-3">
-                <p className="text-lg font-bold text-foreground">{product.price}</p>
+                    <div className="mt-4 space-y-3">
+                      <div>
+                        <Link href={`/shop/${product.slug}`} className="hover:text-primary">
+                          <h3 className="mt-2 text-lg font-semibold text-foreground">{product.name}</h3>
+                        </Link>
+                      </div>
+                      {/* <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">
+                        {product.description}
+                      </p> */}
+                    </div>
+
+                    <div className="mt-5 flex items-center justify-between gap-3">
+                      <p className="text-lg font-bold text-foreground">{product.price ?? "₹0"}</p>
+                      <AddToCartButton product={cartProduct} size="sm" label="Add" />
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+
+            {hasMore && (
+              <div className="mt-10 flex justify-center">
                 <Link
-                  href={product.link}
-                  className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                  href="/shop"
+                  className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
                 >
-                  Add
+                  View all products
                 </Link>
               </div>
-            </article>
-          ))}
-        </div>
+            )}
+          </>
+        )}
       </div>
     </section>
   );
