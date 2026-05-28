@@ -223,7 +223,7 @@ export default function ProductForm({
             onChange={(e) => updateField("featured", e.target.checked)}
             className="size-4 rounded border-border"
           />
-          Featured product
+          Best seller product
         </label>
         <label className="inline-flex items-center gap-2">
           <input

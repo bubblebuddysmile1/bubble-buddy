@@ -43,6 +43,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const query = String(searchParams.get("q") ?? "").trim();
   const categorySlug = String(searchParams.get("category") ?? "").trim();
+  const featuredOnly = String(searchParams.get("featured") ?? "").trim() === "1";
   const adminView = searchParams.get("admin") === "1";
   const sort = String(searchParams.get("sort") ?? "featured");
   const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
@@ -57,6 +58,7 @@ export async function GET(req: NextRequest) {
 
   const where: {
     isActive?: boolean;
+    featured?: boolean;
     OR?: Array<{
       name?: { contains: string };
       description?: { contains: string };
@@ -75,6 +77,10 @@ export async function GET(req: NextRequest) {
 
   if (categorySlug) {
     where.category = { slug: categorySlug };
+  }
+
+  if (featuredOnly) {
+    where.featured = true;
   }
 
   const total = await prisma.product.count({ where });

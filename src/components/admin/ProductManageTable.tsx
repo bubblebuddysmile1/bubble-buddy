@@ -117,7 +117,7 @@ export default function ProductManageTable({ products }: ProductManageTableProps
                   </span>
                   {product.featured && (
                     <span className="ml-2 inline-flex rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
-                      Featured
+                      Best seller
                     </span>
                   )}
                 </td>
