@@ -1,55 +1,100 @@
 'use client';
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/pagination";
 
-const categories = [
+type CategoryCard = {
+  id: number;
+  title: string;
+  image: string;
+  slug: string;
+  link: string;
+};
+
+const defaultCategories: CategoryCard[] = [
   {
     id: 1,
     title: "Skin Care",
     image: "/category/1.jpg",
-    link: "#",
+    slug: "skincare",
+    link: "/shop?category=skincare",
   },
-
   {
     id: 2,
     title: "Hair Care",
     image: "/category/2.jpg",
-    link: "#",
+    slug: "haircare",
+    link: "/shop?category=haircare",
   },
-
   {
     id: 3,
     title: "Face Care",
     image: "/category/3.jpg",
-    link: "#",
+    slug: "face-care",
+    link: "/shop?category=face-care",
   },
-
   {
     id: 4,
     title: "Beauty Products",
     image: "/category/4.jpg",
-    link: "#",
-  },
-   {
-    id: 5,
-    title: "Parfum",
-    image: "/category/2.jpg",
-    link: "#",
+    slug: "beauty",
+    link: "/shop?category=beauty",
   },
   {
-    id: 6,
-    title: "Skin Care",
-    image: "/category/1.jpg",
-    link: "#",
+    id: 5,
+    title: "Perfume",
+    image: "/category/2.jpg",
+    slug: "perfume",
+    link: "/shop?category=perfume",
   },
 ];
 
+const fallbackImages = ["/category/1.jpg", "/category/2.jpg", "/category/3.jpg", "/category/4.jpg"];
+
+type ApiCategory = {
+  id: number;
+  name: string;
+  slug: string;
+  image: string | null;
+};
+
 export default function CategoriesSection() {
+  const [categories, setCategories] = useState<CategoryCard[]>(defaultCategories);
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const response = await fetch("/api/categories", { cache: "no-store" });
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (!Array.isArray(data.categories)) return;
+
+        const categoriesData = data.categories as ApiCategory[];
+        const items = categoriesData.map((category, index) => ({
+          id: category.id,
+          title: category.name,
+          image: category.image || fallbackImages[index % fallbackImages.length],
+          slug: category.slug,
+          link: `/shop?category=${encodeURIComponent(category.slug)}`,
+        }));
+
+        if (items.length > 0) {
+          setCategories(items);
+        }
+      } catch (error) {
+        console.error("Failed to load categories", error);
+      }
+    }
+
+    loadCategories();
+  }, []);
+
   return (
     <section className="py-4 bg-background">
 

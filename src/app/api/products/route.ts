@@ -44,6 +44,9 @@ export async function GET(req: NextRequest) {
   const query = String(searchParams.get("q") ?? "").trim();
   const categorySlug = String(searchParams.get("category") ?? "").trim();
   const adminView = searchParams.get("admin") === "1";
+  const sort = String(searchParams.get("sort") ?? "featured");
+  const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
+  const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit") ?? "12")));
 
   if (adminView) {
     const auth = await requireAdmin(req);
@@ -74,14 +77,39 @@ export async function GET(req: NextRequest) {
     where.category = { slug: categorySlug };
   }
 
-  const products = await prisma.product.findMany({
+  const total = await prisma.product.count({ where });
+
+  const allProducts = await prisma.product.findMany({
     where,
-    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
     include: { category: { select: { id: true, name: true, slug: true } } },
-    take: adminView ? 500 : 100,
+    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    take: adminView ? 500 : 500,
   });
 
-  return NextResponse.json({ products: products.map(normalizeProduct) });
+  const sortedProducts = (() => {
+    if (sort === "price_asc" || sort === "price_desc") {
+      return allProducts.slice().sort((a, b) => {
+        const aPrice = Number(a.price ?? "0");
+        const bPrice = Number(b.price ?? "0");
+        return sort === "price_asc" ? aPrice - bPrice : bPrice - aPrice;
+      });
+    }
+
+    if (sort === "newest") {
+      return allProducts.slice().sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    }
+
+    return allProducts;
+  })();
+
+  const pagedProducts = sortedProducts.slice((page - 1) * limit, page * limit);
+
+  return NextResponse.json({
+    products: pagedProducts.map(normalizeProduct),
+    total,
+    page,
+    perPage: limit,
+  });
 }
 
 export async function POST(req: NextRequest) {
