@@ -14,6 +14,7 @@ type Category = {
   description: string | null;
   image: string | null;
   isActive: boolean;
+  showInBanner: boolean;
   productCount: number;
 };
 
@@ -23,6 +24,7 @@ type FormState = {
   description: string;
   image: string;
   isActive: boolean;
+  showInBanner: boolean;
 };
 
 const emptyForm: FormState = {
@@ -31,6 +33,7 @@ const emptyForm: FormState = {
   description: "",
   image: "",
   isActive: true,
+  showInBanner: false,
 };
 
 export default function CategoryManager() {
@@ -76,6 +79,7 @@ export default function CategoryManager() {
       description: category.description ?? "",
       image: category.image ?? "",
       isActive: category.isActive,
+      showInBanner: Boolean(category.showInBanner),
     });
     setError(null);
     setSuccess(null);
@@ -93,6 +97,7 @@ export default function CategoryManager() {
       description: form.description.trim() || null,
       image: form.image.trim() || null,
       isActive: form.isActive,
+      showInBanner: Boolean(form.showInBanner),
     };
 
     try {
@@ -226,11 +231,20 @@ export default function CategoryManager() {
         <label className="inline-flex items-center gap-2 text-sm">
           <input
             type="checkbox"
-            checked={form.isActive}
+            checked={Boolean(form.isActive)}
             onChange={(e) => setForm((prev) => ({ ...prev, isActive: e.target.checked }))}
             className="size-4 rounded border-border"
           />
           Active category
+        </label>
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={Boolean(form.showInBanner)}
+            onChange={(e) => setForm((prev) => ({ ...prev, showInBanner: e.target.checked }))}
+            className="size-4 rounded border-border"
+          />
+          Show in promo banners
         </label>
 
         {error && <p className="text-sm text-destructive">{error}</p>}
@@ -266,6 +280,7 @@ export default function CategoryManager() {
                   <p className="text-xs text-muted-foreground">
                     {category.slug} · {category.productCount} product(s)
                     {!category.isActive && " · Inactive"}
+                    {category.showInBanner && " · Promo banner"}
                   </p>
                 </div>
                 <div className="flex gap-2">

@@ -9,6 +9,7 @@ function normalizeCategory(category: {
   description: string | null;
   image: string | null;
   isActive: boolean;
+  showInBanner: boolean;
   _count?: { products: number };
 }) {
   return {
@@ -18,6 +19,7 @@ function normalizeCategory(category: {
     description: category.description,
     image: category.image,
     isActive: category.isActive,
+    showInBanner: category.showInBanner,
     productCount: category._count?.products ?? 0,
   };
 }
@@ -54,6 +56,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   if (body.description !== undefined) updates.description = body.description ? String(body.description).trim() : null;
   if (body.image !== undefined) updates.image = body.image ? String(body.image).trim() : null;
   if (body.isActive !== undefined) updates.isActive = Boolean(body.isActive);
+  if (body.showInBanner !== undefined) updates.showInBanner = Boolean(body.showInBanner);
 
   const existing = await prisma.category.findUnique({ where: { slug } });
   if (!existing) {

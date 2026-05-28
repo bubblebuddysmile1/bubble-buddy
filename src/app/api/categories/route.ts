@@ -10,6 +10,7 @@ function normalizeCategory(category: {
   description: string | null;
   image: string | null;
   isActive: boolean;
+  showInBanner: boolean;
   _count?: { products: number };
 }) {
   return {
@@ -19,6 +20,7 @@ function normalizeCategory(category: {
     description: category.description,
     image: category.image,
     isActive: category.isActive,
+    showInBanner: category.showInBanner,
     productCount: category._count?.products ?? 0,
   };
 }
@@ -48,6 +50,7 @@ export async function POST(req: NextRequest) {
   const description = body?.description ? String(body.description).trim() : null;
   const image = body?.image ? String(body.image).trim() : null;
   const isActive = body?.isActive !== undefined ? Boolean(body.isActive) : true;
+  const showInBanner = body?.showInBanner !== undefined ? Boolean(body.showInBanner) : false;
 
   if (!name || !slug) {
     return NextResponse.json({ error: "Category name and slug are required." }, { status: 400 });
@@ -59,7 +62,7 @@ export async function POST(req: NextRequest) {
   }
 
   const category = await prisma.category.create({
-    data: { name, slug, description, image, isActive },
+    data: { name, slug, description, image, isActive, showInBanner },
     include: { _count: { select: { products: true } } },
   });
 
