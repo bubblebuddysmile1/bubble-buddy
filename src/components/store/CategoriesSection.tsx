@@ -81,7 +81,7 @@ export default function CategoriesSection() {
           title: category.name,
           image: category.image || fallbackImages[index % fallbackImages.length],
           slug: category.slug,
-          link: `/shop?category=${encodeURIComponent(category.slug)}`,
+          link: `/categories/${encodeURIComponent(category.slug)}`,
         }));
 
         if (items.length > 0) {

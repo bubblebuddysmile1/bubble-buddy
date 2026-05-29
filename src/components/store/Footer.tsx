@@ -1,3 +1,6 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -5,7 +8,52 @@ import { Input } from "@/components/ui/input";
 
 import { Globe, Mail, MessageCircle, Star } from "lucide-react";
 
+type CategoryLink = {
+  name: string;
+  slug: string;
+};
+
+type CategoriesResponse = {
+  categories: CategoryLink[];
+};
+
 export default function Footer() {
+  const [categories, setCategories] = useState<CategoryLink[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadCategories() {
+      try {
+        const response = await fetch("/api/categories", { cache: "no-store" });
+        if (!active) return;
+
+        if (!response.ok) {
+          setCategories([]);
+          return;
+        }
+
+        const data = (await response.json()) as CategoriesResponse;
+        setCategories(data.categories ?? []);
+      } catch {
+        if (active) {
+          setCategories([]);
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadCategories();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+
   return (
     <footer className="bg-card border-t border-border mt-20 text-foreground">
 
@@ -82,23 +130,21 @@ export default function Footer() {
             </h3>
 
             <div className="mt-4 flex flex-col gap-3 text-md text-muted-foreground">
-
-              <Link href="/categories/skincare" className="hover:text-primary">
-                Skin Care
-              </Link>
-
-              <Link href="/categories/haircare" className="hover:text-primary">
-                Hair Care
-              </Link>
-
-              <Link href="/categories/makeup" className="hover:text-primary">
-                Makeup
-              </Link>
-
-              <Link href="/categories/beauty" className="hover:text-primary">
-                Beauty Products
-              </Link>
-
+              {loading ? (
+                <p className="text-sm text-muted-foreground">Loading categories...</p>
+              ) : categories.length > 0 ? (
+                categories.map((category) => (
+                  <Link
+                    key={category.slug}
+                    href={`/categories/${category.slug}`}
+                    className="hover:text-primary"
+                  >
+                    {category.name}
+                  </Link>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No categories available.</p>
+              )}
             </div>
           </div>
 

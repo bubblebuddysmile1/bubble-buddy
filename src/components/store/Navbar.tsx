@@ -12,21 +12,19 @@ import { useCartStore } from "@/store/cart-store";
 import { useWishlistStore } from "@/store/wishlist-store";
 import { setActiveUserId } from "@/lib/store-persistence";
 
+type CategoryOption = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
 // ============================================================
-// ✅ SIRF YEH ARRAY EDIT KARO — baaki sab automatically update ho jayega
+// ✅ Categories are fetched dynamically now.
 // ============================================================
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
   { label: "About Us", href: "/about" },
-  {
-    label: "Categories",
-    dropdown: [
-      { label: "Skin Care", href: "/categories/skincare" },
-      { label: "Hair Care", href: "/categories/haircare" },
-      { label: "Beauty", href: "/categories/beauty" },
-    ],
-  },
   { label: "Offers", href: "/offers" },
 ];
 // ============================================================
@@ -173,6 +171,30 @@ function UserMenu() {
 
 export default function Navbar() {
   const [hoveredDropdown, setHoveredDropdown] = useState<string | null>(null);
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadCategories() {
+      try {
+        const response = await fetch("/api/categories", { cache: "no-store" });
+        if (!active || !response.ok) return;
+
+        const data = await response.json();
+        if (Array.isArray(data.categories)) {
+          setCategories(data.categories);
+        }
+      } catch {
+        // no-op
+      }
+    }
+
+    loadCategories();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
@@ -196,45 +218,41 @@ export default function Navbar() {
               <SheetContent side="left" className="w-72 px-4 py-6 bg-card shadow-md">
                 <div className="mt-6 flex flex-col items-start gap-3 text-left">
 
-                  {NAV_LINKS.map((item) =>
-                    item.dropdown ? (
-                      // Dropdown item — mobile (simplified)
-                      <div key={item.label} className="w-full p-0">
-                        <details className="group overflow-hidden">
-                          <summary className="flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3 text-left text-md font-semibold text-foreground transition hover:bg-muted">
-                            {item.label}
-                            <ChevronDown className="h-4 w-4 transition-transform duration-150 group-open:-rotate-180" />
-                          </summary>
-                          <div className="mt-2 flex flex-col gap-2 px-3 pb-3">
-                            {item.dropdown.map((sub) => (
-                              <Link
-                                key={sub.href}
-                                href={sub.href}
-                                className="block rounded-2xl px-3 py-2 text-md text-muted-foreground transition hover:bg-muted hover:text-primary"
-                              >
-                                {sub.label}
-                              </Link>
-                            ))}
-                          </div>
-                        </details>
-                      </div>
-                    ) : (
-                      // Normal link — mobile (simplified)
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="w-full px-4 py-3 text-md font-medium text-foreground transition hover:text-primary hover:bg-muted rounded-md"
-                      >
-                        {item.label}
-                      </Link>
-                    )
-                  )}
+                  {NAV_LINKS.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="w-full px-4 py-3 text-md font-medium text-foreground transition hover:text-primary hover:bg-muted rounded-md"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
 
+                  {categories.length > 0 ? (
+                    <div className="w-full p-0">
+                      <details className="group overflow-hidden">
+                        <summary className="flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3 text-left text-md font-semibold text-foreground transition hover:bg-muted">
+                          Categories
+                          <ChevronDown className="h-4 w-4 transition-transform duration-150 group-open:-rotate-180" />
+                        </summary>
+                        <div className="mt-2 flex flex-col gap-2 px-3 pb-3">
+                          {categories.map((category) => (
+                            <Link
+                              key={category.slug}
+                              href={`/categories/${category.slug}`}
+                              className="block rounded-2xl px-3 py-2 text-md text-muted-foreground transition hover:bg-muted hover:text-primary"
+                            >
+                              {category.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </details>
+                    </div>
+                  ) : null}
                 </div>
               </SheetContent>
             </Sheet>
 
-            {/* LOGO */}
             <Link href="/" className="text-xl md:text-2xl font-bold text-primary">
               Bubble Buddy
             </Link>
@@ -271,39 +289,36 @@ export default function Navbar() {
 
         {/* DESKTOP MENU */}
         <nav className="hidden md:flex w-full items-center justify-center gap-6 h-12 text-md font-medium">
-          {NAV_LINKS.map((item) =>
-            item.dropdown ? (
-              // Dropdown — desktop
-              <details
-                key={item.label}
-                className="relative group"
-                open={hoveredDropdown === item.label}
-                onMouseEnter={() => setHoveredDropdown(item.label)}
-                onMouseLeave={() => setHoveredDropdown(null)}
-              >
-                <summary className="flex cursor-pointer items-center gap-1 rounded-full px-3 py-2 text-md font-semibold text-foreground transition hover:bg-muted hover:text-primary [&::-webkit-details-marker]:hidden">
-                  {item.label}
-                  <ChevronDown className="h-4 w-4 transition-transform duration-150" />
-                </summary>
-                <div className="absolute left-1/2 top-full z-20 mt-2 min-w-48 -translate-x-1/2 rounded-3xl border border-border bg-card p-2 shadow-xl">
-                  {item.dropdown.map((sub) => (
-                    <Link
-                      key={sub.href}
-                      href={sub.href}
-                      className="block rounded-2xl px-4 py-2 text-md text-secondary-foreground transition hover:bg-muted hover:text-primary"
-                    >
-                      {sub.label}
-                    </Link>
-                  ))}
-                </div>
-              </details>
-            ) : (
-              // Normal link — desktop
-              <Link key={item.href} href={item.href} className="transition hover:text-primary">
-                {item.label}
-              </Link>
-            )
-          )}
+          {NAV_LINKS.map((item) => (
+            <Link key={item.href} href={item.href} className="transition hover:text-primary">
+              {item.label}
+            </Link>
+          ))}
+
+          {categories.length > 0 ? (
+            <details
+              className="relative group"
+              open={hoveredDropdown === "Categories"}
+              onMouseEnter={() => setHoveredDropdown("Categories")}
+              onMouseLeave={() => setHoveredDropdown(null)}
+            >
+              <summary className="flex cursor-pointer items-center gap-1 rounded-full px-3 py-2 text-md font-semibold text-foreground transition hover:bg-muted hover:text-primary [&::-webkit-details-marker]:hidden">
+                Categories
+                <ChevronDown className="h-4 w-4 transition-transform duration-150" />
+              </summary>
+              <div className="absolute left-1/2 top-full z-20 mt-2 min-w-48 -translate-x-1/2 rounded-3xl border border-border bg-card p-2 shadow-xl">
+                {categories.map((category) => (
+                  <Link
+                    key={category.slug}
+                    href={`/categories/${category.slug}`}
+                    className="block rounded-2xl px-4 py-2 text-md text-secondary-foreground transition hover:bg-muted hover:text-primary"
+                  >
+                    {category.name}
+                  </Link>
+                ))}
+              </div>
+            </details>
+          ) : null}
         </nav>
 
       </div>
