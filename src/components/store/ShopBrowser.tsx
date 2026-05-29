@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import ShopProductCard from "@/components/store/ShopProductCard";
 import { toCartProduct } from "@/lib/cart";
 
@@ -37,6 +38,7 @@ export default function ShopBrowser() {
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
+  const searchParams = useSearchParams();
   const [sort, setSort] = useState("featured");
   const [page, setPage] = useState(1);
   const [perPage] = useState(12);
@@ -44,6 +46,10 @@ export default function ShopBrowser() {
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // derive effective category from local state or URL query param
+  const urlCategory = searchParams?.get("category") ?? "";
+  const effectiveCategory = category || urlCategory;
 
   useEffect(() => {
     async function loadCategories() {
@@ -61,12 +67,12 @@ export default function ShopBrowser() {
   const queryString = useMemo(() => {
     const searchParams = new URLSearchParams();
     if (query.trim()) searchParams.set("q", query.trim());
-    if (category) searchParams.set("category", category);
+    if (effectiveCategory) searchParams.set("category", effectiveCategory);
     if (sort) searchParams.set("sort", sort);
     searchParams.set("page", String(page));
     searchParams.set("limit", String(perPage));
     return searchParams.toString();
-  }, [category, page, perPage, query, sort]);
+  }, [effectiveCategory, page, perPage, query, sort]);
 
   useEffect(() => {
     async function loadProducts() {
@@ -120,7 +126,7 @@ export default function ShopBrowser() {
               Category
             </span>
             <select
-              value={category}
+              value={effectiveCategory}
               onChange={(event) => {
                 setCategory(event.target.value);
                 setPage(1);
