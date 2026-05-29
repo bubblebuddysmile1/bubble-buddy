@@ -1,12 +1,32 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import CheckoutPageClient from "@/components/checkout/CheckoutPageClient";
+import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 
 export const metadata = {
   title: "Checkout",
 };
 
-export default function CheckoutPage() {
+async function verifyCheckoutAuth() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_NAME)?.value;
+  if (!token) {
+    redirect("/auth?returnTo=/checkout");
+  }
+
+  const payload = verifyAuthToken(token);
+  if (!payload) {
+    redirect("/auth?returnTo=/checkout");
+  }
+
+  return payload;
+}
+
+export default async function CheckoutPage() {
+  await verifyCheckoutAuth();
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-background py-12 text-foreground">
       <div className="pointer-events-none absolute -left-24 top-0 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />

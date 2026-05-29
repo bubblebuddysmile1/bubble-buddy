@@ -8,7 +8,9 @@ import { ChevronDown, Menu, Search, User } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import CartNavButton from "@/components/cart/CartNavButton";
 import WishlistNavButton from "@/components/wishlist/WishlistNavButton";
-import { Button } from "../ui/button";
+import { useCartStore } from "@/store/cart-store";
+import { useWishlistStore } from "@/store/wishlist-store";
+import { setActiveUserId } from "@/lib/store-persistence";
 
 // ============================================================
 // ✅ SIRF YEH ARRAY EDIT KARO — baaki sab automatically update ho jayega
@@ -74,8 +76,14 @@ function UserMenu() {
     router.push(path);
   };
 
+  const clearCart = useCartStore((s) => s.setItems);
+  const clearWishlist = useWishlistStore((s) => s.setItems);
+
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
+    setActiveUserId(null);
+    clearCart([]);
+    clearWishlist([]);
     setUser(null);
     router.push("/auth");
   };

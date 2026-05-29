@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { setActiveUserId } from "@/lib/store-persistence";
+import { useCartStore } from "@/store/cart-store";
+import { useWishlistStore } from "@/store/wishlist-store";
 
 type AdminHeaderProps = {
   title: string;
@@ -12,9 +15,14 @@ type AdminHeaderProps = {
 
 export default function AdminHeader({ title, description }: AdminHeaderProps) {
   const router = useRouter();
+  const clearCart = useCartStore((s) => s.setItems);
+  const clearWishlist = useWishlistStore((s) => s.setItems);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
+    setActiveUserId(null);
+    clearCart([]);
+    clearWishlist([]);
     router.push("/auth?returnTo=/admin");
   };
 

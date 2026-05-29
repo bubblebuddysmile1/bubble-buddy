@@ -1,9 +1,20 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import type { CartItem } from "@/types/cart";
+import type { WishlistProduct } from "@/types/wishlist";
+import { useCartStore } from "@/store/cart-store";
+import { useWishlistStore } from "@/store/wishlist-store";
+import {
+  getGuestCartItems,
+  getGuestWishlistItems,
+  getPersistedCartItems,
+  getPersistedWishlistItems,
+  setActiveUserId,
+} from "@/lib/store-persistence";
 
 export default function AuthForm() {
   const router = useRouter();
@@ -16,14 +27,12 @@ export default function AuthForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(
+    searchParams?.get("error") === "admin_required"
+      ? "Admin access required. Sign in with an administrator account."
+      : "",
+  );
   const [success, setSuccess] = useState("");
-
-  useEffect(() => {
-    if (searchParams?.get("error") === "admin_required") {
-      setError("Admin access required. Sign in with an administrator account.");
-    }
-  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -59,6 +68,22 @@ export default function AuthForm() {
       setName("");
       setPassword("");
       return;
+    }
+
+    const userId = String(data.user?.id ?? "");
+    if (userId) {
+      setActiveUserId(userId);
+
+      const savedCart = getPersistedCartItems(userId) as unknown[] | null;
+      const savedWishlist = getPersistedWishlistItems(userId) as unknown[] | null;
+      const guestCart = getGuestCartItems() as unknown[] | null;
+      const guestWishlist = getGuestWishlistItems() as unknown[] | null;
+
+      const cartItems = (savedCart ?? guestCart ?? []) as CartItem[];
+      const wishlistItems = (savedWishlist ?? guestWishlist ?? []) as WishlistProduct[];
+
+      useCartStore.getState().setItems(cartItems);
+      useWishlistStore.getState().setItems(wishlistItems);
     }
 
     setSuccess("Signed in successfully. Redirecting you back...");

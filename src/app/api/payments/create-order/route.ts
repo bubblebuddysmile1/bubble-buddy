@@ -1,4 +1,6 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 import { getCheckoutTotals } from "@/lib/checkout";
 import {
   createRazorpayClient,
@@ -14,6 +16,17 @@ import type { CartItem } from "@/types/cart";
 
 export async function POST(request: Request) {
   try {
+    // Authentication check
+    const cookieStore = await cookies();
+    const token = cookieStore.get(COOKIE_NAME)?.value;
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized. Please login to continue." }, { status: 401 });
+    }
+
+    const payload = verifyAuthToken(token);
+    if (!payload) {
+      return NextResponse.json({ error: "Unauthorized. Invalid session." }, { status: 401 });
+    }
     const json = await request.json();
     const parsed = createPaymentOrderSchema.safeParse(json);
 

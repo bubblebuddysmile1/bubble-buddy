@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CartItem, CartProduct } from "@/types/cart";
+import { cartStorage } from "@/lib/store-persistence";
 
 type CartState = {
   items: CartItem[];
@@ -8,6 +9,7 @@ type CartState = {
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
+  setItems: (items: CartItem[]) => void;
 };
 
 function clampQuantity(quantity: number, stock: number): number {
@@ -64,8 +66,9 @@ export const useCartStore = create<CartState>()(
       },
 
       clearCart: () => set({ items: [] }),
+      setItems: (items) => set({ items }),
     }),
-    { name: "bubble-buddy-cart" },
+    { name: "bubble-buddy-cart", storage: cartStorage },
   ),
 );
 

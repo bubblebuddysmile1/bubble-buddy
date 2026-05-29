@@ -1,12 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { WishlistProduct } from "@/types/wishlist";
+import { wishlistStorage } from "@/lib/store-persistence";
 
 type WishlistState = {
   items: WishlistProduct[];
   toggleItem: (product: WishlistProduct) => void;
   removeItem: (productId: number) => void;
   clearWishlist: () => void;
+  setItems: (items: WishlistProduct[]) => void;
 };
 
 export const useWishlistStore = create<WishlistState>()(
@@ -34,8 +36,9 @@ export const useWishlistStore = create<WishlistState>()(
       },
 
       clearWishlist: () => set({ items: [] }),
+      setItems: (items) => set({ items }),
     }),
-    { name: "bubble-buddy-wishlist" },
+    { name: "bubble-buddy-wishlist", storage: wishlistStorage },
   ),
 );
 
