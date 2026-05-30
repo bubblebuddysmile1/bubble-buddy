@@ -4,19 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CreditCard, ShoppingBag } from "lucide-react";
-import CheckoutAddressForm from "@/components/checkout/CheckoutAddressForm";
+import CheckoutAddressFormComponent from "@/components/checkout/CheckoutAddressForm";
 import CheckoutOrderSummary from "@/components/checkout/CheckoutOrderSummary";
 import { getCheckoutTotals } from "@/lib/checkout";
 import { formatCartMoney } from "@/lib/cart";
 import { loadRazorpayScript, openRazorpayCheckout } from "@/lib/razorpay-client";
-import {
-  checkoutAddressDefaultValues,
-  checkoutAddressSchema,
-  formatZodFieldErrors,
-  type CheckoutAddressForm,
-} from "@/lib/validations/checkout";
+import * as CheckoutValidation from "@/lib/validations/checkout";
 import { useCartStore } from "@/store/cart-store";
 import type { RazorpayHandlerResponse } from "@/types/razorpay-checkout";
+
+type CheckoutAddressValues = typeof CheckoutValidation.checkoutAddressDefaultValues;
 
 type CreateOrderResponse = {
   mock: boolean;
@@ -40,8 +37,8 @@ export default function CheckoutPageClient() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const [mounted, setMounted] = useState(false);
-  const [values, setValues] = useState<CheckoutAddressForm>(checkoutAddressDefaultValues);
-  const [errors, setErrors] = useState<Partial<Record<keyof CheckoutAddressForm, string>>>({});
+  const [values, setValues] = useState<CheckoutAddressValues>(CheckoutValidation.checkoutAddressDefaultValues);
+  const [errors, setErrors] = useState<Partial<Record<keyof CheckoutAddressValues, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMode, setPaymentMode] = useState<"mock" | "razorpay" | null>(null);
   const [couponCode, setCouponCode] = useState("");
@@ -73,10 +70,10 @@ export default function CheckoutPageClient() {
     [items, appliedPromotion],
   );
 
-  const handleChange = (field: keyof CheckoutAddressForm, value: string) => {
+  const handleChange = (field: keyof CheckoutAddressValues, value: string) => {
     setValues((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors((prev) => {
+      setErrors((prev: Partial<Record<keyof CheckoutAddressValues, string>>) => {
         const next = { ...prev };
         delete next[field];
         return next;
@@ -87,7 +84,7 @@ export default function CheckoutPageClient() {
   const verifyAndRedirect = async (
     payload: RazorpayHandlerResponse,
     mock: boolean,
-    address: CheckoutAddressForm,
+    address: CheckoutAddressValues,
   ) => {
     const verifyRes = await fetch("/api/payments/verify", {
       method: "POST",
@@ -111,9 +108,12 @@ export default function CheckoutPageClient() {
     const verifyData = await verifyRes.json();
 
     if (!verifyRes.ok || !verifyData.verified) {
-      router.push("/payment/failure?reason=verification_failed");
+      router.push(`/payment/failure?reason=${verifyData.error || "verification_failed"}&order_id=${verifyData.orderId || ""}`);
       return;
     }
+
+    // Clear cart on successful payment
+    useCartStore.setState({ items: [] });
 
     const params = new URLSearchParams({
       order_id: verifyData.orderId,
@@ -186,10 +186,10 @@ export default function CheckoutPageClient() {
       line2: values.line2?.trim() ? values.line2 : undefined,
     };
 
-    const result = checkoutAddressSchema.safeParse(payload);
+    const result = CheckoutValidation.checkoutAddressSchema.safeParse(payload);
 
     if (!result.success) {
-      setErrors(formatZodFieldErrors(result.error));
+      setErrors(CheckoutValidation.formatZodFieldErrors(result.error));
       return;
     }
 
@@ -256,12 +256,20 @@ export default function CheckoutPageClient() {
           contact: result.data.phone,
         },
         theme: { color: "#a67c52" },
+        method: {
+          upi: true,
+          card: true,
+          netbanking: true,
+          wallet: true,
+          emi: true,
+        },
         handler: async (response) => {
           setIsSubmitting(true);
           await verifyAndRedirect(response, false, result.data);
           setIsSubmitting(false);
         },
         modal: {
+          backdrop: true,
           ondismiss: () => {
             setIsSubmitting(false);
             router.push("/payment/failure?reason=cancelled");
@@ -305,7 +313,7 @@ export default function CheckoutPageClient() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
-        <CheckoutAddressForm
+        <CheckoutAddressFormComponent
           values={values}
           errors={errors}
           onChange={handleChange}

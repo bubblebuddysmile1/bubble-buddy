@@ -143,6 +143,9 @@ model Order {
   status             OrderStatus     @default(PENDING)
   paymentStatus      PaymentStatus   @default(PENDING)
   paymentMethod      PaymentMethod?
+  razorpayOrderId    String?
+  razorpayPaymentId  String?
+  razorpaySignature  String?
   totalAmount        Decimal         @db.Decimal(10, 2)
   taxAmount          Decimal         @db.Decimal(10, 2) @default(0)
   shippingAmount     Decimal         @db.Decimal(10, 2) @default(0)

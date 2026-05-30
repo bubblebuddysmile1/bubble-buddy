@@ -18,14 +18,25 @@ export type RazorpayCheckoutOptions = {
   };
   theme?: { color?: string };
   handler: (response: RazorpayHandlerResponse) => void;
+  method?: {
+    upi?: boolean;
+    card?: boolean;
+    netbanking?: boolean;
+    wallet?: boolean;
+    emi?: boolean;
+    qr?: boolean;
+  };
+  recurring?: "1" | "0";
   modal?: {
     ondismiss?: () => void;
+    backdrop?: boolean;
   };
 };
 
 export type RazorpayInstance = {
   open: () => void;
   on: (event: string, callback: () => void) => void;
+  close: () => void;
 };
 
 declare global {

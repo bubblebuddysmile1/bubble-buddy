@@ -92,9 +92,10 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
       data: {
         orderNumber,
         userId: input.user?.id ?? null,
-        status: "CONFIRMED",
-        paymentStatus: "PAID",
+        status: "PENDING",
+        paymentStatus: "PENDING",
         paymentMethod: "CARD",
+        razorpayOrderId: input.razorpayOrderId,
         totalAmount: new Prisma.Decimal(totals.total),
         shippingAmount: new Prisma.Decimal(totals.shipping),
         taxAmount: new Prisma.Decimal(0),
@@ -120,14 +121,55 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
       select: { id: true, orderNumber: true },
     });
 
-    for (const item of input.items) {
-      if (!productById.has(item.id)) continue;
+    return order;
+  });
+}
+
+export async function confirmOrder(razorpayOrderId: string, razorpayPaymentId: string, razorpaySignature: string) {
+  const orderNumber = orderNumberFromRazorpay(razorpayOrderId);
+  
+  const order = await prisma.order.findUnique({
+    where: { orderNumber },
+    select: { id: true, items: { select: { productId: true, quantity: true } } },
+  });
+
+  if (!order) {
+    throw new Error("Order not found.");
+  }
+
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const updatedOrder = await tx.order.update({
+      where: { orderNumber },
+      data: {
+        status: "CONFIRMED",
+        paymentStatus: "PAID",
+        razorpayPaymentId,
+        razorpaySignature,
+      },
+      select: { id: true, orderNumber: true },
+    });
+
+    // Decrement stock for each item
+    for (const item of order.items) {
       await tx.product.update({
-        where: { id: item.id },
+        where: { id: item.productId },
         data: { stockQuantity: { decrement: item.quantity } },
       });
     }
 
-    return order;
+    return updatedOrder;
+  });
+}
+
+export async function cancelOrder(razorpayOrderId: string) {
+  const orderNumber = orderNumberFromRazorpay(razorpayOrderId);
+
+  return prisma.order.update({
+    where: { orderNumber },
+    data: {
+      status: "CANCELLED",
+      paymentStatus: "FAILED",
+    },
+    select: { id: true, orderNumber: true },
   });
 }
