@@ -16,44 +16,6 @@ type CategoryCard = {
   link: string;
 };
 
-const defaultCategories: CategoryCard[] = [
-  {
-    id: 1,
-    title: "Skin Care",
-    image: "/category/1.jpg",
-    slug: "skincare",
-    link: "/shop?category=skincare",
-  },
-  {
-    id: 2,
-    title: "Hair Care",
-    image: "/category/2.jpg",
-    slug: "haircare",
-    link: "/shop?category=haircare",
-  },
-  {
-    id: 3,
-    title: "Face Care",
-    image: "/category/3.jpg",
-    slug: "face-care",
-    link: "/shop?category=face-care",
-  },
-  {
-    id: 4,
-    title: "Beauty Products",
-    image: "/category/4.jpg",
-    slug: "beauty",
-    link: "/shop?category=beauty",
-  },
-  {
-    id: 5,
-    title: "Perfume",
-    image: "/category/2.jpg",
-    slug: "perfume",
-    link: "/shop?category=perfume",
-  },
-];
-
 const fallbackImages = ["/category/1.jpg", "/category/2.jpg", "/category/3.jpg", "/category/4.jpg"];
 
 type ApiCategory = {
@@ -64,7 +26,7 @@ type ApiCategory = {
 };
 
 export default function CategoriesSection() {
-  const [categories, setCategories] = useState<CategoryCard[]>(defaultCategories);
+  const [categories, setCategories] = useState<CategoryCard[]>([]);
 
   useEffect(() => {
     async function loadCategories() {

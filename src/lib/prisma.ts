@@ -15,7 +15,7 @@ export const prisma: PrismaPkg.PrismaClient =
   globalForPrisma.prisma ??
   new (PrismaClientCtor as any)({
     adapter: mariadbAdapter,
-    log: process.env.NODE_ENV === "development" ? ["query", "warn", "error"] : ["error"],
+    log: [],
   });
 
 if (process.env.NODE_ENV !== "production") {
