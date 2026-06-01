@@ -55,6 +55,7 @@ export default function ProductImageUpload({
       const response = await fetch("/api/upload/images", {
         method: "POST",
         body: formData,
+        credentials: "same-origin",
       });
 
       const data = await response.json();
@@ -104,6 +105,7 @@ export default function ProductImageUpload({
     try {
       const response = await fetch(`/api/products/${slug}`, {
         method: "PATCH",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           thumbnail: thumbnail || null,
@@ -142,6 +144,7 @@ export default function ProductImageUpload({
 
       <input
         ref={fileInputRef}
+        name="files"
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         multiple

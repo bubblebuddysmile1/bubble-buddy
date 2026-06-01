@@ -16,8 +16,6 @@ type CategoryCard = {
   link: string;
 };
 
-const fallbackImages = ["/category/1.jpg", "/category/2.jpg", "/category/3.jpg", "/category/4.jpg"];
-
 type ApiCategory = {
   id: number;
   name: string;
@@ -38,10 +36,10 @@ export default function CategoriesSection() {
         if (!Array.isArray(data.categories)) return;
 
         const categoriesData = data.categories as ApiCategory[];
-        const items = categoriesData.map((category, index) => ({
+        const items = categoriesData.map((category) => ({
           id: category.id,
           title: category.name,
-          image: category.image || fallbackImages[index % fallbackImages.length],
+          image: category.image ?? "/images/default-category.jpg",
           slug: category.slug,
           link: `/categories/${encodeURIComponent(category.slug)}`,
         }));

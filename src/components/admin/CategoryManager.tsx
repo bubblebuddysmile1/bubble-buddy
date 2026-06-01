@@ -6,6 +6,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/slugify";
+import CategoryImageUpload from "./CategoryImageUpload";
 
 type Category = {
   id: number;
@@ -221,10 +222,10 @@ export default function CategoryManager() {
         </label>
 
         <label className="block space-y-2 text-sm">
-          <span className="font-medium">Image URL</span>
-          <Input
-            value={form.image}
-            onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
+          <span className="font-medium">Image</span>
+          <CategoryImageUpload
+            currentImage={form.image}
+            onImageUrlChange={(url) => setForm((prev) => ({ ...prev, image: url }))}
           />
         </label>
 

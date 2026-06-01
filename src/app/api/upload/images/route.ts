@@ -21,8 +21,12 @@ export async function POST(req: NextRequest) {
 
   try {
     const formData = await req.formData();
-    const entries = formData.getAll("files").length
-      ? formData.getAll("files")
+    const fileEntries = formData.getAll("files");
+    const fileArrayEntries = formData.getAll("files[]");
+    const entries = fileEntries.length
+      ? fileEntries
+      : fileArrayEntries.length
+      ? fileArrayEntries
       : formData.getAll("file");
 
     if (entries.length === 0) {

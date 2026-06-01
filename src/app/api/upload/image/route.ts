@@ -21,7 +21,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const formData = await req.formData();
-    const parsed = await parseImageFile(formData.get("file"));
+    const fileEntry =
+      formData.get("file") ?? formData.get("image") ?? formData.get("files") ?? formData.get("files[]");
+    const parsed = await parseImageFile(fileEntry);
 
     if ("error" in parsed) {
       return NextResponse.json({ error: parsed.error }, { status: 400 });
