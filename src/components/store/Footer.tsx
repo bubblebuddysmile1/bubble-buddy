@@ -116,6 +116,10 @@ export default function Footer() {
                 About Us
               </Link>
 
+              <Link href="/offers" className="hover:text-primary">
+                Offers
+              </Link>
+
               <Link href="/contact" className="hover:text-primary">
                 Contact
               </Link>
@@ -181,13 +185,13 @@ export default function Footer() {
             © 2025 bubble buddy smile. All rights reserved.
           </p>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
 
             <Link href="/privacy-policy" className="hover:text-primary">
               Privacy Policy
             </Link>
 
-            <Link href="/terms" className="hover:text-primary">
+            <Link href="/terms-and-conditions" className="hover:text-primary">
               Terms & Conditions
             </Link>
 
