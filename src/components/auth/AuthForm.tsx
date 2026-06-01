@@ -226,13 +226,26 @@ export default function AuthForm() {
                   <Link href="/" className="font-semibold text-primary hover:underline">Forgot?</Link>
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/15 transition duration-300 hover:-translate-y-0.5"
-                  data-loading={loading ? true : false}
-                >
-                  {loading ? "Working..." : mode === "signin" ? "Sign in" : "Get a free consultation →"}
-                </Button>
+                <div className="space-y-3">
+                  <Button
+                    type="submit"
+                    className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/15 transition duration-300 hover:-translate-y-0.5"
+                    data-loading={loading ? true : false}
+                  >
+                    {loading ? "Working..." : mode === "signin" ? "Sign in" : "Get a free consultation →"}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="w-full rounded-full px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition duration-300 hover:bg-background"
+                    onClick={() => {
+                      window.location.href = `/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`;
+                    }}
+                  >
+                    Continue with Google
+                  </Button>
+                </div>
 
                 {error && (
                   <div className="rounded-3xl border border-border bg-destructive/10 p-3 text-sm text-destructive animate-fade-in">
