@@ -11,6 +11,38 @@ export const metadata: Metadata = {
   },
   description:
     "Discover premium beauty essentials for skincare, haircare, and makeup at Bubble Buddy.",
+  keywords: [
+    "beauty store",
+    "skincare",
+    "haircare",
+    "makeup",
+    "bubble buddy",
+    "online beauty shop",
+  ],
+  openGraph: {
+    title: "Bubble Buddy",
+    description:
+      "Discover premium beauty essentials for skincare, haircare, and makeup at Bubble Buddy.",
+    type: "website",
+    siteName: "Bubble Buddy",
+    images: [
+      {
+        url: "/category/1.jpg",
+        alt: "Bubble Buddy beauty products",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bubble Buddy",
+    description:
+      "Discover premium beauty essentials for skincare, haircare, and makeup at Bubble Buddy.",
+    images: ["/category/1.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
