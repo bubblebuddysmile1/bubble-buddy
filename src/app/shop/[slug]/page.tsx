@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import ProductImageGallery from "@/components/store/ProductImageGallery";
 import ProductDetailCart from "@/components/store/ProductDetailCart";
 import RelatedProducts from "@/components/store/RelatedProducts";
+import ProductReviews from "@/components/store/ProductReviews";
 import { parseProductPrice, toCartProduct } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
 
@@ -175,6 +176,13 @@ export default async function ProductDetailPage({ params }: { params: PageParams
             <ProductDetailCart product={cartProduct} compareAtPrice={compareAtPrice} />
           </section>
         </div>
+
+        <ProductReviews
+          productId={product.id}
+          productSlug={product.slug}
+          averageRating={product.averageRating}
+          reviewCount={product.reviewCount}
+        />
 
         <RelatedProducts
           products={relatedProducts}
