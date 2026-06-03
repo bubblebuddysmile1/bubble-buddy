@@ -221,6 +221,7 @@ model Review {
   title      String?
   body       String?
   approved   Boolean  @default(false)
+  verifiedPurchase Boolean @default(false)
   user       User?    @relation(fields: [userId], references: [id])
   userId     Int?
   product    Product  @relation(fields: [productId], references: [id])

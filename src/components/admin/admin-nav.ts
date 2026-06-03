@@ -24,5 +24,6 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
   { label: "Promotions", href: "/admin/promotions", icon: Tag },
   { label: "Customers", href: "/admin/customers", icon: Users },
+  {label: "Reviews", href: "/admin/reviews", icon: ImageIcon },
   { label: "View store", href: "/", icon: Store, external: true },
 ];

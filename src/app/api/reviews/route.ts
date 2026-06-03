@@ -70,12 +70,24 @@ export async function POST(req: NextRequest) {
   if (!pid) return NextResponse.json({ error: "productId or productSlug is required." }, { status: 400 });
   if (!(rating >= 1 && rating <= 5)) return NextResponse.json({ error: "Rating must be between 1 and 5." }, { status: 400 });
 
+  // Check if user has purchased this product (delivered orders)
+  const hasPurchased = await prisma.order.findFirst({
+    where: {
+      userId: auth.id,
+      status: "DELIVERED",
+      items: { some: { productId: pid } },
+    },
+  });
+
+  const verified = Boolean(hasPurchased);
+
   const review = await prisma.review.create({
     data: {
       rating,
       title,
       body: text,
-      approved: true,
+      approved: verified, // auto-approve verified purchases, else require moderation
+      verifiedPurchase: verified,
       user: { connect: { id: auth.id } },
       product: { connect: { id: pid } },
     },
