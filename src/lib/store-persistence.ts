@@ -1,6 +1,7 @@
 const CURRENT_USER_STORAGE_KEY = "bubble-buddy-current-user";
 const CART_STORAGE_PREFIX = "bubble-buddy-cart";
 const WISHLIST_STORAGE_PREFIX = "bubble-buddy-wishlist";
+const COMPARE_STORAGE_PREFIX = "bubble-buddy-compare";
 
 type PersistedState<T> = {
   state?: {
@@ -35,12 +36,20 @@ export function getWishlistStorageKey(userId: string | null = null) {
   return `${WISHLIST_STORAGE_PREFIX}:${userId ?? "guest"}`;
 }
 
+export function getCompareStorageKey(userId: string | null = null) {
+  return `${COMPARE_STORAGE_PREFIX}:${userId ?? "guest"}`;
+}
+
 export function getCurrentCartStorageKey() {
   return getCartStorageKey(getActiveUserId());
 }
 
 export function getCurrentWishlistStorageKey() {
   return getWishlistStorageKey(getActiveUserId());
+}
+
+export function getCurrentCompareStorageKey() {
+  return getCompareStorageKey(getActiveUserId());
 }
 
 function parsePersistedItems<T>(raw: string | null): T[] | null {
@@ -85,6 +94,18 @@ export function getGuestWishlistItems(): unknown[] | null {
   return parsePersistedItems(raw);
 }
 
+export function getPersistedCompareItems(userId: string): unknown[] | null {
+  if (!isBrowser()) return null;
+  const raw = window.localStorage.getItem(getCompareStorageKey(userId));
+  return parsePersistedItems(raw);
+}
+
+export function getGuestCompareItems(): unknown[] | null {
+  if (!isBrowser()) return null;
+  const raw = window.localStorage.getItem(getCompareStorageKey("guest"));
+  return parsePersistedItems(raw);
+}
+
 export const cartStorage = {
   getItem: (_name: string) => {
     if (!isBrowser()) return null;
@@ -112,5 +133,20 @@ export const wishlistStorage = {
   removeItem: (_name: string) => {
     if (!isBrowser()) return;
     window.localStorage.removeItem(getCurrentWishlistStorageKey());
+  },
+};
+
+export const compareStorage = {
+  getItem: (_name: string) => {
+    if (!isBrowser()) return null;
+    return window.localStorage.getItem(getCurrentCompareStorageKey());
+  },
+  setItem: (_name: string, value: string) => {
+    if (!isBrowser()) return;
+    window.localStorage.setItem(getCurrentCompareStorageKey(), value);
+  },
+  removeItem: (_name: string) => {
+    if (!isBrowser()) return;
+    window.localStorage.removeItem(getCurrentCompareStorageKey());
   },
 };

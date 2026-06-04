@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import AddToCartButton from "@/components/cart/AddToCartButton";
+import CompareButton from "@/components/compare/CompareButton";
 import WishlistButton from "@/components/wishlist/WishlistButton";
 import { formatCartMoney } from "@/lib/cart";
 import type { CartProduct } from "@/types/cart";
@@ -57,8 +58,9 @@ export default function ShopProductCard({
               {formatCartMoney(product.price, product.currency)}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <AddToCartButton product={product} size="sm" label="Add" />
+            <CompareButton product={product} variant="icon" className="text-foreground" />
             <Link
               href={`/shop/${product.slug}`}
               className="inline-flex items-center justify-center rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted"

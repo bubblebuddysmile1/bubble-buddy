@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import AddToCartButton from "@/components/cart/AddToCartButton";
+import CompareButton from "@/components/compare/CompareButton";
 import { toCartProduct } from "@/lib/cart";
 import type { CartProduct } from "@/types/cart";
 
@@ -121,9 +122,12 @@ export default function ProductList() {
                       </p> */}
                     </div>
 
-                    <div className="mt-5 flex items-center justify-between gap-3">
+                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
                       <p className="text-lg font-bold text-foreground">{product.price ?? "₹0"}</p>
-                      <AddToCartButton product={cartProduct} size="sm" label="Add" />
+                      <div className="flex items-center gap-2">
+                        <AddToCartButton product={cartProduct} size="sm" label="Add" />
+                        <CompareButton product={cartProduct} variant="icon" />
+                      </div>
                     </div>
                   </article>
                 );

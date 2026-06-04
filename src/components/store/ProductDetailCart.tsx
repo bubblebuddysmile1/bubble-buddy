@@ -1,6 +1,7 @@
 "use client";
 
 import AddToCartButton from "@/components/cart/AddToCartButton";
+import CompareButton from "@/components/compare/CompareButton";
 import WishlistButton from "@/components/wishlist/WishlistButton";
 import { formatCartMoney } from "@/lib/cart";
 import type { CartProduct } from "@/types/cart";
@@ -26,8 +27,9 @@ export default function ProductDetailCart({ product, compareAtPrice }: ProductDe
           )}
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <AddToCartButton product={product} size="lg" className="min-w-[140px]" />
+          <AddToCartButton product={product} size="lg" className="min-w-35" />
           <WishlistButton product={product} variant="pill" showLabel />
+          <CompareButton product={product} variant="pill" showLabel />
         </div>
       </div>
     </div>

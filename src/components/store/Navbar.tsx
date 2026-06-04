@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { ChevronDown, Menu, Search, User } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import CartNavButton from "@/components/cart/CartNavButton";
+import CompareNavButton from "@/components/compare/CompareNavButton";
 import WishlistNavButton from "@/components/wishlist/WishlistNavButton";
 import { useCartStore } from "@/store/cart-store";
+import { useCompareStore } from "@/store/compare-store";
 import { useWishlistStore } from "@/store/wishlist-store";
 import { setActiveUserId } from "@/lib/store-persistence";
 
@@ -76,12 +78,14 @@ function UserMenu() {
 
   const clearCart = useCartStore((s) => s.setItems);
   const clearWishlist = useWishlistStore((s) => s.setItems);
+  const clearCompare = useCompareStore((s) => s.setItems);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     setActiveUserId(null);
     clearCart([]);
     clearWishlist([]);
+    clearCompare([]);
     setUser(null);
     router.push("/auth");
   };
@@ -269,6 +273,7 @@ export default function Navbar() {
 
           {/* RIGHT ICONS */}
           <div className="flex items-center gap-1 md:gap-3">
+            <CompareNavButton />
             <WishlistNavButton />
             <CartNavButton />
 

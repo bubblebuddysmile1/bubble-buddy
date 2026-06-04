@@ -31,6 +31,7 @@ export async function GET() {
     { path: "/checkout", lastmod: undefined },
     { path: "/profile", lastmod: undefined },
     { path: "/wishlist", lastmod: undefined },
+    { path: "/compare", lastmod: undefined },
     { path: "/about", lastmod: undefined },
     { path: "/terms-and-conditions", lastmod: undefined },
     { path: "/privacy-policy", lastmod: undefined },

@@ -5,13 +5,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { CartItem } from "@/types/cart";
+import type { CompareProduct } from "@/types/compare";
 import type { WishlistProduct } from "@/types/wishlist";
 import { useCartStore } from "@/store/cart-store";
+import { useCompareStore } from "@/store/compare-store";
 import { useWishlistStore } from "@/store/wishlist-store";
 import {
   getGuestCartItems,
+  getGuestCompareItems,
   getGuestWishlistItems,
   getPersistedCartItems,
+  getPersistedCompareItems,
   getPersistedWishlistItems,
   setActiveUserId,
 } from "@/lib/store-persistence";
@@ -76,14 +80,18 @@ export default function AuthForm() {
 
       const savedCart = getPersistedCartItems(userId) as unknown[] | null;
       const savedWishlist = getPersistedWishlistItems(userId) as unknown[] | null;
+      const savedCompare = getPersistedCompareItems(userId) as unknown[] | null;
       const guestCart = getGuestCartItems() as unknown[] | null;
       const guestWishlist = getGuestWishlistItems() as unknown[] | null;
+      const guestCompare = getGuestCompareItems() as unknown[] | null;
 
       const cartItems = (savedCart ?? guestCart ?? []) as CartItem[];
       const wishlistItems = (savedWishlist ?? guestWishlist ?? []) as WishlistProduct[];
+      const compareItems = (savedCompare ?? guestCompare ?? []) as CompareProduct[];
 
       useCartStore.getState().setItems(cartItems);
       useWishlistStore.getState().setItems(wishlistItems);
+      useCompareStore.getState().setItems(compareItems);
     }
 
     setSuccess("Signed in successfully. Redirecting you back...");
