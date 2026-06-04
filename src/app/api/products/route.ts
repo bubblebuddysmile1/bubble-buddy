@@ -42,12 +42,17 @@ function normalizeProduct(product: ProductWithCategory) {
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const query = String(searchParams.get("q") ?? "").trim();
+  const slugsParam = String(searchParams.get("slugs") ?? "").trim();
   const categorySlug = String(searchParams.get("category") ?? "").trim();
   const featuredOnly = String(searchParams.get("featured") ?? "").trim() === "1";
   const adminView = searchParams.get("admin") === "1";
   const sort = String(searchParams.get("sort") ?? "featured");
   const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
   const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit") ?? "12")));
+
+  const requestedSlugs = slugsParam
+    ? slugsParam.split(",").map((slug) => slug.trim()).filter(Boolean)
+    : [];
 
   if (adminView) {
     const auth = await requireAdmin(req);
@@ -59,6 +64,7 @@ export async function GET(req: NextRequest) {
   const where: {
     isActive?: boolean;
     featured?: boolean;
+    slug?: { in: string[] };
     OR?: Array<{
       name?: { contains: string };
       description?: { contains: string };
@@ -81,6 +87,23 @@ export async function GET(req: NextRequest) {
 
   if (featuredOnly) {
     where.featured = true;
+  }
+
+  if (requestedSlugs.length > 0) {
+    where.slug = { in: requestedSlugs };
+  }
+
+  if (requestedSlugs.length > 0) {
+    const foundProducts = await prisma.product.findMany({
+      where,
+      include: { category: { select: { id: true, name: true, slug: true } } },
+    });
+
+    const orderedProducts = requestedSlugs
+      .map((slug) => foundProducts.find((product) => product.slug === slug))
+      .filter(Boolean) as ProductWithCategory[];
+
+    return NextResponse.json({ products: orderedProducts.map(normalizeProduct) });
   }
 
   const total = await prisma.product.count({ where });

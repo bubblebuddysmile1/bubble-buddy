@@ -6,6 +6,7 @@ import ProductImageGallery from "@/components/store/ProductImageGallery";
 import ProductDetailCart from "@/components/store/ProductDetailCart";
 import RelatedProducts from "@/components/store/RelatedProducts";
 import ProductReviews from "@/components/store/ProductReviews";
+import RecentlyViewedSection from "@/components/store/RecentlyViewedSection";
 import { parseProductPrice, toCartProduct } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
 
@@ -183,6 +184,8 @@ export default async function ProductDetailPage({ params }: { params: PageParams
           averageRating={product.averageRating}
           reviewCount={product.reviewCount}
         />
+
+        <RecentlyViewedSection currentSlug={product.slug} />
 
         <RelatedProducts
           products={relatedProducts}
