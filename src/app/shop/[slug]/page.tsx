@@ -7,6 +7,7 @@ import ProductDetailCart from "@/components/store/ProductDetailCart";
 import RelatedProducts from "@/components/store/RelatedProducts";
 import ProductReviews from "@/components/store/ProductReviews";
 import RecentlyViewedSection from "@/components/store/RecentlyViewedSection";
+import FrequentlyBoughtTogether from "@/components/store/FrequentlyBoughtTogether";
 import { parseProductPrice, toCartProduct } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
 
@@ -53,6 +54,53 @@ async function getRelatedProducts(
       category: { select: { name: true } },
     },
   });
+}
+
+async function getFrequentlyBoughtTogetherProducts(productId: number): Promise<RelatedProduct[]> {
+  const groupedOrderItems = await prisma.orderItem.groupBy({
+    by: ["productId"],
+    where: {
+      order: {
+        status: { not: "CANCELLED" },
+        paymentStatus: "PAID",
+        items: {
+          some: {
+            productId,
+          },
+        },
+      },
+      productId: { not: productId },
+      product: {
+        isActive: true,
+      },
+    },
+    _sum: {
+      quantity: true,
+    },
+    orderBy: {
+      _sum: {
+        quantity: "desc",
+      },
+    },
+    take: 4,
+  });
+
+  if (groupedOrderItems.length === 0) {
+    return [];
+  }
+
+  const productIds = groupedOrderItems.map((item) => item.productId);
+  const products = await prisma.product.findMany({
+    where: { id: { in: productIds } },
+    include: {
+      category: { select: { name: true } },
+    },
+  });
+
+  const productById = new Map(products.map((product) => [product.id, product] as const));
+  return productIds
+    .map((id) => productById.get(id))
+    .filter((product): product is RelatedProduct => Boolean(product));
 }
 
 export async function generateStaticParams() {
@@ -110,6 +158,7 @@ export default async function ProductDetailPage({ params }: { params: PageParams
   }
 
   const relatedProducts = await getRelatedProducts(product.categoryId, product.id);
+  const frequentlyBoughtTogetherProducts = await getFrequentlyBoughtTogetherProducts(product.id);
   const cartProduct = toCartProduct(product);
   const compareAtPrice = product.compareAtPrice
     ? parseProductPrice(product.compareAtPrice)
@@ -186,6 +235,8 @@ export default async function ProductDetailPage({ params }: { params: PageParams
         />
 
         <RecentlyViewedSection currentSlug={product.slug} />
+
+        <FrequentlyBoughtTogether products={frequentlyBoughtTogetherProducts} />
 
         <RelatedProducts
           products={relatedProducts}
