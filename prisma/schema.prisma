@@ -138,29 +138,41 @@ model CartItem {
 }
 
 model Order {
-  id                 Int             @id @default(autoincrement())
-  orderNumber        String          @unique
-  user               User?           @relation(fields: [userId], references: [id])
+  id                 Int                     @id @default(autoincrement())
+  orderNumber        String                  @unique
+  user               User?                   @relation(fields: [userId], references: [id])
   userId             Int?
-  status             OrderStatus     @default(PENDING)
-  paymentStatus      PaymentStatus   @default(PENDING)
+  status             OrderStatus             @default(PENDING)
+  paymentStatus      PaymentStatus           @default(PENDING)
   paymentMethod      PaymentMethod?
   razorpayOrderId    String?
   razorpayPaymentId  String?
   razorpaySignature  String?
-  totalAmount        Decimal         @db.Decimal(10, 2)
-  taxAmount          Decimal         @db.Decimal(10, 2) @default(0)
-  shippingAmount     Decimal         @db.Decimal(10, 2) @default(0)
-  discountAmount     Decimal         @db.Decimal(10, 2) @default(0)
-  shippingAddress    Address?        @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  totalAmount        Decimal                 @db.Decimal(10, 2)
+  taxAmount          Decimal                 @db.Decimal(10, 2) @default(0)
+  shippingAmount     Decimal                 @db.Decimal(10, 2) @default(0)
+  discountAmount     Decimal                 @db.Decimal(10, 2) @default(0)
+  shippingAddress    Address?                @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
   shippingAddressId  Int?
-  billingAddress     Address?        @relation("BillingAddress", fields: [billingAddressId], references: [id])
+  billingAddress     Address?                @relation("BillingAddress", fields: [billingAddressId], references: [id])
   billingAddressId   Int?
   placedAt           DateTime?
   fulfilledAt        DateTime?
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
   items              OrderItem[]
+  trackingEvents     OrderTrackingEvent[]
+}
+
+model OrderTrackingEvent {
+  id          Int        @id @default(autoincrement())
+  order       Order      @relation(fields: [orderId], references: [id])
+  orderId     Int
+  status      OrderStatus
+  description String?
+  createdAt   DateTime   @default(now())
+
+  @@index([orderId])
 }
 
 model OrderItem {

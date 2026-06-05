@@ -10,7 +10,7 @@ const updateOrderSchema = z.object({
 });
 
 async function requireAdminSession() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
 
   if (!token) {
@@ -40,9 +40,21 @@ export async function PATCH(request: Request) {
     }
 
     const { orderId, status } = parsed.data;
-    const order = await prisma.order.update({
-      where: { id: orderId },
-      data: { status },
+    const order = await prisma.$transaction(async (tx) => {
+      const updated = await tx.order.update({
+        where: { id: orderId },
+        data: { status },
+      });
+
+      await tx.orderTrackingEvent.create({
+        data: {
+          orderId: updated.id,
+          status,
+          description: `Order status changed to ${status}`,
+        },
+      });
+
+      return updated;
     });
 
     return NextResponse.json({ id: order.id, status: order.status });

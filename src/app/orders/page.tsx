@@ -105,6 +105,14 @@ export default async function OrdersPage() {
                     </div>
                   ))}
                 </div>
+                <div className="mt-5 flex justify-end">
+                  <Link
+                    href={`/orders/${order.orderNumber}`}
+                    className="inline-flex rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-muted"
+                  >
+                    Track order
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
