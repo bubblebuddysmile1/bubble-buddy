@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import OrderReturnRequest from "@/components/order/OrderReturnRequest";
 import OrderTrackingTimeline from "@/components/order/OrderTrackingTimeline";
 import OrderInvoiceActions from "@/components/order/OrderInvoiceActions";
 
@@ -167,6 +168,12 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
                 ))}
               </div>
             </div>
+
+            <OrderReturnRequest
+              orderNumber={order.orderNumber}
+              status={order.status}
+              returnReason={order.returnReason}
+            />
           </aside>
         </div>
       </div>

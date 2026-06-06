@@ -17,6 +17,7 @@ const statusLabels: Record<OrderStatus, string> = {
   PROCESSING: "Order processing",
   SHIPPED: "Order shipped",
   DELIVERED: "Delivered",
+  RETURN_REQUESTED: "Return requested",
   CANCELLED: "Order cancelled",
   RETURNED: "Order returned",
 };

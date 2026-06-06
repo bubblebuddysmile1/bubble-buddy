@@ -21,6 +21,7 @@ export default async function AdminOrdersPage() {
     totalAmount: order.totalAmount.toString(),
     itemCount: order.items.length,
     placedAt: order.placedAt?.toISOString() ?? null,
+    returnReason: order.returnReason,
   }));
 
   return (

@@ -14,6 +14,7 @@ export type AdminOrderRow = {
   totalAmount: string;
   itemCount: number;
   placedAt: string | null;
+  returnReason?: string | null;
 };
 
 const statusOptions = [
@@ -22,6 +23,7 @@ const statusOptions = [
   "PROCESSING",
   "SHIPPED",
   "DELIVERED",
+  "RETURN_REQUESTED",
   "CANCELLED",
   "RETURNED",
 ] as const;
@@ -29,7 +31,8 @@ const statusOptions = [
 type StatusOption = (typeof statusOptions)[number];
 
 function formatStatus(status: string) {
-  return status.charAt(0) + status.slice(1).toLowerCase();
+  const normalized = status.replace(/_/g, " ").toLowerCase();
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 }
 
 function getStatusBadgeClasses(status: string) {
@@ -40,6 +43,8 @@ function getStatusBadgeClasses(status: string) {
     case "SHIPPED":
     case "DELIVERED":
       return "bg-emerald-500/10 text-emerald-700";
+    case "RETURN_REQUESTED":
+      return "bg-amber-500/10 text-amber-700";
     case "CANCELLED":
     case "RETURNED":
       return "bg-destructive/10 text-destructive";
@@ -106,8 +111,9 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
               <th className="px-5 py-4">Items</th>
               <th className="px-5 py-4">Placed</th>
               <th className="px-5 py-4">Payment</th>
-              <th className="px-5 py-4">Status</th>
-              <th className="px-5 py-4 text-right">Update</th>
+            <th className="px-5 py-4">Return reason</th>
+            <th className="px-5 py-4">Status</th>
+            <th className="px-5 py-4 text-right">Update</th>
             </tr>
           </thead>
           <tbody>
@@ -128,6 +134,7 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
                   {order.placedAt ? new Date(order.placedAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "—"}
                 </td>
                 <td className="px-5 py-4 text-muted-foreground">{formatStatus(order.paymentStatus)}</td>
+                <td className="px-5 py-4 text-muted-foreground max-w-56 truncate">{order.returnReason ?? "—"}</td>
                 <td className="px-5 py-4">
                   <span className={cn("inline-flex rounded-full px-3 py-1 text-xs font-semibold", getStatusBadgeClasses(order.status))}>
                     {formatStatus(order.status)}

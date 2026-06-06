@@ -6,7 +6,16 @@ import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 
 const updateOrderSchema = z.object({
   orderId: z.number(),
-  status: z.enum(["PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "RETURNED"]),
+  status: z.enum([
+    "PENDING",
+    "CONFIRMED",
+    "PROCESSING",
+    "SHIPPED",
+    "DELIVERED",
+    "RETURN_REQUESTED",
+    "CANCELLED",
+    "RETURNED",
+  ]),
 });
 
 async function requireAdminSession() {
@@ -43,7 +52,10 @@ export async function PATCH(request: Request) {
     const order = await prisma.$transaction(async (tx) => {
       const updated = await tx.order.update({
         where: { id: orderId },
-        data: { status },
+        data: {
+          status,
+          paymentStatus: status === "RETURNED" ? "REFUNDED" : status === "CANCELLED" ? "FAILED" : undefined,
+        },
       });
 
       await tx.orderTrackingEvent.create({

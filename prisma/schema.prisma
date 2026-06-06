@@ -17,6 +17,7 @@ enum OrderStatus {
   PROCESSING
   SHIPPED
   DELIVERED
+  RETURN_REQUESTED
   CANCELLED
   RETURNED
 }
@@ -152,6 +153,8 @@ model Order {
   taxAmount          Decimal                 @db.Decimal(10, 2) @default(0)
   shippingAmount     Decimal                 @db.Decimal(10, 2) @default(0)
   discountAmount     Decimal                 @db.Decimal(10, 2) @default(0)
+  returnRequestedAt  DateTime?
+  returnReason       String?
   shippingAddress    Address?                @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
   shippingAddressId  Int?
   billingAddress     Address?                @relation("BillingAddress", fields: [billingAddressId], references: [id])
