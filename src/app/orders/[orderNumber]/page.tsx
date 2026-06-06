@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import OrderTrackingTimeline from "@/components/order/OrderTrackingTimeline";
+import OrderInvoiceActions from "@/components/order/OrderInvoiceActions";
 
 function formatOrderDate(date: Date | null) {
   if (!date) return "—";
@@ -74,12 +75,31 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
                 Review the latest status updates and delivery timeline for your order.
               </p>
             </div>
-            <Link
-              href="/orders"
-              className="inline-flex rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-muted"
-            >
-              Back to order history
-            </Link>
+            <div className="flex flex-col gap-3 sm:items-end">
+              <Link
+                href="/orders"
+                className="inline-flex rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-muted"
+              >
+                Back to order history
+              </Link>
+              <OrderInvoiceActions
+                orderNumber={order.orderNumber}
+                placedAt={order.placedAt?.toISOString()}
+                status={order.status}
+                paymentStatus={order.paymentStatus}
+                paymentMethod={order.paymentMethod}
+                totalAmount={order.totalAmount.toString()}
+                shippingAmount={order.shippingAmount.toString()}
+                taxAmount={order.taxAmount.toString()}
+                discountAmount={order.discountAmount.toString()}
+                items={order.items.map((item) => ({
+                  name: item.name,
+                  quantity: item.quantity,
+                  unitPrice: item.unitPrice.toString(),
+                  totalPrice: item.totalPrice.toString(),
+                }))}
+              />
+            </div>
           </div>
         </div>
 
