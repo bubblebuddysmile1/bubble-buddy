@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
-import { sendOrderStatusUpdateEmail } from "@/lib/order-emails";
+import { notifyOrderStatusUpdate } from "@/lib/order-notifications";
 
 const updateOrderSchema = z.object({
   orderId: z.number(),
@@ -70,8 +70,8 @@ export async function PATCH(request: Request) {
       return updated;
     });
 
-    await sendOrderStatusUpdateEmail(order.orderNumber, order.status).catch((error) => {
-      console.error("[api/admin/orders] Failed to send order status update email:", error);
+    await notifyOrderStatusUpdate(order.orderNumber, order.status).catch((error) => {
+      console.error("[api/admin/orders] Failed to send order status update notification:", error);
     });
 
     return NextResponse.json({ id: order.id, status: order.status });
