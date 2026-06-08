@@ -6,6 +6,7 @@ import { persistOrderAfterPayment, confirmOrder, cancelOrder } from "@/lib/order
 import { isMockPaymentMode, createRazorpayClient } from "@/lib/razorpay";
 import { verifyPaymentSchema } from "@/lib/validations/payment";
 import { prisma } from "@/lib/prisma";
+import { sendOrderConfirmationEmail, sendPaymentFailureEmail } from "@/lib/order-emails";
 
 export async function POST(request: Request) {
   try {
@@ -79,8 +80,14 @@ export async function POST(request: Request) {
     let finalOrder = savedOrder;
     if (paymentSuccessful) {
       finalOrder = await confirmOrder(razorpay_order_id, razorpay_payment_id, razorpay_signature);
+      await sendOrderConfirmationEmail(finalOrder.orderNumber).catch((error) => {
+        console.error("[payments/verify] Failed to send order confirmation email:", error);
+      });
     } else {
       finalOrder = await cancelOrder(razorpay_order_id);
+      await sendPaymentFailureEmail(finalOrder.orderNumber).catch((error) => {
+        console.error("[payments/verify] Failed to send payment failure email:", error);
+      });
       return NextResponse.json({
         verified: false,
         mock: isMockPaymentMode(),

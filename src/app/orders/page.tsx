@@ -105,13 +105,29 @@ export default async function OrdersPage() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-5 flex justify-end">
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
                   <Link
                     href={`/orders/${order.orderNumber}`}
                     className="inline-flex rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-muted"
                   >
                     Track order
                   </Link>
+                  {order.status === "DELIVERED" ? (
+                    <Link
+                      href={`/orders/${order.orderNumber}`}
+                      className="inline-flex rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                    >
+                      Request return
+                    </Link>
+                  ) : order.status === "RETURN_REQUESTED" ? (
+                    <span className="inline-flex items-center justify-center rounded-full bg-amber-100 px-5 py-3 text-sm font-semibold text-amber-700">
+                      Return requested
+                    </span>
+                  ) : order.status === "RETURNED" ? (
+                    <span className="inline-flex items-center justify-center rounded-full bg-emerald-100 px-5 py-3 text-sm font-semibold text-emerald-700">
+                      Returned
+                    </span>
+                  ) : null}
                 </div>
               </div>
             ))}

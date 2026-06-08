@@ -15,7 +15,7 @@ export default function OrderReturnRequest({ orderNumber, status, returnReason }
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [requestStatus, setRequestStatus] = useState(status);
 
-  const canRequestReturn = requestStatus === "DELIVERED" || requestStatus === "SHIPPED";
+  const canRequestReturn = requestStatus === "DELIVERED";
   const isRequested = requestStatus === "RETURN_REQUESTED";
   const isReturned = requestStatus === "RETURNED";
 
@@ -27,7 +27,7 @@ export default function OrderReturnRequest({ orderNumber, status, returnReason }
       return "A return request is pending approval. You will be notified once it is reviewed.";
     }
     if (requestStatus === "SHIPPED") {
-      return "Your order is on the way — you can request a return if the package does not arrive or is damaged.";
+      return "This order is still in transit. A return can only be requested once it is delivered.";
     }
     return "You can request a return for this order if items arrive damaged or not as described.";
   }, [isReturned, isRequested, requestStatus]);
