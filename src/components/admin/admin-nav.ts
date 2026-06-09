@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   FolderTree,
   ImageIcon,
   LayoutDashboard,
@@ -25,5 +26,8 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { label: "Promotions", href: "/admin/promotions", icon: Tag },
   { label: "Customers", href: "/admin/customers", icon: Users },
   {label: "Reviews", href: "/admin/reviews", icon: ImageIcon },
+  {label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  {label: "Sales charts", href: "/admin/sales-charts", icon: BarChart3 },
+  {label: "Revenue", href: "/admin/revenue-reports", icon: BarChart3 },
   { label: "View store", href: "/", icon: Store, external: true },
 ];
