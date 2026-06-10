@@ -47,7 +47,7 @@ export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps)
         </button>
       </div>
 
-      <nav className="flex-1 space-y-1 p-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
         {ADMIN_NAV_ITEMS.map((item) => {
           const active = !item.external && isActivePath(pathname, item.href, item.exact);
           const Icon = item.icon;

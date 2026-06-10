@@ -1,5 +1,8 @@
 import {
+  Activity,
   BarChart3,
+  Database,
+  Download,
   FolderTree,
   ImageIcon,
   LayoutDashboard,
@@ -7,6 +10,7 @@ import {
   ShoppingBag,
   Store,
   Tag,
+  TrendingUp,
   Users,
 } from "lucide-react";
 
@@ -29,5 +33,9 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   {label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   {label: "Sales charts", href: "/admin/sales-charts", icon: BarChart3 },
   {label: "Revenue", href: "/admin/revenue-reports", icon: BarChart3 },
+  {label: "Best Selling", href: "/admin/best-selling-products", icon: TrendingUp },
+  {label: "Inventory", href: "/admin/inventory-reports", icon: Database },
+  {label: "Export Reports", href: "/admin/export-reports", icon: Download },
+  {label: "Admin Metrics", href: "/admin/admin-metrics", icon: Activity },
   { label: "View store", href: "/", icon: Store, external: true },
 ];
