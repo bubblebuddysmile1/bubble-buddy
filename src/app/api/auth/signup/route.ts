@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME, authCookieOptions, createAuthToken } from "@/lib/auth";
+import { logActivity } from "@/lib/activity-log";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -34,8 +35,15 @@ export async function POST(req: NextRequest) {
     role: user.role,
   });
 
+  await logActivity({
+    userId: user.id,
+    eventType: "AUDIT_TRAIL",
+    action: "User registered",
+    description: `New user created with email ${user.email}`,
+  });
+
   const response = NextResponse.json({
-    user: { id: user.id, email: user.email, name: user.name },
+    user: { id: user.id, email: user.email, name: user.name, role: user.role },
     token,
   });
 

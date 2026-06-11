@@ -36,6 +36,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   {label: "Best Selling", href: "/admin/best-selling-products", icon: TrendingUp },
   {label: "Inventory", href: "/admin/inventory-reports", icon: Database },
   {label: "Export Reports", href: "/admin/export-reports", icon: Download },
+  {label: "Activity Logs", href: "/admin/activity-logs", icon: Activity },
   {label: "Admin Metrics", href: "/admin/admin-metrics", icon: Activity },
   { label: "View store", href: "/", icon: Store, external: true },
 ];

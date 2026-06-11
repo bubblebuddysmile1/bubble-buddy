@@ -1,11 +1,16 @@
 import jwt from "jsonwebtoken";
 
+export type UserRole = "CUSTOMER" | "ADMIN";
+
 export type AuthTokenPayload = {
   id: number;
   email: string;
   name?: string | null;
-  role: string;
+  role: UserRole;
 };
+
+export const ADMIN_ROLE: UserRole = "ADMIN";
+export const CUSTOMER_ROLE: UserRole = "CUSTOMER";
 
 export const COOKIE_NAME = "bubble_auth_token";
 
@@ -30,4 +35,17 @@ export function verifyAuthToken(token: string): AuthTokenPayload | null {
   } catch (error) {
     return null;
   }
+}
+
+export function isAdminPayload(payload: AuthTokenPayload | null): payload is AuthTokenPayload {
+  return payload?.role === ADMIN_ROLE;
+}
+
+export function hasRole(payload: AuthTokenPayload | null, role: UserRole | UserRole[]): boolean {
+  if (!payload) return false;
+  if (Array.isArray(role)) {
+    return role.includes(payload.role);
+  }
+
+  return payload.role === role;
 }

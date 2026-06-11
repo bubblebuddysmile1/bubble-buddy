@@ -1,8 +1,10 @@
 import AdminHeader from "@/components/admin/AdminHeader";
 import { prisma } from "@/lib/prisma";
-import { Activity, Clock, TrendingUp, Users, ShoppingCart, Package, AlertCircle, CheckCircle } from "lucide-react";
+import { Activity, AlertCircle, CheckCircle, Clock, ShieldCheck, TrendingUp, Users, ShoppingCart, Package } from "lucide-react";
 
 export default async function AdminMetricsPage() {
+  const periodStart = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
   const [
     totalUsers,
     totalOrders,
@@ -12,6 +14,10 @@ export default async function AdminMetricsPage() {
     completedOrders,
     recentUsers,
     recentOrders,
+    recentLogins,
+    recentFailedLogins,
+    recentAdminActions,
+    recentSecurityAlerts,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.order.count(),
@@ -22,16 +28,28 @@ export default async function AdminMetricsPage() {
     prisma.user.count({
       where: {
         createdAt: {
-          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+          gte: periodStart,
         },
       },
     }),
     prisma.order.count({
       where: {
         placedAt: {
-          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+          gte: periodStart,
         },
       },
+    }),
+    prisma.activityLog.count({
+      where: { eventType: "LOGIN", createdAt: { gte: periodStart } },
+    }),
+    prisma.activityLog.count({
+      where: { eventType: "FAILED_LOGIN", createdAt: { gte: periodStart } },
+    }),
+    prisma.activityLog.count({
+      where: { eventType: "ADMIN_ACTION", createdAt: { gte: periodStart } },
+    }),
+    prisma.activityLog.count({
+      where: { eventType: "SECURITY_ALERT", createdAt: { gte: periodStart } },
     }),
   ]);
 
@@ -280,6 +298,40 @@ export default async function AdminMetricsPage() {
             </div>
           </section>
         )}
+
+        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <h2 className="text-xl font-semibold text-foreground">Security Monitoring</h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-[1.75rem] border border-border bg-background p-6 shadow-sm">
+              <div className="rounded-2xl bg-blue-600/10 p-3 text-blue-600">
+                <Clock className="size-6" />
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground">Successful Logins</p>
+              <p className="mt-2 text-3xl font-bold text-foreground">{recentLogins}</p>
+            </div>
+            <div className="rounded-[1.75rem] border border-border bg-background p-6 shadow-sm">
+              <div className="rounded-2xl bg-red-600/10 p-3 text-red-600">
+                <Activity className="size-6" />
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground">Failed Login Attempts</p>
+              <p className="mt-2 text-3xl font-bold text-foreground">{recentFailedLogins}</p>
+            </div>
+            <div className="rounded-[1.75rem] border border-border bg-background p-6 shadow-sm">
+              <div className="rounded-2xl bg-purple-600/10 p-3 text-purple-600">
+                <ShieldCheck className="size-6" />
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground">Admin Actions</p>
+              <p className="mt-2 text-3xl font-bold text-foreground">{recentAdminActions}</p>
+            </div>
+            <div className="rounded-[1.75rem] border border-border bg-background p-6 shadow-sm">
+              <div className="rounded-2xl bg-yellow-600/10 p-3 text-yellow-600">
+                <AlertCircle className="size-6" />
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground">Security Alerts</p>
+              <p className="mt-2 text-3xl font-bold text-foreground">{recentSecurityAlerts}</p>
+            </div>
+          </div>
+        </section>
       </div>
     </>
   );

@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME, authCookieOptions, createAuthToken } from "@/lib/auth";
+import { logActivity } from "@/lib/activity-log";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -14,11 +15,26 @@ export async function POST(req: NextRequest) {
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
+    await logActivity({
+      eventType: "FAILED_LOGIN",
+      action: "Failed sign-in attempt",
+      description: `Invalid credentials for ${email}`,
+      metadata: JSON.stringify({ email }),
+    });
+
     return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
   }
 
   const isValid = await bcrypt.compare(password, user.password);
   if (!isValid) {
+    await logActivity({
+      userId: user.id,
+      eventType: "FAILED_LOGIN",
+      action: "Failed sign-in attempt",
+      description: `Incorrect password for ${email}`,
+      metadata: JSON.stringify({ email }),
+    });
+
     return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
   }
 
@@ -29,8 +45,16 @@ export async function POST(req: NextRequest) {
     role: user.role,
   });
 
+  await logActivity({
+    userId: user.id,
+    eventType: "LOGIN",
+    action: "User signed in",
+    description: `User signed in with ${email}`,
+    metadata: JSON.stringify({ email }),
+  });
+
   const response = NextResponse.json({
-    user: { id: user.id, email: user.email, name: user.name },
+    user: { id: user.id, email: user.email, name: user.name, role: user.role },
     token,
   });
 

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 import { notifyOrderStatusUpdate } from "@/lib/order-notifications";
+import { logActivity } from "@/lib/activity-log";
 
 const updateOrderSchema = z.object({
   orderId: z.number(),
@@ -73,6 +74,18 @@ export async function PATCH(request: Request) {
     await notifyOrderStatusUpdate(order.orderNumber, order.status).catch((error) => {
       console.error("[api/admin/orders] Failed to send order status update notification:", error);
     });
+
+    const cookieStore = await cookies();
+    const token = cookieStore.get(COOKIE_NAME)?.value;
+    const payload = token ? verifyAuthToken(token) : null;
+    if (payload) {
+      await logActivity({
+        userId: payload.id,
+        eventType: "ADMIN_ACTION",
+        action: "Updated order status",
+        description: `Order ${order.orderNumber} updated to ${order.status}`,
+      });
+    }
 
     return NextResponse.json({ id: order.id, status: order.status });
   } catch (error) {
