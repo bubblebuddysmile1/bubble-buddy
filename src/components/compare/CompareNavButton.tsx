@@ -17,7 +17,7 @@ export default function CompareNavButton() {
       <div className="relative inline-flex items-center justify-center">
         <Columns className="size-5 text-foreground" />
         {count > 0 ? (
-          <span className="pointer-events-none absolute -right-2 -top-2 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground">
+          <span className="pointer-events-none absolute -right-2 -top-2 inline-flex h-5 min-w-[==1.25rem items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground">
             {count}
           </span>
         ) : null}
