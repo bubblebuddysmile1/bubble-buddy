@@ -15,7 +15,7 @@ if (!databaseUrl && !isGenerateCommand) {
 
 export default defineConfig({
   datasource: {
-    url: databaseUrl ?? "mysql://127.0.0.1:3306/bubble_buddy",
+    url: databaseUrl ?? "postgresql://127.0.0.1:5432/bubble_buddy",
   },
   migrations: {
     path: "prisma/migrations",

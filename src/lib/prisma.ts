@@ -1,20 +1,14 @@
-import * as PrismaPkg from "@prisma/client";
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-// Some Prisma client builds may export differently depending on environment.
-// Safely resolve the PrismaClient constructor at runtime and fall back to any.
-const PrismaClientCtor = (PrismaPkg as any).PrismaClient ?? (PrismaPkg as any).default ?? (PrismaPkg as any);
-
-type PrismaClientAny = PrismaPkg.PrismaClient;
-
+type PrismaClientAny = PrismaClient;
 const globalForPrisma = global as unknown as { prisma?: PrismaClientAny };
+const adapter = new PrismaPg(process.env.DATABASE_URL ?? "");
 
-const mariadbAdapter = new PrismaMariaDb(process.env.DATABASE_URL ?? "");
-
-export const prisma: PrismaPkg.PrismaClient =
+export const prisma: PrismaClient =
   globalForPrisma.prisma ??
-  new (PrismaClientCtor as any)({
-    adapter: mariadbAdapter,
+  new PrismaClient({
+    adapter,
     log: [],
   });
 
