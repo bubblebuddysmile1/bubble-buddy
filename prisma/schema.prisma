@@ -42,21 +42,23 @@ enum DiscountType {
 }
 
 model User {
-  id           Int                     @id @default(autoincrement())
-  email        String                  @unique
-  password     String
-  name         String?
-  phone        String?
-  role         UserRole                @default(CUSTOMER)
-  createdAt    DateTime                @default(now())
-  updatedAt    DateTime                @updatedAt
-  addresses    Address[]
-  cartItems    CartItem[]
-  orders       Order[]
-  favorites    Favorite[]
-  reviews      Review[]
-  newsletter   NewsletterSubscription?
-  activityLogs ActivityLog[]
+  id                  Int                     @id @default(autoincrement())
+  email               String                  @unique
+  password            String
+  name                String?
+  phone               String?
+  role                UserRole                @default(CUSTOMER)
+  failedLoginAttempts Int                     @default(0)
+  lockedUntil         DateTime?
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+  addresses           Address[]
+  cartItems           CartItem[]
+  orders              Order[]
+  favorites           Favorite[]
+  reviews             Review[]
+  newsletter          NewsletterSubscription?
+  activityLogs        ActivityLog[]
 }
 
 enum ActivityType {

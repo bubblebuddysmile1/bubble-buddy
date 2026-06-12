@@ -49,3 +49,13 @@ export function hasRole(payload: AuthTokenPayload | null, role: UserRole | UserR
 
   return payload.role === role;
 }
+
+export function isAccountLocked(lockedUntil: Date | null | undefined): boolean {
+  if (!lockedUntil) return false;
+  return new Date() < lockedUntil;
+}
+
+export function getAccountLockoutDuration(): number {
+  // 1.5 hours in milliseconds
+  return 1.5 * 60 * 60 * 1000;
+}

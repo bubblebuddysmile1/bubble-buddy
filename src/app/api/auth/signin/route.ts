@@ -1,8 +1,10 @@
 import bcrypt from "bcrypt";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { COOKIE_NAME, authCookieOptions, createAuthToken } from "@/lib/auth";
+import { COOKIE_NAME, authCookieOptions, createAuthToken, isAccountLocked, getAccountLockoutDuration } from "@/lib/auth";
 import { logActivity } from "@/lib/activity-log";
+
+const MAX_FAILED_ATTEMPTS = 5;
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -13,7 +15,40 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      email: true,
+      password: true,
+      name: true,
+      phone: true,
+      role: true,
+      failedLoginAttempts: true,
+      lockedUntil: true,
+    },
+  });
+
+  // Check if account is locked
+  if (user && user.lockedUntil && isAccountLocked(user.lockedUntil)) {
+    const lockoutExpiry = user.lockedUntil as Date;
+    const remainingMinutes = Math.ceil((lockoutExpiry.getTime() - Date.now()) / 60000);
+
+    await logActivity({
+      eventType: "SECURITY_ALERT",
+      action: "Login attempt on locked account",
+      description: `Account locked for ${email}. Locked until ${lockoutExpiry.toISOString()}`,
+      metadata: JSON.stringify({ email }),
+    });
+
+    return NextResponse.json(
+      {
+        error: `Account is temporarily locked. Please try again in ${remainingMinutes} minute${remainingMinutes !== 1 ? "s" : ""}. Too many failed login attempts.`,
+      },
+      { status: 429 },
+    );
+  }
+
   if (!user) {
     await logActivity({
       eventType: "FAILED_LOGIN",
@@ -27,16 +62,55 @@ export async function POST(req: NextRequest) {
 
   const isValid = await bcrypt.compare(password, user.password);
   if (!isValid) {
+    // Increment failed attempts and lock if threshold reached
+    const newFailedAttempts = user.failedLoginAttempts + 1;
+    const shouldLock = newFailedAttempts >= MAX_FAILED_ATTEMPTS;
+    const lockedUntil = shouldLock ? new Date(Date.now() + getAccountLockoutDuration()) : null;
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        failedLoginAttempts: newFailedAttempts,
+        lockedUntil,
+      },
+    });
+
     await logActivity({
       userId: user.id,
       eventType: "FAILED_LOGIN",
       action: "Failed sign-in attempt",
-      description: `Incorrect password for ${email}`,
-      metadata: JSON.stringify({ email }),
+      description: `Incorrect password for ${email}. Attempt ${newFailedAttempts}/${MAX_FAILED_ATTEMPTS}`,
+      metadata: JSON.stringify({ email, attemptCount: newFailedAttempts }),
     });
+
+    if (shouldLock) {
+      await logActivity({
+        userId: user.id,
+        eventType: "SECURITY_ALERT",
+        action: "Account locked",
+        description: `Account ${email} locked due to ${MAX_FAILED_ATTEMPTS} failed login attempts`,
+        metadata: JSON.stringify({ email, lockedUntil: lockedUntil?.toISOString() }),
+      });
+
+      return NextResponse.json(
+        {
+          error: "Too many failed login attempts. Your account is locked for 1.5 hours. Please try again later.",
+        },
+        { status: 429 },
+      );
+    }
 
     return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
   }
+
+  // Successful login - reset failed attempts
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      failedLoginAttempts: 0,
+      lockedUntil: null,
+    },
+  });
 
   const token = createAuthToken({
     id: user.id,
