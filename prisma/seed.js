@@ -2,8 +2,8 @@ require("dotenv").config();
 const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
 
-const ADMIN_EMAIL = "admin@bubblebuddy.com";
-const ADMIN_PASSWORD = "Admin@chirag";
+const ADMIN_EMAIL = "Adminchirag@bubblebuddysmile.com";
+const ADMIN_PASSWORD = "Manzil#CMR#316";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
