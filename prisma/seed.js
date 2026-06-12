@@ -1,7 +1,6 @@
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
-const { PrismaMariaDb } = require("@prisma/adapter-mariadb");
 
 const ADMIN_EMAIL = "admin@bubblebuddy.com";
 const ADMIN_PASSWORD = "Admin@chirag";
@@ -11,8 +10,7 @@ if (!databaseUrl) {
   throw new Error("DATABASE_URL is missing. Add it to your .env file.");
 }
 
-const adapter = new PrismaMariaDb(databaseUrl);
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 async function main() {
   const adminPasswordHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
