@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
@@ -9,8 +10,8 @@ type PromotionRecord = {
   title: string;
   description: string | null;
   discountType: "PERCENTAGE" | "FIXED";
-  discountValue: string;
-  minOrderAmount: string;
+  discountValue: Prisma.Decimal;
+  minOrderAmount: Prisma.Decimal;
   activeFrom: Date | null;
   activeUntil: Date | null;
   isActive: boolean;

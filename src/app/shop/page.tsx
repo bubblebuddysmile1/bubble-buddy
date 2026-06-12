@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import ShopBrowser from "@/components/store/ShopBrowser";
 
 export default function ShopPage() {
@@ -12,7 +13,9 @@ export default function ShopPage() {
           </p>
         </div>
 
-        <ShopBrowser />
+        <Suspense fallback={<div className="rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">Loading shop browser...</div>}>
+          <ShopBrowser />
+        </Suspense>
       </div>
     </main>
   );
