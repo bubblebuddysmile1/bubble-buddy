@@ -1,3 +1,5 @@
+import { createJSONStorage } from "zustand/middleware";
+
 const CURRENT_USER_STORAGE_KEY = "bubble-buddy-current-user";
 const CART_STORAGE_PREFIX = "bubble-buddy-cart";
 const WISHLIST_STORAGE_PREFIX = "bubble-buddy-wishlist";
@@ -106,47 +108,47 @@ export function getGuestCompareItems(): unknown[] | null {
   return parsePersistedItems(raw);
 }
 
-export const cartStorage = {
-  getItem: (_name: string) => {
+export const cartStorage = createJSONStorage(() => ({
+  getItem: (name: string) => {
     if (!isBrowser()) return null;
     return window.localStorage.getItem(getCurrentCartStorageKey());
   },
-  setItem: (_name: string, value: string) => {
+  setItem: (name: string, value: string) => {
     if (!isBrowser()) return;
     window.localStorage.setItem(getCurrentCartStorageKey(), value);
   },
-  removeItem: (_name: string) => {
+  removeItem: (name: string) => {
     if (!isBrowser()) return;
     window.localStorage.removeItem(getCurrentCartStorageKey());
   },
-};
+}));
 
-export const wishlistStorage = {
-  getItem: (_name: string) => {
+export const wishlistStorage = createJSONStorage(() => ({
+  getItem: (name: string) => {
     if (!isBrowser()) return null;
     return window.localStorage.getItem(getCurrentWishlistStorageKey());
   },
-  setItem: (_name: string, value: string) => {
+  setItem: (name: string, value: string) => {
     if (!isBrowser()) return;
     window.localStorage.setItem(getCurrentWishlistStorageKey(), value);
   },
-  removeItem: (_name: string) => {
+  removeItem: (name: string) => {
     if (!isBrowser()) return;
     window.localStorage.removeItem(getCurrentWishlistStorageKey());
   },
-};
+}));
 
-export const compareStorage = {
-  getItem: (_name: string) => {
+export const compareStorage = createJSONStorage(() => ({
+  getItem: (name: string) => {
     if (!isBrowser()) return null;
     return window.localStorage.getItem(getCurrentCompareStorageKey());
   },
-  setItem: (_name: string, value: string) => {
+  setItem: (name: string, value: string) => {
     if (!isBrowser()) return;
     window.localStorage.setItem(getCurrentCompareStorageKey(), value);
   },
-  removeItem: (_name: string) => {
+  removeItem: (name: string) => {
     if (!isBrowser()) return;
     window.localStorage.removeItem(getCurrentCompareStorageKey());
   },
-};
+}));

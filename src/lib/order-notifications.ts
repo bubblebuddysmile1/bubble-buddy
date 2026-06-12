@@ -57,7 +57,11 @@ function formatAmount(amount: string | number | { toNumber(): number }) {
   return `$${value.toFixed(2)}`;
 }
 
-function buildWhatsAppBody(order: Awaited<ReturnType<typeof loadOrder>>, type: "confirmation" | "payment_failed" | "status_update", status?: string) {
+function buildWhatsAppBody(
+  order: Exclude<Awaited<ReturnType<typeof loadOrder>>, null>,
+  type: "confirmation" | "payment_failed" | "status_update",
+  status?: string,
+) {
   const recipient = order.user?.name ?? order.shippingAddress?.recipient ?? "Customer";
   const orderLink = `${APP_URL}/orders/${order.orderNumber}`;
 

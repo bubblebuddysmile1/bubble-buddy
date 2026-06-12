@@ -54,7 +54,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
   }
 
   const events = order.trackingEvents.length
-    ? order.trackingEvents
+    ? order.trackingEvents.map((event) => ({
+        ...event,
+        createdAt: event.createdAt.toISOString(),
+      }))
     : [
         {
           id: 0,

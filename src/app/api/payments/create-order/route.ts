@@ -114,7 +114,7 @@ export async function POST(request: Request) {
       amount,
       currency,
       receipt,
-      payment_capture: 1,
+      payment_capture: true,
       notes: {
         customer: address.fullName,
         phone: address.phone,
