@@ -17,6 +17,8 @@ export default function ProductReviews({ productId, productSlug, averageRating, 
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [displayReviewCount, setDisplayReviewCount] = useState(reviewCount ?? 0);
+  const [displayAverageRating, setDisplayAverageRating] = useState(averageRating ?? 0);
   const perPage = 4;
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState("");
@@ -30,6 +32,8 @@ export default function ProductReviews({ productId, productSlug, averageRating, 
         const data = await res.json();
         setReviews(data.reviews ?? []);
         setTotal(data.total ?? 0);
+        setDisplayReviewCount(data.total ?? 0);
+        setDisplayAverageRating(data.averageRating ?? displayAverageRating);
       }
     } finally {
       setLoading(false);
@@ -38,7 +42,9 @@ export default function ProductReviews({ productId, productSlug, averageRating, 
 
   useEffect(() => {
     setPage(1);
-  }, [productId]);
+    setDisplayReviewCount(reviewCount ?? 0);
+    setDisplayAverageRating(averageRating ?? 0);
+  }, [productId, reviewCount, averageRating]);
 
   useEffect(() => { load(page); }, [productId, page]);
 
@@ -65,10 +71,10 @@ export default function ProductReviews({ productId, productSlug, averageRating, 
     <section className="mt-12">
       <h2 className="text-lg font-semibold">Reviews</h2>
       <div className="mt-2 flex items-center gap-4">
-        <div className="text-2xl font-bold">{Number(averageRating ?? 0).toFixed(1)}</div>
+        <div className="text-2xl font-bold">{Number(displayAverageRating ?? 0).toFixed(1)}</div>
         <div>
-          <StarRating value={Math.round((averageRating ?? 0))} readOnly size={18} />
-          <div className="text-sm text-muted-foreground">{reviewCount ?? 0} reviews</div>
+          <StarRating value={Math.round(displayAverageRating ?? 0)} readOnly size={18} />
+          <div className="text-sm text-muted-foreground">{displayReviewCount ?? 0} reviews</div>
         </div>
       </div>
 

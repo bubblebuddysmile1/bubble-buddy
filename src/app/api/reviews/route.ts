@@ -37,6 +37,11 @@ export async function GET(req: NextRequest) {
   const where = { productId: pid, approved: true };
 
   const total = await prisma.review.count({ where });
+  const agg = await prisma.review.aggregate({
+    where,
+    _avg: { rating: true },
+  });
+  const averageRating = Number(agg._avg.rating ?? 0);
 
   const reviews = await prisma.review.findMany({
     where,
@@ -46,8 +51,15 @@ export async function GET(req: NextRequest) {
     take: limit,
   });
 
-  return NextResponse.json({ reviews: reviews.map(normalizeReview), total, page, perPage: limit });
+  return NextResponse.json({
+    reviews: reviews.map(normalizeReview),
+    total,
+    averageRating,
+    page,
+    perPage: limit,
+  });
 }
+
 
 export async function POST(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -86,7 +98,7 @@ export async function POST(req: NextRequest) {
       rating,
       title,
       body: text,
-      approved: verified, // auto-approve verified purchases, else require moderation
+      approved: true, // show reviews immediately
       verifiedPurchase: verified,
       user: { connect: { id: auth.id } },
       product: { connect: { id: pid } },
