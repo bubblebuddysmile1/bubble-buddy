@@ -4,9 +4,9 @@ import "./globals.css";
 import AppChrome from "@/components/layout/AppChrome";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? ""),
   title: {
-    default: "Bubble Buddy",
+    default: "Bubble Buddy smile",
     template: "%s | Bubble Buddy",
   },
   description:
