@@ -137,7 +137,7 @@ function UserMenu() {
                 onClick={() => router.push("/admin/products")}
                 className="w-full rounded-2xl px-4 py-3 text-left text-sm text-foreground transition hover:bg-muted hover:text-primary"
               >
-                Admin · Product images
+                Admin · Products 
               </button>
             )}
             <div className="border-t border-border pt-2">
