@@ -42,7 +42,7 @@ export const checkoutAddressDefaultValues: CheckoutAddressForm = {
   city: "",
   state: "",
   postalCode: "",
-  country: "Pakistan",
+  country: "",
 };
 
 export function formatZodFieldErrors(
