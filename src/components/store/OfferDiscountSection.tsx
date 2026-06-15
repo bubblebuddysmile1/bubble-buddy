@@ -53,12 +53,8 @@ export default function OfferDiscountSection() {
       <div className="container mx-auto px-4">
         <div className="mb-10 text-center">
           <p className="text-xs uppercase tracking-[0.32em] text-primary">Offers & Discounts</p>
-          <h2 className="mt-4 text-3xl font-semibold text-foreground sm:text-4xl">
-            Explore limited-time deals across categories
-          </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Promotion cards now reflect active coupon offers configured from the admin panel.
-          </p>
+          Exclusive beauty deals and special savings on your favorite essentials. 💖          </p>
         </div>
 
         {error ? (

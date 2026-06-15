@@ -34,16 +34,6 @@ export default function Home() {
           <div className="h-px flex-1 bg-gradient from-transparent via-[#c9a97a] to-transparent" />
         </div>
 
-        {/* Main heading */}
-        <h2 className="text-center font-serif text-[1.65rem] font-bold leading-snug text-[#2a2218]">
-          Discover our most-loved products with a premium animated design.
-        </h2>
-
-        {/* Description */}
-        <p className="text-center text-[13px] leading-relaxed text-[#9e9488]">
-          Each product card glows with subtle motion, gradient accents, and a
-          polished layout built to make your best sellers feel irresistible.
-        </p>
       </div>
       <AdvancedPromoSection />
       <PromoBannerSection/>

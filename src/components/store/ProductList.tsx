@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -62,12 +62,12 @@ export default function ProductList() {
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="mb-10 flex flex-col items-center gap-4 text-center">
-          <p className="text-xs uppercase tracking-[0.32em] text-primary">Product List</p>
-          <h2 className="text-3xl font-semibold text-foreground sm:text-4xl">
-            Browse our product collection
-          </h2>
+          <p className="text-xs uppercase tracking-[0.32em] text-primary">
+            Product List
+          </p>
           <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
-            Explore products dynamically pulled from the store. Add items to cart directly or visit the shop for the full catalog.
+            Explore our complete collection of beauty essentials for every
+            routine. ✨{" "}
           </p>
         </div>
 
@@ -100,7 +100,10 @@ export default function ProductList() {
                     className="group overflow-hidden rounded-[2rem] border border-border bg-card p-4 shadow-lg shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
                   >
                     <div className="relative overflow-hidden rounded-[1.75rem] bg-muted">
-                      <Link href={`/shop/${product.slug}`} className="block h-52 w-full">
+                      <Link
+                        href={`/shop/${product.slug}`}
+                        className="block h-52 w-full"
+                      >
                         <Image
                           src={product.thumbnail ?? "/category/1.jpg"}
                           alt={product.name}
@@ -113,8 +116,13 @@ export default function ProductList() {
 
                     <div className="mt-4 space-y-3">
                       <div>
-                        <Link href={`/shop/${product.slug}`} className="hover:text-primary">
-                          <h3 className="mt-2 text-lg font-semibold text-foreground">{product.name}</h3>
+                        <Link
+                          href={`/shop/${product.slug}`}
+                          className="hover:text-primary"
+                        >
+                          <h3 className="mt-2 text-lg font-semibold text-foreground">
+                            {product.name}
+                          </h3>
                         </Link>
                       </div>
                       {/* <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">
@@ -123,10 +131,22 @@ export default function ProductList() {
                     </div>
 
                     <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-                      <p className="text-lg font-bold text-foreground">{product.price ?? "₹0"}</p>
+                      <p className="text-lg font-bold text-foreground">
+                        {product.price ?? "₹0"}
+                      </p>
                       <div className="flex items-center gap-2">
-                        <AddToCartButton product={cartProduct} size="sm" label="Add" />
+                        <AddToCartButton
+                          product={cartProduct}
+                          size="sm"
+                          label="Add"
+                        />
                         <CompareButton product={cartProduct} variant="icon" />
+                        <Link
+                          href={`/shop/${product.slug}`}
+                          className="hover:text-primary border border-border rounded-full bg-background px-3 py-1 text-sm font-semibold text-foreground transition hover:bg-muted"
+                        >
+                          view
+                        </Link>
                       </div>
                     </div>
                   </article>
