@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import Link from "next/link";
 
 export default function AdvancedPromoSection() {
@@ -18,12 +18,13 @@ export default function AdvancedPromoSection() {
                 Watch our promo video to discover the best of the store.
               </h2>
               <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-                Enjoy an immersive showcase featuring product highlights, brand storytelling, and exclusive deal previews—all in one place.
+                Enjoy an immersive showcase featuring product highlights, brand
+                storytelling, and exclusive deal previews—all in one place.
               </p>
             </div>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link
-                href="/"
+                href="https://player.cloudinary.com/embed/?cloud_name=djb7ybhl4&public_id=download_d0jty8"
                 className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
               >
                 Watch the video
@@ -37,30 +38,42 @@ export default function AdvancedPromoSection() {
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="rounded-[1.75rem] border border-border bg-card p-4 text-center shadow-sm shadow-black/5">
-                <p className="text-sm font-semibold text-foreground">Instant inspiration</p>
-                <p className="mt-2 text-sm text-muted-foreground">See new collections come to life.</p>
+                <p className="text-sm font-semibold text-foreground">
+                  Instant inspiration
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  See new collections come to life.
+                </p>
               </div>
               <div className="rounded-[1.75rem] border border-border bg-card p-4 text-center shadow-sm shadow-black/5">
-                <p className="text-sm font-semibold text-foreground">Engaging stories</p>
-                <p className="mt-2 text-sm text-muted-foreground">A visual journey through our bestsellers.</p>
+                <p className="text-sm font-semibold text-foreground">
+                  Engaging stories
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  A visual journey through our bestsellers.
+                </p>
               </div>
               <div className="rounded-[1.75rem] border border-border bg-card p-4 text-center shadow-sm shadow-black/5">
-                <p className="text-sm font-semibold text-foreground">Shop with confidence</p>
-                <p className="mt-2 text-sm text-muted-foreground">Video-backed product recommendations.</p>
+                <p className="text-sm font-semibold text-foreground">
+                  Shop with confidence
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Video-backed product recommendations.
+                </p>
               </div>
             </div>
           </div>
 
           <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card p-1 shadow-2xl shadow-black/10">
-            <div className="overflow-hidden rounded-[2rem] bg-black">
-              <video
-                controls
-                poster="/category/1.jpg"
-                className="h-full w-full min-h-80 object-cover"
-              >
-                <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+            <div className="overflow-hidden rounded-[2rem] bg-black aspect-video min-h-80">
+              <iframe
+                src="https://player.cloudinary.com/embed/?cloud_name=djb7ybhl4&public_id=download_d0jty8&source_types[0]=mp4"
+                className="h-full w-full"
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                allowFullScreen
+            
+                title="Promo video"
+              />
             </div>
             <div className="pointer-events-none absolute -right-12 top-12 h-24 w-24 rounded-full bg-primary/10 blur-3xl" />
             <div className="pointer-events-none absolute -left-12 bottom-12 h-24 w-24 rounded-full bg-secondary/10 blur-3xl" />
@@ -70,4 +83,3 @@ export default function AdvancedPromoSection() {
     </section>
   );
 }
-  
