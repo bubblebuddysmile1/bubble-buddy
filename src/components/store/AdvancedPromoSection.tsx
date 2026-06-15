@@ -23,7 +23,7 @@ export default function AdvancedPromoSection() {
             </div>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link
-                href="/shop"
+                href="/"
                 className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
               >
                 Watch the video
@@ -70,3 +70,4 @@ export default function AdvancedPromoSection() {
     </section>
   );
 }
+  

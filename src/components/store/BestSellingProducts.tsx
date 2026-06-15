@@ -69,15 +69,7 @@ export default function BestSellingProducts() {
         <div className="mb-10 flex flex-col gap-4 rounded-[2rem] border border-border bg-card p-8 shadow-lg shadow-black/5">
           <div className="flex items-center gap-3 text-xs uppercase tracking-[0.32em] text-primary">
             <span className="inline-flex rounded-full bg-primary/80 px-3 py-1 text-white">Best Sellers</span>
-            <span className="text-muted-foreground">Curated collection for your daily beauty ritual.</span>
-          </div>
-          <div className="w-full space-y-4">
-            <h2 className="text-3xl font-semibold tracking-tight text-center sm:text-4xl">
-              Discover our most-loved products with a premium animated design.
-            </h2>
-            <p className="text-sm text-muted-foreground text-center sm:text-base">
-              Add best-seller items from admin and customers can buy them instantly from this section.
-            </p>
+            <span className="text-muted-foreground">Curated collection of our most-loved beauty essentials for a radiant daily glow. ✨</span>
           </div>
         </div>
 
