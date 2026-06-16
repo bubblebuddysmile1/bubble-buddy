@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CartItem, CartProduct } from "@/types/cart";
-import { cartStorage } from "@/lib/store-persistence";
+import { cartStorage, getActiveUserId } from "@/lib/store-persistence";
+import { postServerCart } from "@/lib/client-sync";
 
 type CartState = {
   items: CartItem[];
@@ -18,7 +19,7 @@ function clampQuantity(quantity: number, stock: number): number {
 
 export const useCartStore = create<CartState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       items: [],
 
       addItem: (product, quantity = 1) => {
@@ -71,6 +72,16 @@ export const useCartStore = create<CartState>()(
     { name: "bubble-buddy-cart", storage: cartStorage },
   ),
 );
+
+// subscribe to changes and sync to server when user is active
+if (typeof window !== "undefined") {
+  useCartStore.subscribe((state) => {
+    const userId = getActiveUserId();
+    if (!userId) return;
+    const payload = state.items.map((item) => ({ id: item.id, quantity: item.quantity }));
+    void postServerCart(payload);
+  });
+}
 
 export function selectCartCount(state: CartState): number {
   return state.items.reduce((sum, item) => sum + item.quantity, 0);

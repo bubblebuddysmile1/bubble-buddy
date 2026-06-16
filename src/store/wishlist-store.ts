@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { WishlistProduct } from "@/types/wishlist";
-import { wishlistStorage } from "@/lib/store-persistence";
+import { wishlistStorage, getActiveUserId } from "@/lib/store-persistence";
+import { postServerWishlist } from "@/lib/client-sync";
 
 type WishlistState = {
   items: WishlistProduct[];
@@ -41,6 +42,16 @@ export const useWishlistStore = create<WishlistState>()(
     { name: "bubble-buddy-wishlist", storage: wishlistStorage },
   ),
 );
+
+// subscribe to changes and sync to server when user is active
+if (typeof window !== "undefined") {
+  useWishlistStore.subscribe((state) => {
+    const userId = getActiveUserId();
+    if (!userId) return;
+    const payload = state.items.map((item) => ({ id: item.id }));
+    void postServerWishlist(payload);
+  });
+}
 
 export function selectWishlistCount(state: WishlistState): number {
   return state.items.length;
