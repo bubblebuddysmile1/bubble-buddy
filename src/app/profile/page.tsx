@@ -25,6 +25,7 @@ async function getProfileData() {
       name: true,
       role: true,
       phone: true,
+      loyaltyPoints: true,
       createdAt: true,
       _count: { select: { orders: true, favorites: true } },
       orders: {
