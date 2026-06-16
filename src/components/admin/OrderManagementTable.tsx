@@ -9,6 +9,7 @@ export type AdminOrderRow = {
   orderNumber: string;
   customerEmail: string | null;
   customerName: string | null;
+  customerPhone: string | null;
   status: string;
   paymentStatus: string;
   totalAmount: string;
@@ -126,6 +127,7 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
                   <div className="max-w-55 truncate">
                     <p className="font-medium text-foreground">{order.customerName ?? "Guest"}</p>
                     <p className="text-xs">{order.customerEmail ?? "No email"}</p>
+                    {order.customerPhone && <p className="text-xs text-primary">{order.customerPhone}</p>}
                   </div>
                 </td>
                 <td className="px-5 py-4 font-semibold text-foreground">${order.totalAmount}</td>
