@@ -82,7 +82,7 @@ if (typeof window !== "undefined") {
     void postServerCart(payload);
   });
 }
-
+  
 export function selectCartCount(state: CartState): number {
   return state.items.reduce((sum, item) => sum + item.quantity, 0);
 }

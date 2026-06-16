@@ -25,6 +25,7 @@ export async function POST(request: Request) {
       address,
       items,
       couponCode,
+      redeemPoints = 0,
     } = parsed.data;
 
     // Verify signature
@@ -59,6 +60,7 @@ export async function POST(request: Request) {
       items,
       user,
       couponCode,
+      redeemPoints,
     });
 
     // Check payment status from Razorpay
