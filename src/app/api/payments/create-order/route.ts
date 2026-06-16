@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { address, items, couponCode } = parsed.data;
+    const { address, items, couponCode, redeemPoints = 0 } = parsed.data;
     const cartItems: CartItem[] = items.map((item) => ({
       ...item,
       image: "",
@@ -85,11 +85,29 @@ export async function POST(request: Request) {
       }
     }
 
+    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const promotionDiscount = promotion ? getPromotionDiscountAmount(promotion, subtotal) : 0;
+    const discountedSubtotal = Math.max(0, subtotal - promotionDiscount);
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+      select: { loyaltyPoints: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "Unable to load your account." }, { status: 400 });
+    }
+
+    const maxRedeemable = getMaxRedeemablePoints(user.loyaltyPoints, discountedSubtotal);
+    if (redeemPoints > maxRedeemable) {
+      return NextResponse.json({ error: `You can redeem up to ${maxRedeemable} points on this order.` }, { status: 400 });
+    }
+
     const totals = getCheckoutTotals(cartItems, promotion && {
       discountType: promotion.discountType,
       discountValue: Number(promotion.discountValue),
       minOrderAmount: Number(promotion.minOrderAmount),
-    });
+    }, loyaltyDiscountFromRedeem(redeemPoints));
 
     const currency = getPaymentCurrency(totals.currency);
     const amount = toSmallestCurrencyUnit(totals.total);

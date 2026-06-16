@@ -102,6 +102,10 @@ export default async function ProfilePage() {
                 <p className="text-sm text-muted-foreground">Wishlist items</p>
                 <p className="mt-3 text-xl font-semibold text-foreground">{user._count.favorites}</p>
               </div>
+              <div className="rounded-3xl border border-border bg-background/80 p-5 text-center">
+                <p className="text-sm text-muted-foreground">Loyalty points</p>
+                <p className="mt-3 text-xl font-semibold text-foreground">{user.loyaltyPoints}</p>
+              </div>
             </div>
 
             <div className="space-y-6">

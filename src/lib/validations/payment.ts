@@ -15,6 +15,7 @@ export const createPaymentOrderSchema = z.object({
   address: checkoutAddressSchema,
   items: z.array(cartItemSchema).min(1, "Cart cannot be empty"),
   couponCode: z.string().trim().optional(),
+  redeemPoints: z.number().int().nonnegative().optional(),
 });
 
 export type CreatePaymentOrderInput = z.infer<typeof createPaymentOrderSchema>;
@@ -26,6 +27,7 @@ export const verifyPaymentSchema = z.object({
   address: checkoutAddressSchema,
   items: z.array(cartItemSchema).min(1, "Cart cannot be empty"),
   couponCode: z.string().trim().optional(),
+  redeemPoints: z.number().int().nonnegative().optional(),
 });
 
 export type VerifyPaymentInput = z.infer<typeof verifyPaymentSchema>;

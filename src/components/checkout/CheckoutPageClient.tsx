@@ -9,11 +9,16 @@ import CheckoutOrderSummary from "@/components/checkout/CheckoutOrderSummary";
 import { getCheckoutTotals } from "@/lib/checkout";
 import { formatCartMoney } from "@/lib/cart";
 import { loadRazorpayScript, openRazorpayCheckout } from "@/lib/razorpay-client";
+import { formatLoyaltyPoints, getMaxRedeemablePoints, loyaltyDiscountFromRedeem } from "@/lib/loyalty";
 import * as CheckoutValidation from "@/lib/validations/checkout";
 import { useCartStore } from "@/store/cart-store";
 import type { RazorpayHandlerResponse } from "@/types/razorpay-checkout";
 
 type CheckoutAddressValues = typeof CheckoutValidation.checkoutAddressDefaultValues;
+
+type CheckoutPageClientProps = {
+  loyaltyPoints: number;
+};
 
 type CreateOrderResponse = {
   mock: boolean;
@@ -33,7 +38,7 @@ type AppliedPromotion = {
   minOrderAmount: number;
 };
 
-export default function CheckoutPageClient() {
+export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClientProps) {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const [mounted, setMounted] = useState(false);
@@ -46,6 +51,8 @@ export default function CheckoutPageClient() {
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [appliedPromotion, setAppliedPromotion] = useState<AppliedPromotion | null>(null);
+  const [redeemPoints, setRedeemPoints] = useState(0);
+  const [redeemError, setRedeemError] = useState<string | null>(null);
 
   useEffect(() => setMounted(true), []);
 
@@ -56,18 +63,32 @@ export default function CheckoutPageClient() {
     }
   }, [mounted, items.length, router]);
 
-  const totals = useMemo(
+  const promotionDefinition = useMemo(
     () =>
-      getCheckoutTotals(items,
-        appliedPromotion
-          ? {
-              discountType: appliedPromotion.discountType as "PERCENTAGE" | "FIXED",
-              discountValue: appliedPromotion.discountValue,
-              minOrderAmount: appliedPromotion.minOrderAmount,
-            }
-          : undefined,
-      ),
-    [items, appliedPromotion],
+      appliedPromotion
+        ? {
+            discountType: appliedPromotion.discountType as "PERCENTAGE" | "FIXED",
+            discountValue: appliedPromotion.discountValue,
+            minOrderAmount: appliedPromotion.minOrderAmount,
+          }
+        : undefined,
+    [appliedPromotion],
+  );
+
+  const baseTotals = useMemo(
+    () => getCheckoutTotals(items, promotionDefinition),
+    [items, promotionDefinition],
+  );
+
+  const maxRedeemablePoints = useMemo(
+    () => getMaxRedeemablePoints(loyaltyPoints, Math.max(0, baseTotals.subtotal - baseTotals.discount)),
+    [loyaltyPoints, baseTotals.subtotal, baseTotals.discount],
+  );
+
+  const effectiveRedeemPoints = Math.min(Math.max(redeemPoints, 0), maxRedeemablePoints);
+  const totals = useMemo(
+    () => getCheckoutTotals(items, promotionDefinition, loyaltyDiscountFromRedeem(effectiveRedeemPoints)),
+    [items, promotionDefinition, effectiveRedeemPoints],
   );
 
   const handleChange = (field: keyof CheckoutAddressValues, value: string) => {
@@ -102,6 +123,7 @@ export default function CheckoutPageClient() {
           stockQuantity,
         })),
         couponCode: appliedPromotion?.code,
+        redeemPoints: effectiveRedeemPoints,
       }),
     });
 
@@ -212,6 +234,7 @@ export default function CheckoutPageClient() {
             stockQuantity,
           })),
           couponCode: appliedPromotion?.code,
+          redeemPoints: effectiveRedeemPoints,
         }),
       });
 
@@ -360,6 +383,45 @@ export default function CheckoutPageClient() {
                 {appliedPromotion.title} — saved {appliedPromotion.discountType === "PERCENTAGE" ? `${appliedPromotion.discountValue}%` : formatCartMoney(appliedPromotion.discountValue, totals.currency)} off.
               </div>
             )}
+          </section>
+          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+            <div className="mb-4">
+              <p className="text-xs uppercase tracking-[0.28em] text-primary">Loyalty rewards</p>
+              <h2 className="mt-2 text-lg font-semibold text-foreground">Redeem your points</h2>
+            </div>
+            <div className="rounded-3xl border border-border bg-background/80 p-4 text-sm">
+              <p className="text-muted-foreground">Available points</p>
+              <p className="mt-2 text-lg font-semibold text-foreground">{formatLoyaltyPoints(loyaltyPoints)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                1 point = {formatCartMoney(0.01, totals.currency)}
+              </p>
+            </div>
+            <div className="mt-4 space-y-3">
+              <label className="text-sm font-semibold text-foreground" htmlFor="redeemPoints">
+                Points to redeem
+              </label>
+              <input
+                id="redeemPoints"
+                type="number"
+                min={0}
+                max={maxRedeemablePoints}
+                value={redeemPoints}
+                onChange={(event) => {
+                  const value = Math.max(0, Number(event.target.value));
+                  setRedeemPoints(Number.isNaN(value) ? 0 : value);
+                  setRedeemError(null);
+                }}
+                placeholder={`Max ${maxRedeemablePoints}`}
+                className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
+              />
+              {redeemError && <p className="text-sm text-destructive">{redeemError}</p>}
+              <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                Redeeming {redeemPoints} points gives you {formatCartMoney(loyaltyDiscountFromRedeem(effectiveRedeemPoints), totals.currency)} off.
+              </div>
+              <p className="text-xs text-muted-foreground">
+                You can redeem up to {formatLoyaltyPoints(maxRedeemablePoints)} on this order.
+              </p>
+            </div>
           </section>
           <CheckoutOrderSummary items={items} totals={totals} />
         </div>

@@ -60,6 +60,12 @@ export default function CheckoutOrderSummary({ items, totals }: CheckoutOrderSum
               <span className="font-medium">-{formatCartMoney(discount, currency)}</span>
             </div>
           )}
+          {totals.loyaltyDiscount > 0 && (
+            <div className="flex justify-between text-sm text-emerald-700">
+              <span className="text-muted-foreground">Loyalty discount</span>
+              <span className="font-medium">-{formatCartMoney(totals.loyaltyDiscount, currency)}</span>
+            </div>
+          )}
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Shipping</span>
             <span className="font-medium">
