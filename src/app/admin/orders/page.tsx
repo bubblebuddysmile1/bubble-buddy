@@ -6,7 +6,7 @@ export default async function AdminOrdersPage() {
   const orders = await prisma.order.findMany({
     orderBy: { placedAt: "desc" },
     include: {
-      user: { select: { name: true, email: true } },
+      user: { select: { name: true, email: true, phone: true } },
       items: { select: { id: true } },
     },
   });
@@ -16,6 +16,7 @@ export default async function AdminOrdersPage() {
     orderNumber: order.orderNumber,
     customerName: order.user?.name ?? null,
     customerEmail: order.user?.email ?? null,
+    customerPhone: order.user?.phone ?? null,
     status: order.status,
     paymentStatus: order.paymentStatus,
     totalAmount: order.totalAmount.toString(),

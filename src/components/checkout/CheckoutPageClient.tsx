@@ -130,7 +130,13 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
     const verifyData = await verifyRes.json();
 
     if (!verifyRes.ok || !verifyData.verified) {
-      router.push(`/payment/failure?reason=${verifyData.error || "verification_failed"}&order_id=${verifyData.orderId || ""}`);
+      const failParams = new URLSearchParams({
+        reason: verifyData.error || "verification_failed",
+        order_id: verifyData.orderId || "",
+      });
+      if (verifyData.orderNumber) failParams.set("order_number", verifyData.orderNumber);
+      if (mock) failParams.set("mock", "1");
+      router.push(`/payment/failure?${failParams.toString()}`);
       return;
     }
 
@@ -421,6 +427,31 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
               <p className="text-xs text-muted-foreground">
                 You can redeem up to {formatLoyaltyPoints(maxRedeemablePoints)} on this order.
               </p>
+            </div>
+          </section>
+          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+            <div className="mb-4">
+              <p className="text-xs uppercase tracking-[0.28em] text-primary">Delivery address</p>
+              <h2 className="mt-2 text-lg font-semibold text-foreground">Your delivery details</h2>
+            </div>
+            <div className="space-y-3 rounded-3xl border border-border/50 bg-background/80 p-4 text-sm">
+              <div>
+                <p className="text-xs text-muted-foreground">Name</p>
+                <p className="mt-1 font-medium text-foreground">{values.fullName || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Phone number</p>
+                <p className="mt-1 font-semibold text-primary text-base">{values.phone || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Address</p>
+                <p className="mt-1 text-foreground">
+                  {values.line1 || "—"}{values.line2 && `, ${values.line2}`}
+                </p>
+                <p className="text-foreground">
+                  {values.city || "—"}{values.state && `, ${values.state}`} {values.postalCode || "—"}
+                </p>
+              </div>
             </div>
           </section>
           <CheckoutOrderSummary items={items} totals={totals} />
