@@ -19,6 +19,7 @@ import {
   getPersistedWishlistItems,
   setActiveUserId,
 } from "@/lib/store-persistence";
+import { fetchServerCart, fetchServerWishlist, postServerCart, postServerWishlist } from "@/lib/client-sync";
 
 export default function AuthForm() {
   const router = useRouter();
@@ -78,13 +79,17 @@ export default function AuthForm() {
     if (userId) {
       setActiveUserId(userId);
 
-      const savedCart = getPersistedCartItems(userId) as unknown[] | null;
-      const savedWishlist = getPersistedWishlistItems(userId) as unknown[] | null;
+      // try server-side data first
+      const [serverCart, serverWishlist] = await Promise.all([fetchServerCart(), fetchServerWishlist()]);
+
+      const savedCart = (serverCart ?? getPersistedCartItems(userId)) as unknown[] | null;
+      const savedWishlist = (serverWishlist ?? getPersistedWishlistItems(userId)) as unknown[] | null;
       const savedCompare = getPersistedCompareItems(userId) as unknown[] | null;
       const guestCart = getGuestCartItems() as unknown[] | null;
       const guestWishlist = getGuestWishlistItems() as unknown[] | null;
       const guestCompare = getGuestCompareItems() as unknown[] | null;
 
+      // merge server/guest preference: prefer server, fallback to guest
       const cartItems = (savedCart ?? guestCart ?? []) as CartItem[];
       const wishlistItems = (savedWishlist ?? guestWishlist ?? []) as WishlistProduct[];
       const compareItems = (savedCompare ?? guestCompare ?? []) as CompareProduct[];
@@ -92,6 +97,16 @@ export default function AuthForm() {
       useCartStore.getState().setItems(cartItems);
       useWishlistStore.getState().setItems(wishlistItems);
       useCompareStore.getState().setItems(compareItems);
+
+      // ensure server has merged data
+      try {
+        await Promise.all([
+          postServerCart((cartItems as CartItem[]).map((it) => ({ id: it.id, quantity: it.quantity }))),
+          postServerWishlist((wishlistItems as WishlistProduct[]).map((it) => ({ id: it.id }))),
+        ]);
+      } catch (e) {
+        // ignore
+      }
     }
 
     setSuccess("Signed in successfully. Redirecting you back...");
