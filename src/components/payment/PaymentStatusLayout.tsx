@@ -47,9 +47,9 @@ export default function PaymentStatusLayout({
         </div>
 
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          Need help?{" "}
+          Need assistance?{" "}
           <Link href="/shop" className="font-semibold text-primary hover:underline">
-            Continue browsing
+            Return to home
           </Link>
         </p>
       </div>

@@ -42,7 +42,7 @@ model ActivityLog {
 
 model Address {
   id             Int      @id @default(autoincrement())
-  userId         Int
+  userId         Int?
   label          String   @default("Home")
   recipient      String?
   line1          String
@@ -55,7 +55,7 @@ model Address {
   isDefault      Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
-  user           User     @relation(fields: [userId], references: [id])
+  user           User?    @relation(fields: [userId], references: [id])
   billingOrders  Order[]  @relation("BillingAddress")
   shippingOrders Order[]  @relation("ShippingAddress")
 }
