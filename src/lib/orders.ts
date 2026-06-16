@@ -73,23 +73,25 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
     let shippingAddressId: number | undefined;
     let billingAddressId: number | undefined;
 
+    // Always persist the provided shipping/billing address so admin can view it,
+    // associate with user when available.
+    const addressData: any = {
+      recipient: input.address.fullName,
+      line1: input.address.line1,
+      line2: input.address.line2 ?? null,
+      city: input.address.city,
+      state: input.address.state,
+      postalCode: input.address.postalCode,
+      country: input.address.country,
+      phone: input.address.phone,
+    };
     if (input.user?.id) {
-      const address = await tx.address.create({
-        data: {
-          userId: input.user.id,
-          recipient: input.address.fullName,
-          line1: input.address.line1,
-          line2: input.address.line2 ?? null,
-          city: input.address.city,
-          state: input.address.state,
-          postalCode: input.address.postalCode,
-          country: input.address.country,
-          phone: input.address.phone,
-        },
-      });
-      shippingAddressId = address.id;
-      billingAddressId = address.id;
+      addressData.userId = input.user.id;
     }
+
+    const address = await tx.address.create({ data: addressData });
+    shippingAddressId = address.id;
+    billingAddressId = address.id;
 
     if (input.user?.id && (input.redeemPoints ?? 0) > 0) {
       const user = await tx.user.findUnique({

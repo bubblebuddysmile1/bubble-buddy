@@ -18,8 +18,11 @@ export default function PaymentSuccessClient() {
   const mock = searchParams.get("mock") === "1";
 
   useEffect(() => {
-    clearCart();
-  }, [clearCart]);
+    // Clear cart on successful payment
+    if (orderNumber || orderId) {
+      clearCart();
+    }
+  }, [orderNumber, orderId, clearCart]);
 
   const copyOrderId = async () => {
     if (!orderId) return;
@@ -41,19 +44,31 @@ export default function PaymentSuccessClient() {
               Mock payment mode — no real charge
             </span>
           )}
-          Your payment was verified successfully. We will deliver to your shipping address soon.
+          <p>Your payment was verified successfully. We will deliver to your shipping address soon.</p>
           {(orderNumber || orderId) && (
-            <span className="mt-4 block rounded-2xl bg-muted/60 px-4 py-3 font-mono text-xs text-foreground">
-              {orderNumber && <>Order #: {orderNumber}</>}
-              {orderNumber && orderId && <br />}
-              {orderId && <>Payment ref: {orderId}</>}
-              {paymentId && (
-                <>
-                  <br />
-                  Transaction: {paymentId}
-                </>
-              )}
-            </span>
+            <div className="mt-6 space-y-3">
+              <div className="rounded-2xl bg-muted/60 p-4 text-left">
+                {orderNumber && (
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-muted-foreground">Order #:</span>
+                    <span className="font-semibold text-foreground">{orderNumber}</span>
+                  </div>
+                )}
+                {orderId && (
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <span className="text-xs text-muted-foreground">Payment Ref:</span>
+                    <span className="font-mono text-sm text-foreground">{orderId}</span>
+                  </div>
+                )}
+                {paymentId && (
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <span className="text-xs text-muted-foreground">Transaction:</span>
+                    <span className="font-mono text-sm text-foreground">{paymentId}</span>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">Check your email for order confirmation and tracking details.</p>
+            </div>
           )}
         </>
       }
@@ -66,20 +81,20 @@ export default function PaymentSuccessClient() {
               className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-muted"
             >
               <Copy className="size-4" />
-              {copied ? "Copied!" : "Copy order ID"}
+              {copied ? "Copied!" : "Copy Order ID"}
             </button>
           )}
           <Link
             href="/orders"
             className="inline-flex rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
           >
-            View orders
+            Track Order
           </Link>
           <Link
             href="/shop"
             className="inline-flex rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition hover:bg-muted"
           >
-            Continue shopping
+            Continue Shopping
           </Link>
         </>
       }

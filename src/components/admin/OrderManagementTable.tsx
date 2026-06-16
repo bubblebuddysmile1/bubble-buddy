@@ -10,6 +10,9 @@ export type AdminOrderRow = {
   customerEmail: string | null;
   customerName: string | null;
   customerPhone: string | null;
+  shippingAddress: string | null;
+  shippingPhone: string | null;
+  shippingName: string | null;
   status: string;
   paymentStatus: string;
   totalAmount: string;
@@ -108,13 +111,15 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
             <tr>
               <th className="px-5 py-4">Order</th>
               <th className="px-5 py-4">Customer</th>
+              <th className="px-5 py-4">Mobile</th>
+              <th className="px-5 py-4">Address</th>
               <th className="px-5 py-4">Total</th>
               <th className="px-5 py-4">Items</th>
               <th className="px-5 py-4">Placed</th>
               <th className="px-5 py-4">Payment</th>
-            <th className="px-5 py-4">Return reason</th>
-            <th className="px-5 py-4">Status</th>
-            <th className="px-5 py-4 text-right">Update</th>
+              <th className="px-5 py-4">Return reason</th>
+              <th className="px-5 py-4">Status</th>
+              <th className="px-5 py-4 text-right">Update</th>
             </tr>
           </thead>
           <tbody>
@@ -127,8 +132,21 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
                   <div className="max-w-55 truncate">
                     <p className="font-medium text-foreground">{order.customerName ?? "Guest"}</p>
                     <p className="text-xs">{order.customerEmail ?? "No email"}</p>
-                    {order.customerPhone && <p className="text-xs text-primary">{order.customerPhone}</p>}
+                                        {order.customerPhone && <p className="text-xs text-primary">{order.customerPhone}</p>}
                   </div>
+                </td>
+                <td className="px-5 py-4 text-muted-foreground">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground">{order.shippingName ?? order.customerName ?? "—"}</p>
+                    <p className="text-xs">{order.shippingPhone ?? order.customerPhone ?? "—"}</p>
+                  </div>
+                </td>
+                <td className="px-5 py-4 text-muted-foreground max-w-72">
+                  {order.shippingAddress ? (
+                    <p className="text-xs text-muted-foreground truncate">{order.shippingAddress}</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">—</p>
+                  )}
                 </td>
                 <td className="px-5 py-4 font-semibold text-foreground">${order.totalAmount}</td>
                 <td className="px-5 py-4 text-muted-foreground">{order.itemCount}</td>

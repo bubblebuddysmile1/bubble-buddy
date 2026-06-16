@@ -351,6 +351,75 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           submitLabel="Pay securely"
         />
         <div className="space-y-4">
+          {/* <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.28em] text-primary">Coupon code</p>
+                <h2 className="mt-2 text-lg font-semibold text-foreground">Unlock extra savings</h2>
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+              <input
+                type="text"
+                value={couponCode}
+                onChange={(event) => {
+                  setCouponCode(event.target.value);
+                  setCouponError(null);
+                  setCouponSuccess(null);
+                  if (appliedPromotion && event.target.value.trim().toUpperCase() !== appliedPromotion.code) {
+                    setAppliedPromotion(null);
+                  }
+                }}
+                placeholder="Enter your coupon"
+                className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
+              />
+              <button
+                type="button"
+                onClick={handleApplyCoupon}
+                disabled={isApplyingCoupon}
+                className="inline-flex h-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-background transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isApplyingCoupon ? "Applying…" : "Apply"}
+              </button>
+            </div>
+            {couponError && <p className="mt-3 text-sm text-destructive">{couponError}</p>}
+            {couponSuccess && <p className="mt-3 text-sm text-emerald-700">{couponSuccess}</p>}
+            {appliedPromotion && (
+              <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                {appliedPromotion.title} — saved {appliedPromotion.discountType === "PERCENTAGE" ? `${appliedPromotion.discountValue}%` : formatCartMoney(appliedPromotion.discountValue, totals.currency)} off.
+              </div>
+            )}
+          </section> */}
+          
+          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+            <div className="mb-4">
+              <p className="text-xs uppercase tracking-[0.28em] text-primary">Delivery address</p>
+              <h2 className="mt-2 text-lg font-semibold text-foreground">Your delivery details</h2>
+            </div>
+            <div className="space-y-3 rounded-3xl border border-border/50 bg-background/80 p-4 text-sm">
+              <div>
+                <p className="text-xs text-muted-foreground">Name</p>
+                <p className="mt-1 font-medium text-foreground">{values.fullName || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Phone number</p>
+                <p className="mt-1 font-semibold text-primary text-base">{values.phone || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Address</p>
+                <p className="mt-1 text-foreground">
+                  {values.line1 || "—"}{values.line2 && `, ${values.line2}`}
+                </p>
+                <p className="text-foreground">
+                  {values.city || "—"}{values.state && `, ${values.state}`} {values.postalCode || "—"}
+                </p>
+              </div>
+            </div>
+          </section>
+          <CheckoutOrderSummary items={items} totals={totals} />
+        </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
           <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
@@ -391,72 +460,51 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
             )}
           </section>
           <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
-            <div className="mb-4">
-              <p className="text-xs uppercase tracking-[0.28em] text-primary">Loyalty rewards</p>
-              <h2 className="mt-2 text-lg font-semibold text-foreground">Redeem your points</h2>
-            </div>
-            <div className="rounded-3xl border border-border bg-background/80 p-4 text-sm">
-              <p className="text-muted-foreground">Available points</p>
-              <p className="mt-2 text-lg font-semibold text-foreground">{formatLoyaltyPoints(loyaltyPoints)}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                1 point = {formatCartMoney(0.01, totals.currency)}
-              </p>
-            </div>
-            <div className="mt-4 space-y-3">
-              <label className="text-sm font-semibold text-foreground" htmlFor="redeemPoints">
-                Points to redeem
-              </label>
-              <input
-                id="redeemPoints"
-                type="number"
-                min={0}
-                max={maxRedeemablePoints}
-                value={redeemPoints}
-                onChange={(event) => {
-                  const value = Math.max(0, Number(event.target.value));
-                  setRedeemPoints(Number.isNaN(value) ? 0 : value);
-                  setRedeemError(null);
-                }}
-                placeholder={`Max ${maxRedeemablePoints}`}
-                className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
-              />
-              {redeemError && <p className="text-sm text-destructive">{redeemError}</p>}
-              <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                Redeeming {redeemPoints} points gives you {formatCartMoney(loyaltyDiscountFromRedeem(effectiveRedeemPoints), totals.currency)} off.
-              </div>
-              <p className="text-xs text-muted-foreground">
-                You can redeem up to {formatLoyaltyPoints(maxRedeemablePoints)} on this order.
-              </p>
-            </div>
-          </section>
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
-            <div className="mb-4">
-              <p className="text-xs uppercase tracking-[0.28em] text-primary">Delivery address</p>
-              <h2 className="mt-2 text-lg font-semibold text-foreground">Your delivery details</h2>
-            </div>
-            <div className="space-y-3 rounded-3xl border border-border/50 bg-background/80 p-4 text-sm">
-              <div>
-                <p className="text-xs text-muted-foreground">Name</p>
-                <p className="mt-1 font-medium text-foreground">{values.fullName || "—"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Phone number</p>
-                <p className="mt-1 font-semibold text-primary text-base">{values.phone || "—"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Address</p>
-                <p className="mt-1 text-foreground">
-                  {values.line1 || "—"}{values.line2 && `, ${values.line2}`}
-                </p>
-                <p className="text-foreground">
-                  {values.city || "—"}{values.state && `, ${values.state}`} {values.postalCode || "—"}
-                </p>
-              </div>
-            </div>
-          </section>
-          <CheckoutOrderSummary items={items} totals={totals} />
-        </div>
-      </div>
+  <div className="mb-4">
+    <p className="text-xs uppercase tracking-[0.28em] text-primary">Loyalty rewards</p>
+    <h2 className="mt-2 text-lg font-semibold text-foreground">Redeem your points</h2>
+  </div>
+
+  <div className="grid grid-cols-2 gap-4">
+    <div className="rounded-3xl border border-border bg-background/80 p-4 text-sm">
+      <p className="text-muted-foreground">Available points</p>
+      <p className="mt-2 text-lg font-semibold text-foreground">{formatLoyaltyPoints(loyaltyPoints)}</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        1 point = {formatCartMoney(0.01, totals.currency)}
+      </p>
+    </div>
+
+    <div className="space-y-3">
+      <label className="text-sm font-semibold text-foreground" htmlFor="redeemPoints">
+        Points to redeem
+      </label>
+      <input
+        id="redeemPoints"
+        type="number"
+        min={0}
+        max={maxRedeemablePoints}
+        value={redeemPoints}
+        onChange={(event) => {
+          const value = Math.max(0, Number(event.target.value));
+          setRedeemPoints(Number.isNaN(value) ? 0 : value);
+          setRedeemError(null);
+        }}
+        placeholder={`Max ${maxRedeemablePoints}`}
+        className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
+      />
+      {redeemError && <p className="text-sm text-destructive">{redeemError}</p>}
+      <p className="text-xs text-muted-foreground">
+        You can redeem up to {formatLoyaltyPoints(maxRedeemablePoints)} on this order.
+      </p>
+    </div>
+  </div>
+
+  <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+    Redeeming {redeemPoints} points gives you {formatCartMoney(loyaltyDiscountFromRedeem(effectiveRedeemPoints), totals.currency)} off.
+  </div>
+</section>
+          </div>
+
 
       <p className="text-center text-xs text-muted-foreground">
         By placing your order you agree to our terms.{" "}
