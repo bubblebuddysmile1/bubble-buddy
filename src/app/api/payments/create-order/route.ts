@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 import { getCheckoutTotals } from "@/lib/checkout";
+import { getMaxRedeemablePoints, loyaltyDiscountFromRedeem } from "@/lib/loyalty";
 import {
   createRazorpayClient,
   getPaymentCurrency,
