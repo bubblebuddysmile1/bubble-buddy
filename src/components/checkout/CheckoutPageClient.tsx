@@ -62,10 +62,10 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
 
   useEffect(() => {
     if (!mounted) return;
-    if (items.length === 0) {
+    if (items.length === 0 && !isSubmitting && !isConfirmationOpen) {
       router.replace("/cart");
     }
-  }, [mounted, items.length, router]);
+  }, [mounted, items.length, isSubmitting, isConfirmationOpen, router]);
 
   const promotionDefinition = useMemo(
     () =>
@@ -156,15 +156,15 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
       return;
     }
 
-    // Clear cart on successful payment
-    useCartStore.setState({ items: [] });
-
     const params = new URLSearchParams({
       order_id: verifyData.orderId,
       payment_id: verifyData.paymentId,
     });
     if (verifyData.orderNumber) params.set("order_number", verifyData.orderNumber);
     if (mock) params.set("mock", "1");
+
+    setIsSubmitting(false);
+    setIsConfirmationOpen(false);
 
     router.push(`/payment/success?${params.toString()}`);
   };
@@ -293,6 +293,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           true,
           pendingAddress,
         );
+        setIsConfirmationOpen(false);
         setIsSubmitting(false);
         return;
       }

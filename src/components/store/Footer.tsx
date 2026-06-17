@@ -158,11 +158,17 @@ export default function Footer() {
               </Link>
 
               <Link
-                href="/contact"
+                href="/contact-us"
                 className="hover:text-primary transition-colors duration-200 inline-block"
               >
                 Contact
               </Link>
+              <Link
+              href="/frequently-asked-questions"
+              className="hover:text-primary transition-colors duration-200 inline-block"
+            >
+              FAQ
+            </Link>
             </div>
           </div>
 
@@ -246,6 +252,7 @@ export default function Footer() {
             >
               Terms & Conditions
             </Link>
+            
           </div>
         </div>
       </div>
