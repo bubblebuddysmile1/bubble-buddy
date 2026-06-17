@@ -6,7 +6,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { Globe, Mail, MessageCircle, Star } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
+import { FaInstagram, FaFacebook } from "react-icons/fa";
 
 type CategoryLink = {
   name: string;
@@ -64,10 +65,8 @@ export default function Footer() {
   return (
     <footer className="bg-card border-t border-border mt-20 text-foreground">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-        
         {/* MAIN GRID - Responsive */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12">
-          
           {/* BRAND SECTION */}
           <div className="text-center sm:text-left">
             <h2 className="text-xl sm:text-2xl font-bold text-primary">
@@ -75,48 +74,51 @@ export default function Footer() {
             </h2>
 
             <p className="mt-3 sm:mt-4 text-sm sm:text-base text-muted-foreground leading-relaxed">
-              Discover premium skincare, beauty care, and haircare products 
+              Discover premium skincare, beauty care, and haircare products
               designed to make you glow naturally.
             </p>
 
             {/* SOCIAL ICONS */}
             <div className="flex items-center justify-center sm:justify-start gap-2 sm:gap-3 mt-4 sm:mt-5">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                aria-label="Visit website" 
+              <a
+                href="https://www.instagram.com/bubble_buddy_smile"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit Instagram"
                 className="text-foreground hover:text-primary transition-colors duration-200 h-9 w-9 sm:h-10 sm:w-10"
               >
-                <Globe className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
+                <FaInstagram className="h-4 w-4 sm:h-5 sm:w-5" />
+              </a>
 
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                aria-label="Open chat" 
+              <a
+                href="mailto:chat@bubblebuddysmile.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open chat"
                 className="text-foreground hover:text-primary transition-colors duration-200 h-9 w-9 sm:h-10 sm:w-10"
               >
                 <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
+              </a>
 
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                aria-label="Send email" 
+              <a
+                href="mailto:info@bubblebuddysmile.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Send email"
                 className="text-foreground hover:text-primary transition-colors duration-200 h-9 w-9 sm:h-10 sm:w-10"
               >
                 <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
+              </a>
 
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                aria-label="Favorites" 
+              <a
+                href="https://www.facebook.com/bubblebuddysmile"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit Facebook"
                 className="text-foreground hover:text-primary transition-colors duration-200 h-9 w-9 sm:h-10 sm:w-10"
               >
-                <Star className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
-
+                <FaFacebook className="h-4 w-4 sm:h-5 sm:w-5" />
+              </a>
             </div>
           </div>
 
@@ -127,41 +129,40 @@ export default function Footer() {
             </h3>
 
             <div className="mt-3 sm:mt-4 flex flex-col gap-2 sm:gap-3 text-sm sm:text-base text-muted-foreground">
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 className="hover:text-primary transition-colors duration-200 inline-block"
               >
                 Home
               </Link>
 
-              <Link 
-                href="/shop" 
+              <Link
+                href="/shop"
                 className="hover:text-primary transition-colors duration-200 inline-block"
               >
                 Shop
               </Link>
 
-              <Link 
-                href="/about" 
+              <Link
+                href="/about"
                 className="hover:text-primary transition-colors duration-200 inline-block"
               >
                 About Us
               </Link>
 
-              <Link 
-                href="/offers" 
+              <Link
+                href="/offers"
                 className="hover:text-primary transition-colors duration-200 inline-block"
               >
                 Offers
               </Link>
 
-              <Link 
-                href="/contact" 
+              <Link
+                href="/contact"
                 className="hover:text-primary transition-colors duration-200 inline-block"
               >
                 Contact
               </Link>
-
             </div>
           </div>
 
@@ -214,7 +215,7 @@ export default function Footer() {
                   required
                   className="bg-input text-foreground placeholder:text-muted-foreground flex-1 h-10 sm:h-11 text-sm sm:text-base"
                 />
-                <Button 
+                <Button
                   type="submit"
                   className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 h-10 sm:h-11 px-4 sm:px-6"
                 >
@@ -223,7 +224,6 @@ export default function Footer() {
               </div>
             </form>
           </div>
-
         </div>
 
         {/* BOTTOM SECTION - Responsive */}
@@ -233,24 +233,21 @@ export default function Footer() {
           </p>
 
           <div className="flex gap-4 sm:gap-6 flex-wrap justify-center">
-            <Link 
-              href="/privacy-policy" 
+            <Link
+              href="/privacy-policy"
               className="hover:text-primary transition-colors duration-200 text-xs sm:text-sm"
             >
               Privacy Policy
             </Link>
 
-            <Link 
-              href="/terms-and-conditions" 
+            <Link
+              href="/terms-and-conditions"
               className="hover:text-primary transition-colors duration-200 text-xs sm:text-sm"
             >
               Terms & Conditions
             </Link>
-
           </div>
-
         </div>
-        
       </div>
     </footer>
   );

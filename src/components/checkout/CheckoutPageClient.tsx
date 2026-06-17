@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CreditCard, ShoppingBag } from "lucide-react";
 import CheckoutAddressFormComponent from "@/components/checkout/CheckoutAddressForm";
+import CheckoutConfirmationSheet from "@/components/checkout/CheckoutConfirmationSheet";
 import CheckoutOrderSummary from "@/components/checkout/CheckoutOrderSummary";
 import { getCheckoutTotals } from "@/lib/checkout";
 import { formatCartMoney } from "@/lib/cart";
@@ -46,6 +47,9 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutAddressValues, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMode, setPaymentMode] = useState<"mock" | "razorpay" | null>(null);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [pendingAddress, setPendingAddress] = useState<CheckoutAddressValues | null>(null);
+  const [confirmationError, setConfirmationError] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
@@ -67,10 +71,10 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
     () =>
       appliedPromotion
         ? {
-            discountType: appliedPromotion.discountType as "PERCENTAGE" | "FIXED",
-            discountValue: appliedPromotion.discountValue,
-            minOrderAmount: appliedPromotion.minOrderAmount,
-          }
+          discountType: appliedPromotion.discountType as "PERCENTAGE" | "FIXED",
+          discountValue: appliedPromotion.discountValue,
+          minOrderAmount: appliedPromotion.minOrderAmount,
+        }
         : undefined,
     [appliedPromotion],
   );
@@ -93,6 +97,11 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
 
   const handleChange = (field: keyof CheckoutAddressValues, value: string) => {
     setValues((prev) => ({ ...prev, [field]: value }));
+    if (isConfirmationOpen) {
+      setIsConfirmationOpen(false);
+      setPendingAddress(null);
+      setConfirmationError(null);
+    }
     if (errors[field]) {
       setErrors((prev: Partial<Record<keyof CheckoutAddressValues, string>>) => {
         const next = { ...prev };
@@ -100,6 +109,12 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
         return next;
       });
     }
+  };
+
+  const handleCancelConfirmation = () => {
+    setIsConfirmationOpen(false);
+    setPendingAddress(null);
+    setConfirmationError(null);
   };
 
   const verifyAndRedirect = async (
@@ -136,6 +151,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
       });
       if (verifyData.orderNumber) failParams.set("order_number", verifyData.orderNumber);
       if (mock) failParams.set("mock", "1");
+      setIsSubmitting(false);
       router.push(`/payment/failure?${failParams.toString()}`);
       return;
     }
@@ -208,7 +224,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const payload = {
       ...values,
       line2: values.line2?.trim() ? values.line2 : undefined,
@@ -222,6 +238,18 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
     }
 
     setErrors({});
+    setPendingAddress(result.data);
+    setIsConfirmationOpen(true);
+    setConfirmationError(null);
+  };
+
+  const handleConfirmPayment = async () => {
+    if (!pendingAddress) {
+      setConfirmationError("Please confirm your delivery address before payment.");
+      return;
+    }
+
+    setConfirmationError(null);
     setIsSubmitting(true);
 
     try {
@@ -229,7 +257,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          address: result.data,
+          address: pendingAddress,
           items: items.map(({ id, slug, name, price, currency, quantity, stockQuantity }) => ({
             id,
             slug,
@@ -247,6 +275,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
       const orderData: CreateOrderResponse = await orderRes.json();
 
       if (!orderRes.ok) {
+        setIsSubmitting(false);
         router.push("/payment/failure?reason=create_order_failed");
         return;
       }
@@ -262,13 +291,15 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
             razorpay_signature: "mock_signature",
           },
           true,
-          result.data,
+          pendingAddress,
         );
+        setIsSubmitting(false);
         return;
       }
 
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
+        setIsSubmitting(false);
         router.push("/payment/failure?reason=gateway_unavailable");
         return;
       }
@@ -281,8 +312,8 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
         description: `Order ${orderData.orderId}`,
         order_id: orderData.orderId,
         prefill: {
-          name: result.data.fullName,
-          contact: result.data.phone,
+          name: pendingAddress.fullName,
+          contact: pendingAddress.phone,
         },
         theme: { color: "#a67c52" },
         method: {
@@ -294,7 +325,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
         },
         handler: async (response) => {
           setIsSubmitting(true);
-          await verifyAndRedirect(response, false, result.data);
+          await verifyAndRedirect(response, false, pendingAddress);
           setIsSubmitting(false);
         },
         modal: {
@@ -329,7 +360,8 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-[80vh] flex items-center justify-center">
+      <div className="w-full max-w-6xl space-y-6 px-4">
       {paymentMode === "mock" && (
         <div className="checkout-back-enter rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-center text-sm text-amber-900">
           Mock payment mode — Razorpay keys not set. Payments are simulated for testing.
@@ -341,6 +373,23 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
         Secure checkout powered by Razorpay
       </div>
 
+      <CheckoutConfirmationSheet
+        open={isConfirmationOpen}
+        onOpenChange={(open) => {
+          if (!open) handleCancelConfirmation();
+          setIsConfirmationOpen(open);
+        }}
+        address={pendingAddress ?? CheckoutValidation.checkoutAddressDefaultValues}
+        items={items}
+        totals={totals}
+        couponCode={appliedPromotion?.code ?? null}
+        redeemPoints={effectiveRedeemPoints}
+        isSubmitting={isSubmitting}
+        error={confirmationError}
+        onEdit={handleCancelConfirmation}
+        onConfirm={handleConfirmPayment}
+      />
+
       <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
         <CheckoutAddressFormComponent
           values={values}
@@ -348,49 +397,9 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           onChange={handleChange}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          submitLabel="Pay securely"
+          submitLabel="Review order"
         />
         <div className="space-y-4">
-          {/* <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-primary">Coupon code</p>
-                <h2 className="mt-2 text-lg font-semibold text-foreground">Unlock extra savings</h2>
-              </div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-              <input
-                type="text"
-                value={couponCode}
-                onChange={(event) => {
-                  setCouponCode(event.target.value);
-                  setCouponError(null);
-                  setCouponSuccess(null);
-                  if (appliedPromotion && event.target.value.trim().toUpperCase() !== appliedPromotion.code) {
-                    setAppliedPromotion(null);
-                  }
-                }}
-                placeholder="Enter your coupon"
-                className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
-              />
-              <button
-                type="button"
-                onClick={handleApplyCoupon}
-                disabled={isApplyingCoupon}
-                className="inline-flex h-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-background transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isApplyingCoupon ? "Applying…" : "Apply"}
-              </button>
-            </div>
-            {couponError && <p className="mt-3 text-sm text-destructive">{couponError}</p>}
-            {couponSuccess && <p className="mt-3 text-sm text-emerald-700">{couponSuccess}</p>}
-            {appliedPromotion && (
-              <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                {appliedPromotion.title} — saved {appliedPromotion.discountType === "PERCENTAGE" ? `${appliedPromotion.discountValue}%` : formatCartMoney(appliedPromotion.discountValue, totals.currency)} off.
-              </div>
-            )}
-          </section> */}
-          
           <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
             <div className="mb-4">
               <p className="text-xs uppercase tracking-[0.28em] text-primary">Delivery address</p>
@@ -416,95 +425,97 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
               </div>
             </div>
           </section>
+          
           <CheckoutOrderSummary items={items} totals={totals} />
         </div>
       </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-primary">Coupon code</p>
-                <h2 className="mt-2 text-lg font-semibold text-foreground">Unlock extra savings</h2>
-              </div>
+        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.28em] text-primary">Coupon code</p>
+              <h2 className="mt-2 text-lg font-semibold text-foreground">Unlock extra savings</h2>
             </div>
-            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-              <input
-                type="text"
-                value={couponCode}
-                onChange={(event) => {
-                  setCouponCode(event.target.value);
-                  setCouponError(null);
-                  setCouponSuccess(null);
-                  if (appliedPromotion && event.target.value.trim().toUpperCase() !== appliedPromotion.code) {
-                    setAppliedPromotion(null);
-                  }
-                }}
-                placeholder="Enter your coupon"
-                className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
-              />
-              <button
-                type="button"
-                onClick={handleApplyCoupon}
-                disabled={isApplyingCoupon}
-                className="inline-flex h-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-background transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isApplyingCoupon ? "Applying…" : "Apply"}
-              </button>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+            <input
+              type="text"
+              value={couponCode}
+              onChange={(event) => {
+                setCouponCode(event.target.value);
+                setCouponError(null);
+                setCouponSuccess(null);
+                if (appliedPromotion && event.target.value.trim().toUpperCase() !== appliedPromotion.code) {
+                  setAppliedPromotion(null);
+                }
+              }}
+              placeholder="Enter your coupon"
+              className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
+            />
+            <button
+              type="button"
+              onClick={handleApplyCoupon}
+              disabled={isApplyingCoupon}
+              className="inline-flex h-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-background transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isApplyingCoupon ? "Applying…" : "Apply"}
+            </button>
+          </div>
+          {couponError && <p className="mt-3 text-sm text-destructive">{couponError}</p>}
+          {couponSuccess && <p className="mt-3 text-sm text-emerald-700">{couponSuccess}</p>}
+          {appliedPromotion && (
+            <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+              {appliedPromotion.title} — saved {appliedPromotion.discountType === "PERCENTAGE" ? `${appliedPromotion.discountValue}%` : formatCartMoney(appliedPromotion.discountValue, totals.currency)} off.
             </div>
-            {couponError && <p className="mt-3 text-sm text-destructive">{couponError}</p>}
-            {couponSuccess && <p className="mt-3 text-sm text-emerald-700">{couponSuccess}</p>}
-            {appliedPromotion && (
-              <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                {appliedPromotion.title} — saved {appliedPromotion.discountType === "PERCENTAGE" ? `${appliedPromotion.discountValue}%` : formatCartMoney(appliedPromotion.discountValue, totals.currency)} off.
-              </div>
-            )}
-          </section>
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
-  <div className="mb-4">
-    <p className="text-xs uppercase tracking-[0.28em] text-primary">Loyalty rewards</p>
-    <h2 className="mt-2 text-lg font-semibold text-foreground">Redeem your points</h2>
-  </div>
-
-  <div className="grid grid-cols-2 gap-4">
-    <div className="rounded-3xl border border-border bg-background/80 p-4 text-sm">
-      <p className="text-muted-foreground">Available points</p>
-      <p className="mt-2 text-lg font-semibold text-foreground">{formatLoyaltyPoints(loyaltyPoints)}</p>
-      <p className="mt-1 text-xs text-muted-foreground">
-        1 point = {formatCartMoney(0.01, totals.currency)}
-      </p>
-    </div>
-
-    <div className="space-y-3">
-      <label className="text-sm font-semibold text-foreground" htmlFor="redeemPoints">
-        Points to redeem
-      </label>
-      <input
-        id="redeemPoints"
-        type="number"
-        min={0}
-        max={maxRedeemablePoints}
-        value={redeemPoints}
-        onChange={(event) => {
-          const value = Math.max(0, Number(event.target.value));
-          setRedeemPoints(Number.isNaN(value) ? 0 : value);
-          setRedeemError(null);
-        }}
-        placeholder={`Max ${maxRedeemablePoints}`}
-        className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
-      />
-      {redeemError && <p className="text-sm text-destructive">{redeemError}</p>}
-      <p className="text-xs text-muted-foreground">
-        You can redeem up to {formatLoyaltyPoints(maxRedeemablePoints)} on this order.
-      </p>
-    </div>
-  </div>
-
-  <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-    Redeeming {redeemPoints} points gives you {formatCartMoney(loyaltyDiscountFromRedeem(effectiveRedeemPoints), totals.currency)} off.
-  </div>
-</section>
+          )}
+        </section>
+        
+        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+          <div className="mb-4">
+            <p className="text-xs uppercase tracking-[0.28em] text-primary">Loyalty rewards</p>
+            <h2 className="mt-2 text-lg font-semibold text-foreground">Redeem your points</h2>
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="rounded-3xl border border-border bg-background/80 p-4 text-sm">
+              <p className="text-muted-foreground">Available points</p>
+              <p className="mt-2 text-lg font-semibold text-foreground">{formatLoyaltyPoints(loyaltyPoints)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                1 point = {formatCartMoney(0.01, totals.currency)}
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-foreground" htmlFor="redeemPoints">
+                Points to redeem
+              </label>
+              <input
+                id="redeemPoints"
+                type="number"
+                min={0}
+                max={maxRedeemablePoints}
+                value={redeemPoints}
+                onChange={(event) => {
+                  const value = Math.max(0, Number(event.target.value));
+                  setRedeemPoints(Number.isNaN(value) ? 0 : value);
+                  setRedeemError(null);
+                }}
+                placeholder={`Max ${maxRedeemablePoints}`}
+                className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
+              />
+              {redeemError && <p className="text-sm text-destructive">{redeemError}</p>}
+              <p className="text-xs text-muted-foreground">
+                You can redeem up to {formatLoyaltyPoints(maxRedeemablePoints)} on this order.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            Redeeming {redeemPoints} points gives you {formatCartMoney(loyaltyDiscountFromRedeem(effectiveRedeemPoints), totals.currency)} off.
+          </div>
+        </section>
+      </div>
 
       <p className="text-center text-xs text-muted-foreground">
         By placing your order you agree to our terms.{" "}
@@ -512,6 +523,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           Payment help
         </Link>
       </p>
+      </div>
     </div>
   );
 }
