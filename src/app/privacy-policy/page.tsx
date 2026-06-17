@@ -1,4 +1,3 @@
-import Link from "next/link";
 
 export const metadata = {
   title: "Privacy Policy - Bubble Buddy",
@@ -34,7 +33,7 @@ export default function PrivacyPolicyPage() {
           <section className="space-y-4">
             <h2 className="text-3xl font-bold">1. Introduction</h2>
             <p className="text-muted-foreground">
-              Bubble Buddy Smile ("we", "us", "our", or "Company") operates the website and mobile applications. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.
+              Bubble Buddy Smile (we, us, our, or Company) operates the website and mobile applications. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.
             </p>
             <p className="text-muted-foreground">
               We are committed to maintaining your privacy and ensuring you have a positive experience on our platform. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
@@ -169,7 +168,7 @@ export default function PrivacyPolicyPage() {
 
           {/* Children's Privacy */}
           <section className="space-y-4">
-            <h2 className="text-3xl font-bold">9. Children's Privacy</h2>
+            <h2 className="text-3xl font-bold">9. Childrens Privacy</h2>
             <p className="text-muted-foreground">
               Our Service is not intended for children under the age of 13. We do not knowingly collect personal data from children under 13. If we become aware that a child under 13 has provided us with personal data, we will take steps to delete such information.
             </p>
@@ -195,8 +194,8 @@ export default function PrivacyPolicyPage() {
               </p>
               <p className="text-muted-foreground">
                 Email: privacy@buddybubble.com<br />
-                Phone: +91-XXXX-XXXX-XXX<br />
-                Address: Private Label Cosmetics Manufacturing, India
+                Phone: +91 98888 88727<br />
+                Address: Tricity Plaza, 316, Peer Muchalla Rd, Sector 20, Zirakpur, Sanauli, Punjab 140603
               </p>
             </div>
           </section>

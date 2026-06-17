@@ -241,7 +241,7 @@ export default function TermsAndConditionsPage() {
               <p className="text-muted-foreground">
                 Email: support@buddybubble.com<br />
                 Phone: +91 98888 88727<br />
-                Address: Private Label Cosmetics Manufacturing, India
+                Address: Tricity Plaza, 316, Peer Muchalla Rd, Sector 20, Zirakpur, Sanauli, Punjab 140603
               </p>
             </div>
           </section>

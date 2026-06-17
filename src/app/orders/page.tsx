@@ -34,7 +34,12 @@ async function getUserOrders() {
     orderBy: { placedAt: "desc" },
     include: {
       items: {
-        select: { name: true, quantity: true, totalPrice: true, unitPrice: true },
+        select: {
+          name: true,
+          quantity: true,
+          totalPrice: true,
+          unitPrice: true,
+        },
       },
     },
   });
@@ -47,18 +52,24 @@ export default async function OrdersPage() {
     <main className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4">
         <div className="mb-8 rounded-[2rem] border border-border bg-card p-8 shadow-lg">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">My Orders</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">
+            My Orders
+          </p>
           <h1 className="mt-3 text-4xl font-bold">Order history</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Review your recent orders and check the latest status of each purchase.
+            Review your recent orders and check the latest status of each
+            purchase.
           </p>
         </div>
 
         {orders.length === 0 ? (
           <div className="rounded-[2rem] border border-border bg-card p-10 text-center shadow-lg">
-            <p className="text-xl font-semibold text-foreground">No orders yet</p>
+            <p className="text-xl font-semibold text-foreground">
+              No orders yet
+            </p>
             <p className="mt-3 text-sm text-muted-foreground">
-              Once you place an order while signed in, it will appear here with full details.
+              Once you place an order while signed in, it will appear here with
+              full details.
             </p>
             <Link
               href="/shop"
@@ -70,21 +81,28 @@ export default async function OrdersPage() {
         ) : (
           <div className="space-y-6">
             {orders.map((order) => (
-              <div key={order.id} className="rounded-[2rem] border border-border bg-card p-6 shadow-sm">
+              <div
+                key={order.id}
+                className="rounded-[2rem] border border-border bg-card p-6 shadow-sm"
+              >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Order #{order.orderNumber}</p>
-                    <p className="mt-2 text-2xl font-semibold text-foreground">
+                    <p className="text-sm text-muted-foreground">
+                      Order #{order.orderNumber}
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-foreground">
                       ${order.totalAmount.toString()}
                     </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="mt-1 text-md text-muted-foreground">
                       Placed {formatOrderDate(order.placedAt)}
                     </p>
                   </div>
-                  <div className="space-y-2 text-sm text-muted-foreground">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-md text-muted-foreground">
                     <p>
                       Status:{" "}
-                      <span className="font-semibold text-foreground">{formatStatus(order.status)}</span>
+                      <span className="font-semibold text-foreground">
+                        {formatStatus(order.status)}
+                      </span>
                     </p>
                     <p>
                       Payment:{" "}
@@ -92,15 +110,19 @@ export default async function OrdersPage() {
                         {formatStatus(order.paymentStatus)}
                       </span>
                     </p>
-                    <p>Items: {order.items.length}</p>
+                    <p>Items: <span className="font-semibold text-foreground"> {order.items.length}</span> </p>
                   </div>
                 </div>
                 <div className="mt-5 grid gap-3 rounded-3xl bg-background/80 p-4 text-sm text-muted-foreground">
                   {order.items.map((item) => (
-                    <div key={`${order.id}-${item.name}`} className="flex items-center justify-between gap-3">
+                    <div
+                      key={`${order.id}-${item.name}`}
+                      className="flex items-center justify-between gap-3"
+                    >
                       <span>{item.name}</span>
                       <span className="font-medium text-foreground">
-                        {item.quantity} × ${item.unitPrice.toString()} = ${item.totalPrice.toString()}
+                        {item.quantity} × {item.unitPrice.toString()} ={" "}
+                        {item.totalPrice.toString()}
                       </span>
                     </div>
                   ))}
