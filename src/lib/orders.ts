@@ -48,7 +48,7 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
     }
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const discount = getPromotionDiscountAmount(promotion, subtotal);
+    const discount = getPromotionDiscountAmount(promotion, subtotal, cartItems);
     if (discount <= 0) {
       throw new Error("Coupon code is not eligible for this order.");
     }

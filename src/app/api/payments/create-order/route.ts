@@ -45,11 +45,13 @@ export async function POST(request: Request) {
       category: undefined,
     }));
 
-    const products = await prisma.product.findMany({
+    const products: Array<{ id: number; stockQuantity: number }> = await prisma.product.findMany({
       where: { id: { in: items.map((item) => item.id) } },
       select: { id: true, stockQuantity: true },
     });
-    const productById = new Map(products.map((product) => [product.id, product]));
+    const productById = new Map<number, { id: number; stockQuantity: number }>(
+      products.map((product) => [product.id, product] as const),
+    );
 
     for (const item of items) {
       const product = productById.get(item.id);
