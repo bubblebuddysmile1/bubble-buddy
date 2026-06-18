@@ -29,13 +29,13 @@ export async function POST(request: Request) {
     }
 
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const discount = getPromotionDiscountAmount(promotion, subtotal);
+    const discount = getPromotionDiscountAmount(promotion, subtotal, items);
 
     if (discount <= 0) {
       return NextResponse.json(
         {
           error: "Coupon code cannot be applied.",
-          message: `Spend ${Number(promotion.minOrderAmount).toFixed(2)} or more to use this coupon.`,
+          message: getPromotionValidationMessage(promotion, subtotal, items),
         },
         { status: 400 },
       );

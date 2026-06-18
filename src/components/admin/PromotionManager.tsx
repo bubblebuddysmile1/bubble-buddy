@@ -14,9 +14,19 @@ type Promotion = {
   discountType: "PERCENTAGE" | "FIXED";
   discountValue: number;
   minOrderAmount: number;
+  productId: number | null;
+  availableQuantity: number | null;
+  product: { id: number; name: string; slug: string; thumbnail: string | null } | null;
   activeFrom: string | null;
   activeUntil: string | null;
   isActive: boolean;
+};
+
+type ProductOption = {
+  id: number;
+  name: string;
+  slug: string;
+  thumbnail: string | null;
 };
 
 type FormState = {
@@ -26,6 +36,8 @@ type FormState = {
   discountType: "PERCENTAGE" | "FIXED";
   discountValue: string;
   minOrderAmount: string;
+  productId: string;
+  availableQuantity: string;
   activeFrom: string;
   activeUntil: string;
   isActive: boolean;
@@ -38,6 +50,8 @@ const emptyForm: FormState = {
   discountType: "PERCENTAGE",
   discountValue: "",
   minOrderAmount: "",
+  productId: "",
+  availableQuantity: "",
   activeFrom: "",
   activeUntil: "",
   isActive: true,
@@ -46,6 +60,7 @@ const emptyForm: FormState = {
 export default function PromotionManager() {
   const router = useRouter();
   const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [products, setProducts] = useState<ProductOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editingCode, setEditingCode] = useState<string | null>(null);
@@ -56,10 +71,20 @@ export default function PromotionManager() {
   const loadPromotions = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/promotions?admin=1&all=1");
-      const data = await response.json();
-      if (response.ok) {
-        setPromotions(data.promotions ?? []);
+      const [promotionsRes, productsRes] = await Promise.all([
+        fetch("/api/promotions?admin=1&all=1"),
+        fetch("/api/products?admin=1"),
+      ]);
+
+      const promotionsData = await promotionsRes.json();
+      const productsData = await productsRes.json();
+
+      if (promotionsRes.ok) {
+        setPromotions(promotionsData.promotions ?? []);
+      }
+
+      if (productsRes.ok) {
+        setProducts(productsData.products ?? []);
       }
     } finally {
       setLoading(false);
@@ -86,6 +111,8 @@ export default function PromotionManager() {
       discountType: promotion.discountType,
       discountValue: promotion.discountValue.toString(),
       minOrderAmount: promotion.minOrderAmount.toString(),
+      productId: promotion.productId?.toString() ?? "",
+      availableQuantity: promotion.availableQuantity?.toString() ?? "",
       activeFrom: promotion.activeFrom ?? "",
       activeUntil: promotion.activeUntil ?? "",
       isActive: promotion.isActive,
@@ -107,6 +134,8 @@ export default function PromotionManager() {
       discountType: form.discountType,
       discountValue: Number(form.discountValue || 0),
       minOrderAmount: Number(form.minOrderAmount || 0),
+      productId: form.productId ? Number(form.productId) : null,
+      availableQuantity: form.availableQuantity ? Number(form.availableQuantity) : null,
       activeFrom: form.activeFrom || null,
       activeUntil: form.activeUntil || null,
       isActive: form.isActive,
@@ -252,6 +281,36 @@ export default function PromotionManager() {
               step="0.01"
               value={form.minOrderAmount}
               onChange={(e) => setForm((prev) => ({ ...prev, minOrderAmount: e.target.value }))}
+            />
+          </label>
+
+          <label className="block space-y-2 text-sm">
+            <span className="font-medium">Limited product</span>
+            <select
+              value={form.productId}
+              onChange={(e) => setForm((prev) => ({ ...prev, productId: e.target.value }))}
+              className="h-11 w-full rounded-4xl border border-input bg-input/30 px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            >
+              <option value="">Any product</option>
+              {products.map((product) => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="block space-y-2 text-sm">
+            <span className="font-medium">Available quantity</span>
+            <Input
+              type="number"
+              min="0"
+              step="1"
+              value={form.availableQuantity}
+              onChange={(e) => setForm((prev) => ({ ...prev, availableQuantity: e.target.value }))}
+              placeholder="Leave blank for unlimited"
             />
           </label>
 

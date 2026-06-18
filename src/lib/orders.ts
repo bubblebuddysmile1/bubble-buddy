@@ -118,6 +118,7 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
         status: "PENDING",
         paymentStatus: "PENDING",
         paymentMethod: "CARD",
+        couponCode: input.couponCode?.trim().toUpperCase() ?? null,
         razorpayOrderId: input.razorpayOrderId,
         totalAmount: new Prisma.Decimal(totals.total),
         shippingAmount: new Prisma.Decimal(totals.shipping),
@@ -160,12 +161,18 @@ export async function confirmOrder(razorpayOrderId: string, razorpayPaymentId: s
       userId: true,
       redeemedLoyaltyPoints: true,
       loyaltyPointsEarned: true,
+      paymentStatus: true,
+      couponCode: true,
       items: { select: { productId: true, quantity: true } },
     },
   });
 
   if (!order) {
     throw new Error("Order not found.");
+  }
+
+  if (order.paymentStatus === "PAID") {
+    return { id: order.id, orderNumber };
   }
 
   return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -185,6 +192,18 @@ export async function confirmOrder(razorpayOrderId: string, razorpayPaymentId: s
         where: { id: order.userId },
         data: {
           loyaltyPoints: { increment: order.loyaltyPointsEarned },
+        },
+      });
+    }
+
+    if (order.couponCode) {
+      await tx.promotion.updateMany({
+        where: {
+          code: order.couponCode,
+          availableQuantity: { gt: 0 },
+        },
+        data: {
+          availableQuantity: { decrement: 1 },
         },
       });
     }

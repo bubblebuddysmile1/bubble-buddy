@@ -12,7 +12,7 @@ import {
 } from "@/lib/razorpay";
 import { createPaymentOrderSchema } from "@/lib/validations/payment";
 import { prisma } from "@/lib/prisma";
-import { getPromotionByCode, getPromotionDiscountAmount, isPromotionActive } from "@/lib/promotions";
+import { getPromotionByCode, getPromotionDiscountAmount, getPromotionValidationMessage, isPromotionActive } from "@/lib/promotions";
 import type { CartItem } from "@/types/cart";
 
 export async function POST(request: Request) {
@@ -74,12 +74,12 @@ export async function POST(request: Request) {
       }
 
       const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const discount = getPromotionDiscountAmount(promotion, subtotal);
+      const discount = getPromotionDiscountAmount(promotion, subtotal, cartItems);
       if (discount <= 0) {
         return NextResponse.json(
           {
             error: "Coupon cannot be applied to this order.",
-            message: `Spend ${Number(promotion.minOrderAmount).toFixed(2)} or more to use this coupon.`,
+            message: getPromotionValidationMessage(promotion, subtotal, cartItems),
           },
           { status: 400 },
         );

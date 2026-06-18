@@ -16,10 +16,32 @@ export type ActivePromotion = {
   isActive: boolean;
 };
 
+function formatCountdown(target: Date): string {
+  const totalSeconds = Math.max(0, Math.floor((target.getTime() - Date.now()) / 1000));
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const parts = [];
+
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0 || days > 0) parts.push(`${hours}h`);
+  parts.push(`${minutes}m`);
+  parts.push(`${seconds}s`);
+
+  return parts.join(" ");
+}
+
 export default function OfferDiscountSection() {
   const [promotions, setPromotions] = useState<ActivePromotion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     async function loadPromotions() {
@@ -98,7 +120,7 @@ export default function OfferDiscountSection() {
                       </p>
                     </div>
 
-                    <div className="rounded-[1.5rem] border border-border bg-background p-5">
+                            <div className="rounded-[1.5rem] border border-border bg-background p-5">
                       <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Offer</p>
                       <p className="mt-2 text-xl font-semibold text-foreground">{badge}</p>
                       {promotion.minOrderAmount > 0 && (
@@ -106,9 +128,16 @@ export default function OfferDiscountSection() {
                           Minimum order ₹{promotion.minOrderAmount.toFixed(2)}
                         </p>
                       )}
-                      <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                        {activeRange}
-                      </p>
+                      {promotion.activeUntil ? (
+                        <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">
+                          <span>Ends in</span>
+                          <span>{formatCountdown(new Date(promotion.activeUntil))}</span>
+                        </div>
+                      ) : (
+                        <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                          {activeRange}
+                        </p>
+                      )}
                     </div>
 
                     <div className="flex justify-end">

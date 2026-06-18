@@ -1,6 +1,6 @@
 import BestSellingProducts from '@/components/store/BestSellingProducts'
 import PromoBannerSection from '@/components/store/PromoBannerSection'
-import OfferDiscountSection from '@/components/store/OfferDiscountSection'
+import FlashSaleSection from '@/components/store/FlashSaleSection'
 
 export default function AboutPage() {
   return (
@@ -17,11 +17,9 @@ export default function AboutPage() {
           </p>
         </div>
       </div>
-    
-    
         <BestSellingProducts/>
         <PromoBannerSection/>
-        <OfferDiscountSection/>
+        <FlashSaleSection/>
     </main>
   )
 }

@@ -3,11 +3,29 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin-auth";
 
+type Deal = {
+  id: number;
+  title: string;
+  dealType: string;
+  urgencyLevel: string;
+  discountPercent: number | null;
+  discountFixed: Prisma.Decimal | null;
+  limitedQuantity: number | null;
+  claimedQuantity: number;
+  maxCoupons: number | null;
+  usedCoupons: number;
+  couponCode: string | null;
+  isActive: boolean;
+  endsAt: Date | null;
+};
+
 type ProductWithCategory = Prisma.ProductGetPayload<{
   include: {
     category: { select: { id: true; name: true; slug: true } };
   };
-}>;
+}> & {
+  deal: Deal | null;
+};
 
 type ProductCreateImage = {
   url: string;
@@ -34,6 +52,21 @@ function normalizeProduct(product: ProductWithCategory) {
       ? { id: product.category.id, name: product.category.name, slug: product.category.slug }
       : null,
     thumbnail: product.thumbnail,
+    deal: product.deal ? {
+      id: product.deal.id,
+      title: product.deal.title,
+      dealType: product.deal.dealType,
+      urgencyLevel: product.deal.urgencyLevel,
+      discountPercent: product.deal.discountPercent,
+      discountFixed: product.deal.discountFixed?.toString() ?? null,
+      limitedQuantity: product.deal.limitedQuantity,
+      claimedQuantity: product.deal.claimedQuantity,
+      maxCoupons: product.deal.maxCoupons,
+      usedCoupons: product.deal.usedCoupons,
+      couponCode: product.deal.couponCode,
+      isActive: product.deal.isActive,
+      endsAt: product.deal.endsAt
+    } : null,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
   };
@@ -96,8 +129,11 @@ export async function GET(req: NextRequest) {
   if (requestedSlugs.length > 0) {
     const foundProducts = await prisma.product.findMany({
       where,
-      include: { category: { select: { id: true, name: true, slug: true } } },
-    });
+      include: { 
+        category: { select: { id: true, name: true, slug: true } },
+        deal: true
+      },
+    }) as ProductWithCategory[];
 
     const orderedProducts = requestedSlugs
       .map((slug) => foundProducts.find((product) => product.slug === slug))
@@ -108,12 +144,15 @@ export async function GET(req: NextRequest) {
 
   const total = await prisma.product.count({ where });
 
-  const allProducts = await prisma.product.findMany({
+  const allProducts = (await prisma.product.findMany({
     where,
-    include: { category: { select: { id: true, name: true, slug: true } } },
+    include: { 
+      category: { select: { id: true, name: true, slug: true } },
+      deal: true
+    },
     orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
     take: adminView ? 500 : 500,
-  });
+  })) as ProductWithCategory[];
 
   const sortedProducts = (() => {
     if (sort === "price_asc" || sort === "price_desc") {
@@ -201,8 +240,11 @@ export async function POST(req: NextRequest) {
           .map((item) => ({ url: String(item.url), altText: item?.altText ? String(item.altText) : null })),
       },
     },
-    include: { category: { select: { id: true, name: true, slug: true } } },
-  });
+    include: { 
+      category: { select: { id: true, name: true, slug: true } },
+      deal: true
+    },
+  }) as ProductWithCategory;
 
   return NextResponse.json({ product: normalizeProduct(product) }, { status: 201 });
 }
