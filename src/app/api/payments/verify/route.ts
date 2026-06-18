@@ -65,23 +65,26 @@ export async function POST(request: Request) {
 
     // Check payment status from Razorpay
     let paymentSuccessful = false;
-    
+    let paymentFetchFailed = false;
+
     if (isMockPaymentMode()) {
       paymentSuccessful = true;
     } else {
       try {
         const razorpay = createRazorpayClient();
         const payment = await razorpay.payments.fetch(razorpay_payment_id);
-        paymentSuccessful = payment.status === "captured";
+        paymentSuccessful = payment.status === "captured" || payment.status === "authorized";
       } catch (error) {
         console.error("[payments/verify] Failed to fetch payment status:", error);
-        paymentSuccessful = false;
+        paymentFetchFailed = true;
       }
     }
 
-    // Confirm or cancel order based on payment status
+    // Confirm or cancel order based on payment status. If the payment fetch fails after
+    // the Razorpay signature is already verified, use the signature as the primary proof
+    // and confirm the order rather than cancelling a potentially valid payment.
     let finalOrder = savedOrder;
-    if (paymentSuccessful) {
+    if (paymentSuccessful || paymentFetchFailed) {
       finalOrder = await confirmOrder(razorpay_order_id, razorpay_payment_id, razorpay_signature);
       await notifyOrderConfirmation(finalOrder.orderNumber);
     } else {
