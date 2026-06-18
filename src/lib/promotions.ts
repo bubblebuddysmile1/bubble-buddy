@@ -12,16 +12,27 @@ export async function getPromotionByCode(code: string): Promise<Promotion | null
   });
 }
 
+export function isPromotionEligibleForCart(promotion: Promotion, items: Array<{ id: number }>): boolean {
+  if (promotion.productId == null) return true;
+  return items.some((item) => item.id === promotion.productId);
+}
+
 export function isPromotionActive(promotion: Promotion): boolean {
   const now = new Date();
   if (!promotion.isActive) return false;
+  if (promotion.availableQuantity !== null && promotion.availableQuantity <= 0) return false;
   if (promotion.activeFrom && promotion.activeFrom > now) return false;
   if (promotion.activeUntil && promotion.activeUntil < now) return false;
   return true;
 }
 
-export function getPromotionDiscountAmount(promotion: Promotion, subtotal: number): number {
+export function getPromotionDiscountAmount(
+  promotion: Promotion,
+  subtotal: number,
+  items: Array<{ id: number }> = [],
+): number {
   if (!isPromotionActive(promotion)) return 0;
+  if (!isPromotionEligibleForCart(promotion, items)) return 0;
 
   const minOrderAmount = Number(promotion.minOrderAmount);
   if (subtotal < minOrderAmount) return 0;
@@ -34,9 +45,21 @@ export function getPromotionDiscountAmount(promotion: Promotion, subtotal: numbe
   return Math.min(subtotal, discountValue);
 }
 
-export function getPromotionValidationMessage(promotion: Promotion, subtotal: number): string {
+export function getPromotionValidationMessage(
+  promotion: Promotion,
+  subtotal: number,
+  items: Array<{ id: number }> = [],
+): string {
   if (!promotion.isActive) {
     return "This coupon is no longer active.";
+  }
+
+  if (promotion.availableQuantity !== null && promotion.availableQuantity <= 0) {
+    return "This coupon is no longer available.";
+  }
+
+  if (!isPromotionEligibleForCart(promotion, items)) {
+    return "Add the promotional product to your cart to use this coupon.";
   }
 
   const minOrderAmount = Number(promotion.minOrderAmount);

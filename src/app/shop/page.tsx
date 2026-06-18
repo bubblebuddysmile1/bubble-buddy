@@ -16,7 +16,9 @@ export default function ShopPage() {
         <Suspense fallback={<div className="rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">Loading shop browser...</div>}>
           <ShopBrowser />
         </Suspense>
+
       </div>
     </main>
   );
 }
+  

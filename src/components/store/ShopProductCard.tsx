@@ -5,11 +5,29 @@ import Link from "next/link";
 import AddToCartButton from "@/components/cart/AddToCartButton";
 import CompareButton from "@/components/compare/CompareButton";
 import WishlistButton from "@/components/wishlist/WishlistButton";
+import LimitedOfferBadge from "@/components/store/LimitedOfferBadge";
+import ClaimFastButton from "@/components/store/ClaimFastButton";
 import { formatCartMoney } from "@/lib/cart";
 import type { CartProduct } from "@/types/cart";
 
+interface Deal {
+  id: number;
+  title: string;
+  dealType: "LIMITED_STOCK" | "COUPON_CODE" | "FLASH_SALE" | "BUNDLE_DEAL";
+  urgencyLevel: "NORMAL" | "URGENT" | "CRITICAL";
+  discountPercent?: number | null;
+  discountFixed?: string | null;
+  limitedQuantity?: number | null;
+  claimedQuantity: number;
+  maxCoupons?: number | null;
+  usedCoupons: number;
+  couponCode?: string | null;
+  isActive: boolean;
+  endsAt?: Date | null;
+}
+
 type ShopProductCardProps = {
-  product: CartProduct;
+  product: CartProduct & { deal?: Deal | null };
   description: string;
   featured?: boolean;
 };
@@ -19,6 +37,9 @@ export default function ShopProductCard({
   description,
   featured,
 }: ShopProductCardProps) {
+  const isDealActive = product.deal?.isActive && 
+    (!product.deal?.endsAt || new Date(product.deal.endsAt) > new Date());
+
   return (
     <article className="group overflow-hidden rounded-[2rem] border border-border bg-card p-0 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
       <div className="relative h-80 overflow-hidden bg-muted">
@@ -32,6 +53,11 @@ export default function ShopProductCard({
           />
         </Link>
         <WishlistButton product={product} variant="overlay" className="absolute right-4 top-4 z-10" />
+        {isDealActive && product.deal && (
+          <div className="absolute left-4 top-4 z-10 max-w-[calc(100%-2rem)]">
+            <LimitedOfferBadge deal={product.deal} />
+          </div>
+        )}
       </div>
       <div className="space-y-4 p-6">
         <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.24em] text-primary">
@@ -51,13 +77,18 @@ export default function ShopProductCard({
           <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted-foreground">{description}</p>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3">
           <div>
             <p className="text-sm text-muted-foreground">Price</p>
             <p className="text-xl font-semibold text-foreground">
               {formatCartMoney(product.price, product.currency)}
             </p>
           </div>
+
+          {isDealActive && product.deal && (
+            <ClaimFastButton dealId={product.deal.id} />
+          )}
+
           <div className="flex flex-wrap items-center gap-2">
             <AddToCartButton product={product} size="sm" label="Add" />
             <CompareButton product={product} variant="icon" className="text-foreground" />

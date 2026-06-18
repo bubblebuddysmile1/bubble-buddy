@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import FlashSaleSection from "@/components/store/FlashSaleSection";
 
 export const metadata = {
   title: "Offers & Promotions - Bubble Buddy",
@@ -27,121 +28,7 @@ export default function OffersPage() {
           </div>
         </div>
       </div>
-
-      {/* Current Promotions */}
-      <div className="mx-auto max-w-6xl px-4 py-16">
-        <h2 className="mb-12 text-4xl font-bold">Current Promotions</h2>
-        
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Offer 1 */}
-          <div className="group relative overflow-hidden rounded-[2rem] border border-border bg-card/50 p-8 shadow-lg shadow-primary/10 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 backdrop-blur-lg">
-            <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
-            <div className="relative space-y-4">
-              <div className="inline-flex rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
-                🎉 Limited Time
-              </div>
-              <h3 className="text-2xl font-bold">Summer Mega Sale</h3>
-              <p className="text-sm text-muted-foreground">
-                Get up to 40% off on selected skincare and haircare products this summer.
-              </p>
-              <div className="space-y-2 pt-4">
-                <p className="text-xs font-medium text-muted-foreground">Valid Till: July 31, 2026</p>
-                <p className="text-xs font-medium text-muted-foreground">Minimum Order: ₹5,000</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Offer 2 */}
-          <div className="group relative overflow-hidden rounded-[2rem] border border-border bg-card/50 p-8 shadow-lg shadow-primary/10 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 backdrop-blur-lg">
-            <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
-            <div className="relative space-y-4">
-              <div className="inline-flex rounded-full bg-accent/10 px-4 py-2 text-sm font-semibold text-accent">
-                💎 Bulk Orders
-              </div>
-              <h3 className="text-2xl font-bold">Wholesale Discounts</h3>
-              <p className="text-sm text-muted-foreground">
-                Special pricing for bulk orders. Perfect for salon owners and beauty brands.
-              </p>
-              <div className="space-y-2 pt-4">
-                <p className="text-xs font-medium text-muted-foreground">Order 100+ Units: 25% Off</p>
-                <p className="text-xs font-medium text-muted-foreground">Order 500+ Units: 35% Off</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Offer 3 */}
-          <div className="group relative overflow-hidden rounded-[2rem] border border-border bg-card/50 p-8 shadow-lg shadow-primary/10 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 backdrop-blur-lg">
-            <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
-            <div className="relative space-y-4">
-              <div className="inline-flex rounded-full bg-green-500/10 px-4 py-2 text-sm font-semibold text-green-500">
-                ✨ New Users
-              </div>
-              <h3 className="text-2xl font-bold">Welcome Bonus</h3>
-              <p className="text-sm text-muted-foreground">
-                New customers get ₹1,000 off on their first order over ₹10,000.
-              </p>
-              <div className="space-y-2 pt-4">
-                <p className="text-xs font-medium text-muted-foreground">Coupon: WELCOME1000</p>
-                <p className="text-xs font-medium text-muted-foreground">One time per account</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Offer 4 */}
-          <div className="group relative overflow-hidden rounded-[2rem] border border-border bg-card/50 p-8 shadow-lg shadow-primary/10 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 backdrop-blur-lg">
-            <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
-            <div className="relative space-y-4">
-              <div className="inline-flex rounded-full bg-purple-500/10 px-4 py-2 text-sm font-semibold text-purple-500">
-                👥 Referral Program
-              </div>
-              <h3 className="text-2xl font-bold">Refer & Earn</h3>
-              <p className="text-sm text-muted-foreground">
-                Refer a friend and both of you get ₹500 discount on next orders.
-              </p>
-              <div className="space-y-2 pt-4">
-                <p className="text-xs font-medium text-muted-foreground">Unlimited referrals</p>
-                <p className="text-xs font-medium text-muted-foreground">Valid for all customers</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Offer 5 */}
-          <div className="group relative overflow-hidden rounded-[2rem] border border-border bg-card/50 p-8 shadow-lg shadow-primary/10 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 backdrop-blur-lg">
-            <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
-            <div className="relative space-y-4">
-              <div className="inline-flex rounded-full bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-500">
-                🎁 Bundle Offers
-              </div>
-              <h3 className="text-2xl font-bold">Combo Packages</h3>
-              <p className="text-sm text-muted-foreground">
-                Buy combo sets and save up to 20% on your purchase.
-              </p>
-              <div className="space-y-2 pt-4">
-                <p className="text-xs font-medium text-muted-foreground">Skincare Bundle: 20% Off</p>
-                <p className="text-xs font-medium text-muted-foreground">Haircare Bundle: 15% Off</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Offer 6 */}
-          <div className="group relative overflow-hidden rounded-[2rem] border border-border bg-card/50 p-8 shadow-lg shadow-primary/10 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 backdrop-blur-lg">
-            <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
-            <div className="relative space-y-4">
-              <div className="inline-flex rounded-full bg-orange-500/10 px-4 py-2 text-sm font-semibold text-orange-500">
-                📅 Festival Specials
-              </div>
-              <h3 className="text-2xl font-bold">Seasonal Discounts</h3>
-              <p className="text-sm text-muted-foreground">
-                Extra savings during festivals and special occasions throughout the year.
-              </p>
-              <div className="space-y-2 pt-4">
-                <p className="text-xs font-medium text-muted-foreground">Diwali: 30% Off</p>
-                <p className="text-xs font-medium text-muted-foreground">Holi & More: Special Rates</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <FlashSaleSection />
 
       {/* How to Use Coupons */}
       <div className="border-t border-border bg-card/30 py-16">
@@ -198,7 +85,7 @@ export default function OffersPage() {
                   <Link href="/shop">Start Shopping</Link>
                 </Button>
                 <Button variant="secondary" className="rounded-full px-8 py-3 text-base font-semibold">
-                  <Link href="/contact">Contact Sales</Link>
+                  <Link href="/contact-us">Contact Sales</Link>
                 </Button>
               </div>
             </div>
