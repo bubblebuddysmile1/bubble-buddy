@@ -1,1 +1,0 @@
-ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "loyaltyPoints" integer NOT NULL DEFAULT 0;

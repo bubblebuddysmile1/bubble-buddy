@@ -1,2 +1,0 @@
-ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "redeemedLoyaltyPoints" integer NOT NULL DEFAULT 0;
-ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "loyaltyPointsEarned" integer NOT NULL DEFAULT 0;
