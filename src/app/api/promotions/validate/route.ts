@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getPromotionByCode, getPromotionDiscountAmount, isPromotionActive } from "@/lib/promotions";
+import { getPromotionByCode, getPromotionDiscountAmount, isPromotionActive, getPromotionValidationMessage } from "@/lib/promotions";
 import { cartItemSchema } from "@/lib/validations/payment";
 import type { CartItem } from "@/types/cart";
 
