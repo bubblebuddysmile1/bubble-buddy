@@ -1,23 +1,50 @@
+import fs from "fs";
+import path from "path";
 import { Resend } from "resend";
 
+function readEnvValue(name: string) {
+  const fromProcess = process.env[name];
+  if (fromProcess) {
+    return fromProcess;
+  }
+
+  try {
+    const envPath = path.resolve(process.cwd(), ".env");
+    if (!fs.existsSync(envPath)) {
+      return undefined;
+    }
+
+    const raw = fs.readFileSync(envPath, "utf8");
+    const match = raw.match(new RegExp(`^${name}=(.*)$`, "m"));
+    if (!match) {
+      return undefined;
+    }
+
+    return match[1].trim().replace(/^['"]|['"]$/g, "");
+  } catch (error) {
+    console.warn(`[email] Unable to read ${name} from .env:`, error);
+    return undefined;
+  }
+}
+
 function getAppUrl() {
-  return process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
+  return readEnvValue("NEXT_PUBLIC_APP_URL")?.replace(/\/+$/, "") ?? "http://localhost:3000";
 }
 
 function getSupportEmail() {
-  return process.env.SUPPORT_EMAIL ?? "support@bubblebuddy.com";
+  return readEnvValue("SUPPORT_EMAIL") ?? "support@bubblebuddy.com";
 }
 
 function getAdminEmail() {
-  return process.env.ADMIN_EMAIL ?? getSupportEmail();
+  return readEnvValue("ADMIN_EMAIL") ?? getSupportEmail();
 }
 
 function getFromAddress() {
-  return process.env.EMAIL_FROM ?? "Bubble Buddy <onboarding@resend.dev>";
+  return readEnvValue("EMAIL_FROM") ?? "Bubble Buddy <onboarding@resend.dev>";
 }
 
 function getResendClient() {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = readEnvValue("RESEND_API_KEY");
   if (!apiKey) {
     return null;
   }
@@ -49,7 +76,16 @@ export async function sendEmail(payload: EmailPayload) {
     return false;
   }
 
-  const recipients = Array.isArray(payload.to) ? payload.to : [payload.to];
+  const recipients = (Array.isArray(payload.to) ? payload.to : [payload.to]).filter(Boolean);
+  if (!recipients.length) {
+    console.warn("[email] No recipients provided. Skipping email send.");
+    return false;
+  }
+
+  if (fromAddress.includes("onboarding@resend.dev")) {
+    console.warn("[email] Using Resend sandbox sender. Emails will only be delivered to verified recipients or a verified domain. Set EMAIL_FROM to a verified Resend address.");
+  }
+
   try {
     const response = await resend.emails.send({
       from: fromAddress,
@@ -83,8 +119,11 @@ export async function sendCustomerAndAdminEmail(payload: Omit<EmailPayload, "to"
     return false;
   }
 
+  const dedupedRecipients = [...new Set(recipients)];
+  console.log(`[email] Sending to recipients: ${dedupedRecipients.join(", ")}`);
+
   return sendEmail({
-    to: [...new Set(recipients)],
+    to: dedupedRecipients,
     subject: payload.subject,
     text: payload.text,
     html: payload.html,
