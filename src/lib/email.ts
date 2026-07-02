@@ -2,62 +2,28 @@ import fs from "fs";
 import path from "path";
 import { Resend } from "resend";
 
-function readEnvValue(name: string) {
+function readEnvValue(name: string): string | undefined {
   const fromProcess = process.env[name];
-  if (fromProcess) {
-    return fromProcess;
-  }
+  if (fromProcess) return fromProcess;
 
   try {
     const envPath = path.resolve(process.cwd(), ".env");
-    if (!fs.existsSync(envPath)) {
-      return undefined;
-    }
-
+    if (!fs.existsSync(envPath)) return undefined;
     const raw = fs.readFileSync(envPath, "utf8");
     const match = raw.match(new RegExp(`^${name}=(.*)$`, "m"));
-    if (!match) {
-      return undefined;
-    }
-
-    return match[1].trim().replace(/^['"]|['"]$/g, "");
-  } catch (error) {
-    console.warn(`[email] Unable to read ${name} from .env:`, error);
+    return match ? match[1].trim().replace(/^['"]|['"]$/g, "") : undefined;
+  } catch {
     return undefined;
   }
 }
 
-function getAppUrl() {
-  return readEnvValue("NEXT_PUBLIC_APP_URL")?.replace(/\/+$/, "") ?? "http://localhost:3000";
-}
+let resendClient: Resend | null = null;
 
-function getSupportEmail() {
-  return readEnvValue("SUPPORT_EMAIL") ?? "support@bubblebuddy.com";
-}
-
-function getAdminEmail() {
-  return readEnvValue("ADMIN_EMAIL") ?? getSupportEmail();
-}
-
-function getFromAddress() {
-  return readEnvValue("EMAIL_FROM") ?? "Bubble Buddy <onboarding@resend.dev>";
-}
-
-function getResendClient() {
+function getResendClient(): Resend | null {
   const apiKey = readEnvValue("RESEND_API_KEY");
-  if (!apiKey) {
-    return null;
-  }
-
-  return new Resend(apiKey);
-}
-
-function parseRecipients(value?: string | null) {
-  if (!value) return [];
-  return value
-    .split(",")
-    .map((recipient) => recipient.trim())
-    .filter(Boolean);
+  if (!apiKey) return null;
+  if (!resendClient) resendClient = new Resend(apiKey);
+  return resendClient;
 }
 
 export type EmailPayload = {
@@ -67,108 +33,117 @@ export type EmailPayload = {
   html?: string;
 };
 
-function isValidEmail(email?: string | null) {
-  if (!email) return false;
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-export async function sendEmail(payload: EmailPayload) {
+export async function sendEmail(payload: EmailPayload): Promise<boolean> {
   const resend = getResendClient();
-  const fromAddress = getFromAddress();
-
   if (!resend) {
-    console.warn("[email] Resend API key is missing. Skipping email send.");
+    console.error("[email] Resend API key not configured");
     return false;
   }
 
-  const recipients = (Array.isArray(payload.to) ? payload.to : [payload.to])
-    .filter(Boolean)
-    .filter((email) => {
-      if (!isValidEmail(email)) {
-        console.warn(`[email] Invalid email format, skipping: ${email}`);
-        return false;
-      }
-      return true;
-    });
+  const from = readEnvValue("EMAIL_FROM") || "Bubble Buddy <onboarding@resend.dev>";
+  const recipients = Array.isArray(payload.to) ? payload.to : [payload.to];
+  const cleanRecipients = recipients.filter((e) => e && typeof e === "string").map((e) => e.trim());
 
-  if (!recipients.length) {
-    console.warn("[email] No valid recipients provided. Skipping email send.");
+  if (!cleanRecipients.length) {
+    console.warn("[email] No recipients provided");
     return false;
-  }
-
-  if (fromAddress.includes("onboarding@resend.dev")) {
-    console.warn("[email] Using Resend sandbox sender. Emails will only be delivered to verified recipients. Set EMAIL_FROM to a verified domain.");
   }
 
   try {
-    console.log(`[email] Attempting to send email from: ${fromAddress} to: ${recipients.join(", ")}`);
+    console.log(`[email] Sending to: ${cleanRecipients.join(", ")}`);
     const response = await resend.emails.send({
-      from: fromAddress,
-      to: recipients,
+      from,
+      to: cleanRecipients,
       subject: payload.subject,
-      text: payload.text,
       html: payload.html,
+      text: payload.text,
     });
 
     if (response.error) {
-      console.error("[email] Resend API returned error:", JSON.stringify(response.error));
+      console.error("[email] Error:", response.error);
       return false;
     }
 
-    console.log(`[email] Email queued successfully. ID: ${response.data?.id}`);
+    console.log(`[email] Sent. ID: ${response.data?.id}`);
     return true;
   } catch (error) {
-    console.error("[email] Failed to send email with Resend:", error);
+    console.error("[email] Exception:", error instanceof Error ? error.message : error);
     return false;
   }
 }
 
-export async function sendCustomerAndAdminEmail(payload: Omit<EmailPayload, "to"> & { customerEmail?: string | null; includeAdmin?: boolean }) {
-  const recipients = [
-    ...(payload.customerEmail && isValidEmail(payload.customerEmail) ? [payload.customerEmail] : []),
-    ...(payload.includeAdmin === false ? [] : parseRecipients(getAdminEmail())),
-  ].filter((email) => {
-    if (!isValidEmail(email)) {
-      console.warn(`[email] Invalid recipient email filtered out: ${email}`);
-      return false;
-    }
-    return true;
-  });
+export async function sendCustomerAndAdminEmail(options: {
+  customerEmail?: string | null;
+  subject: string;
+  text: string;
+  html?: string;
+  includeAdmin?: boolean;
+}): Promise<boolean> {
+  const recipients: string[] = [];
 
-  if (!recipients.length) {
-    console.warn("[email] No valid recipients available for customer/admin email notification.");
-    return false;
+  if (options.customerEmail?.trim()) {
+    recipients.push(options.customerEmail.trim());
   }
 
-  const dedupedRecipients = [...new Set(recipients)];
-  console.log(`[email] Sending to recipients: ${dedupedRecipients.join(", ")}`);
+  if (options.includeAdmin !== false) {
+    const adminEmail = readEnvValue("ADMIN_EMAIL") || readEnvValue("SUPPORT_EMAIL") || "support@bubblebuddy.com";
+    if (adminEmail?.trim()) {
+      adminEmail.split(",").forEach((e) => {
+        const trimmed = e.trim();
+        if (trimmed) recipients.push(trimmed);
+      });
+    }
+  }
+
+  const uniqueRecipients = [...new Set(recipients)];
+  if (!uniqueRecipients.length) {
+    console.warn("[email] No valid recipients");
+    return false;
+  }
 
   return sendEmail({
-    to: dedupedRecipients,
-    subject: payload.subject,
-    text: payload.text,
-    html: payload.html,
+    to: uniqueRecipients,
+    subject: options.subject,
+    text: options.text,
+    html: options.html,
   });
 }
 
-export async function sendLoginNotificationEmail(user: { name?: string | null; email?: string | null }, event: "success" | "failed" = "success") {
-  const subject = event === "success" ? "Bubble Buddy sign-in successful" : "Bubble Buddy sign-in attempt failed";
-  const intro = event === "success"
-    ? "A new sign-in to your Bubble Buddy account was detected."
-    : "We detected a failed sign-in attempt to your Bubble Buddy account.";
+export async function sendLoginNotificationEmail(
+  user: { name?: string | null; email?: string | null },
+  event: "success" | "failed" = "success"
+): Promise<boolean> {
+  if (!user.email?.trim()) {
+    console.warn("[email] No user email for login notification");
+    return false;
+  }
 
-  const text = `Hi ${user.name ?? user.email ?? "Customer"},\n\n${intro}\n\n` +
+  const subject = event === "success" ? "Bubble Buddy Sign-in Successful" : "Bubble Buddy Sign-in Failed";
+  const intro =
+    event === "success"
+      ? "A new sign-in to your Bubble Buddy account was detected."
+      : "We detected a failed sign-in attempt to your Bubble Buddy account.";
+
+  const supportEmail = readEnvValue("SUPPORT_EMAIL") || "support@bubblebuddy.com";
+  const appUrl = (readEnvValue("NEXT_PUBLIC_APP_URL") || "http://localhost:3000").replace(/\/+$/, "");
+
+  const text =
+    `Hi ${user.name || user.email},\n\n` +
+    `${intro}\n\n` +
     `Time: ${new Date().toLocaleString("en-US")}\n` +
-    `If this was you, no further action is needed. If this was not you, please reset your password immediately and contact support at ${getSupportEmail()}.\n\n` +
+    `If this was you, no further action needed.\n` +
+    `If not, reset your password at ${appUrl}\n\n` +
+    `Support: ${supportEmail}\n` +
     `Bubble Buddy Team`;
 
-  const html = `<!DOCTYPE html><html><body style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height:1.6; color:#1f2937;">` +
-    `<h1 style="font-size:22px;">${subject}</h1>` +
-    `<p>Hi ${user.name ?? user.email ?? "Customer"},</p>` +
+  const html =
+    `<!DOCTYPE html><html><body style="font-family:sans-serif;line-height:1.6;color:#333;">` +
+    `<h2>${subject}</h2>` +
+    `<p>Hi ${user.name || user.email},</p>` +
     `<p>${intro}</p>` +
     `<p><strong>Time:</strong> ${new Date().toLocaleString("en-US")}</p>` +
-    `<p>If this was you, no further action is needed. If this was not you, please reset your password immediately and contact support at ${getSupportEmail()}.</p>` +
-    `<p><a href="${getAppUrl()}" style="display:inline-block;padding:12px 18px;background:#a67c52;color:white;text-decoration:none;border-radius:9999px;">Visit Bubble Buddy</a></p>` +
+    `<p>If this was you, no action needed. If not, <a href="${appUrl}/auth">reset your password</a>.</p>` +
+    `<p>Questions? <a href="mailto:${supportEmail}">Contact support</a></p>` +
     `<p>Bubble Buddy Team</p>` +
     `</body></html>`;
 
