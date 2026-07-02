@@ -2,8 +2,19 @@ import { Resend } from "resend";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_ADDRESS = process.env.EMAIL_FROM ?? "Bubble Buddy <onboarding@resend.dev>";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
+const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? "support@bubblebuddy.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? SUPPORT_EMAIL;
 
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
+
+function parseRecipients(value?: string | null) {
+  if (!value) return [];
+  return value
+    .split(",")
+    .map((recipient) => recipient.trim())
+    .filter(Boolean);
+}
 
 export type EmailPayload = {
   to: string | string[];
@@ -37,4 +48,52 @@ export async function sendEmail(payload: EmailPayload) {
     console.error("[email] Failed to send email with Resend:", error);
     return false;
   }
+}
+
+export async function sendCustomerAndAdminEmail(payload: Omit<EmailPayload, "to"> & { customerEmail?: string | null; includeAdmin?: boolean }) {
+  const recipients = [
+    ...(payload.customerEmail ? [payload.customerEmail] : []),
+    ...(payload.includeAdmin === false ? [] : parseRecipients(ADMIN_EMAIL)),
+  ].filter(Boolean);
+
+  if (!recipients.length) {
+    console.warn("[email] No recipients available for customer/admin email notification.");
+    return false;
+  }
+
+  return sendEmail({
+    to: [...new Set(recipients)],
+    subject: payload.subject,
+    text: payload.text,
+    html: payload.html,
+  });
+}
+
+export async function sendLoginNotificationEmail(user: { name?: string | null; email?: string | null }, event: "success" | "failed" = "success") {
+  const subject = event === "success" ? "Bubble Buddy sign-in successful" : "Bubble Buddy sign-in attempt failed";
+  const intro = event === "success"
+    ? "A new sign-in to your Bubble Buddy account was detected."
+    : "We detected a failed sign-in attempt to your Bubble Buddy account.";
+
+  const text = `Hi ${user.name ?? user.email ?? "Customer"},\n\n${intro}\n\n` +
+    `Time: ${new Date().toLocaleString("en-US")}\n` +
+    `If this was you, no further action is needed. If this was not you, please reset your password immediately and contact support at ${SUPPORT_EMAIL}.\n\n` +
+    `Bubble Buddy Team`;
+
+  const html = `<!DOCTYPE html><html><body style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height:1.6; color:#1f2937;">` +
+    `<h1 style="font-size:22px;">${subject}</h1>` +
+    `<p>Hi ${user.name ?? user.email ?? "Customer"},</p>` +
+    `<p>${intro}</p>` +
+    `<p><strong>Time:</strong> ${new Date().toLocaleString("en-US")}</p>` +
+    `<p>If this was you, no further action is needed. If this was not you, please reset your password immediately and contact support at ${SUPPORT_EMAIL}.</p>` +
+    `<p><a href="${APP_URL}" style="display:inline-block;padding:12px 18px;background:#a67c52;color:white;text-decoration:none;border-radius:9999px;">Visit Bubble Buddy</a></p>` +
+    `<p>Bubble Buddy Team</p>` +
+    `</body></html>`;
+
+  return sendCustomerAndAdminEmail({
+    customerEmail: user.email,
+    subject,
+    text,
+    html,
+  });
 }
