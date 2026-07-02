@@ -1,8 +1,20 @@
 import { Resend } from "resend";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
-const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? "support@bubblebuddy.com";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? SUPPORT_EMAIL;
+function getAppUrl() {
+  return process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
+}
+
+function getSupportEmail() {
+  return process.env.SUPPORT_EMAIL ?? "support@bubblebuddy.com";
+}
+
+function getAdminEmail() {
+  return process.env.ADMIN_EMAIL ?? getSupportEmail();
+}
+
+function getFromAddress() {
+  return process.env.EMAIL_FROM ?? "Bubble Buddy <onboarding@resend.dev>";
+}
 
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -30,7 +42,7 @@ export type EmailPayload = {
 
 export async function sendEmail(payload: EmailPayload) {
   const resend = getResendClient();
-  const fromAddress = process.env.EMAIL_FROM ?? "Bubble Buddy <onboarding@resend.dev>";
+  const fromAddress = getFromAddress();
 
   if (!resend) {
     console.warn("[email] Resend API key is missing. Skipping email send.");
@@ -63,7 +75,7 @@ export async function sendEmail(payload: EmailPayload) {
 export async function sendCustomerAndAdminEmail(payload: Omit<EmailPayload, "to"> & { customerEmail?: string | null; includeAdmin?: boolean }) {
   const recipients = [
     ...(payload.customerEmail ? [payload.customerEmail] : []),
-    ...(payload.includeAdmin === false ? [] : parseRecipients(ADMIN_EMAIL)),
+    ...(payload.includeAdmin === false ? [] : parseRecipients(getAdminEmail())),
   ].filter(Boolean);
 
   if (!recipients.length) {
@@ -87,7 +99,7 @@ export async function sendLoginNotificationEmail(user: { name?: string | null; e
 
   const text = `Hi ${user.name ?? user.email ?? "Customer"},\n\n${intro}\n\n` +
     `Time: ${new Date().toLocaleString("en-US")}\n` +
-    `If this was you, no further action is needed. If this was not you, please reset your password immediately and contact support at ${SUPPORT_EMAIL}.\n\n` +
+    `If this was you, no further action is needed. If this was not you, please reset your password immediately and contact support at ${getSupportEmail()}.\n\n` +
     `Bubble Buddy Team`;
 
   const html = `<!DOCTYPE html><html><body style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height:1.6; color:#1f2937;">` +
@@ -95,8 +107,8 @@ export async function sendLoginNotificationEmail(user: { name?: string | null; e
     `<p>Hi ${user.name ?? user.email ?? "Customer"},</p>` +
     `<p>${intro}</p>` +
     `<p><strong>Time:</strong> ${new Date().toLocaleString("en-US")}</p>` +
-    `<p>If this was you, no further action is needed. If this was not you, please reset your password immediately and contact support at ${SUPPORT_EMAIL}.</p>` +
-    `<p><a href="${APP_URL}" style="display:inline-block;padding:12px 18px;background:#a67c52;color:white;text-decoration:none;border-radius:9999px;">Visit Bubble Buddy</a></p>` +
+    `<p>If this was you, no further action is needed. If this was not you, please reset your password immediately and contact support at ${getSupportEmail()}.</p>` +
+    `<p><a href="${getAppUrl()}" style="display:inline-block;padding:12px 18px;background:#a67c52;color:white;text-decoration:none;border-radius:9999px;">Visit Bubble Buddy</a></p>` +
     `<p>Bubble Buddy Team</p>` +
     `</body></html>`;
 
