@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { sendWhatsAppMessage } from "@/lib/whatsapp";
-import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail, sendPaymentFailureEmail } from "@/lib/order-emails";
+import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail, sendPaymentFailureEmail, sendAdminOrderNotificationEmail } from "@/lib/order-emails";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? "support@bubblebuddy.com";
@@ -15,6 +15,9 @@ export async function notifyOrderConfirmation(orderNumber: string) {
   await sendOrderConfirmationEmail(orderNumber).catch((error) => {
     console.error("[order-notifications] Email confirmation failed:", error);
   });
+  await sendAdminOrderNotificationEmail(orderNumber, "received").catch((error) => {
+    console.error("[order-notifications] Admin order notification failed:", error);
+  });
   await sendOrderWhatsApp(orderNumber, "confirmation").catch((error) => {
     console.error("[order-notifications] WhatsApp confirmation failed:", error);
   });
@@ -24,6 +27,9 @@ export async function notifyPaymentFailure(orderNumber: string) {
   await sendPaymentFailureEmail(orderNumber).catch((error) => {
     console.error("[order-notifications] Email payment failure failed:", error);
   });
+  await sendAdminOrderNotificationEmail(orderNumber, "payment_failed").catch((error) => {
+    console.error("[order-notifications] Admin payment failure notification failed:", error);
+  });
   await sendOrderWhatsApp(orderNumber, "payment_failed").catch((error) => {
     console.error("[order-notifications] WhatsApp payment failure failed:", error);
   });
@@ -32,6 +38,9 @@ export async function notifyPaymentFailure(orderNumber: string) {
 export async function notifyOrderStatusUpdate(orderNumber: string, status: string) {
   await sendOrderStatusUpdateEmail(orderNumber, status).catch((error) => {
     console.error("[order-notifications] Email status update failed:", error);
+  });
+  await sendAdminOrderNotificationEmail(orderNumber, "status_update", status).catch((error) => {
+    console.error("[order-notifications] Admin status update notification failed:", error);
   });
   await sendOrderWhatsApp(orderNumber, "status_update", status).catch((error) => {
     console.error("[order-notifications] WhatsApp status update failed:", error);
@@ -53,7 +62,7 @@ async function loadOrder(orderNumber: string) {
 }
 
 function formatAmount(amount: string | number | { toNumber(): number }) {
-  const value = typeof amount === "object" ? Number((amount as any).toNumber?.() ?? amount) : Number(amount);
+  const value = typeof amount === "object" ? Number((amount).toNumber?.() ?? amount) : Number(amount);
   return `$${value.toFixed(2)}`;
 }
 
