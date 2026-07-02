@@ -1,62 +1,40 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const SMTP_HOST = process.env.SMTP_HOST;
-const SMTP_PORT = Number(process.env.SMTP_PORT ?? 587);
-const SMTP_USER = process.env.SMTP_USER;
-const SMTP_PASS = process.env.SMTP_PASS;
-const FROM_ADDRESS = process.env.EMAIL_FROM ?? `Bubble Buddy <no-reply@bubblebuddy.com>`;
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const FROM_ADDRESS = process.env.EMAIL_FROM ?? "Bubble Buddy <onboarding@resend.dev>";
 
-let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
-
-function getTransporter() {
-  if (transporter) {
-    return transporter;
-  }
-
-  if (!SMTP_HOST) {
-    return null;
-  }
-
-  transporter = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    secure: SMTP_PORT === 465,
-    auth: SMTP_USER
-      ? {
-          user: SMTP_USER,
-          pass: SMTP_PASS,
-        }
-      : undefined,
-  });
-
-  return transporter;
-}
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 export type EmailPayload = {
-  to: string;
+  to: string | string[];
   subject: string;
   text: string;
   html?: string;
 };
 
 export async function sendEmail(payload: EmailPayload) {
-  const transport = getTransporter();
-  if (!transport) {
-    console.warn("[email] SMTP configuration is missing. Skipping email send.");
+  if (!resend) {
+    console.warn("[email] Resend API key is missing. Skipping email send.");
     return false;
   }
 
   try {
-    await transport.sendMail({
+    const response = await resend.emails.send({
       from: FROM_ADDRESS,
-      to: payload.to,
+      to: Array.isArray(payload.to) ? payload.to : [payload.to],
       subject: payload.subject,
       text: payload.text,
       html: payload.html,
     });
+
+    if (response.error) {
+      console.error("[email] Resend failed to send email:", response.error);
+      return false;
+    }
+
     return true;
   } catch (error) {
-    console.error("[email] Failed to send email:", error);
+    console.error("[email] Failed to send email with Resend:", error);
     return false;
   }
 }
