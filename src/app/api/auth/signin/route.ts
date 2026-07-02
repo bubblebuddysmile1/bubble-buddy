@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME, authCookieOptions, createAuthToken, isAccountLocked, getAccountLockoutDuration } from "@/lib/auth";
 import { logActivity } from "@/lib/activity-log";
+import { sendLoginNotificationEmail } from "@/lib/email";
 
 const MAX_FAILED_ATTEMPTS = 5;
 
@@ -92,6 +93,10 @@ export async function POST(req: NextRequest) {
         metadata: JSON.stringify({ email, lockedUntil: lockedUntil?.toISOString() }),
       });
 
+      await sendLoginNotificationEmail(user, "failed").catch((error) => {
+        console.error("[auth/signin] Failed login email notification failed:", error);
+      });
+
       return NextResponse.json(
         {
           error: "Too many failed login attempts. Your account is locked for 1.5 hours. Please try again later.",
@@ -99,6 +104,10 @@ export async function POST(req: NextRequest) {
         { status: 429 },
       );
     }
+
+    await sendLoginNotificationEmail(user, "failed").catch((error) => {
+      console.error("[auth/signin] Failed login email notification failed:", error);
+    });
 
     return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
   }
@@ -125,6 +134,10 @@ export async function POST(req: NextRequest) {
     action: "User signed in",
     description: `User signed in with ${email}`,
     metadata: JSON.stringify({ email }),
+  });
+
+  await sendLoginNotificationEmail(user, "success").catch((error) => {
+    console.error("[auth/signin] Success login email notification failed:", error);
   });
 
   const response = NextResponse.json({

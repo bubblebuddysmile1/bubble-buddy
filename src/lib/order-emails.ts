@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { sendEmail } from "@/lib/email";
+import { sendCustomerAndAdminEmail, sendEmail } from "@/lib/email";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? "support@bubblebuddy.com";
@@ -220,7 +220,12 @@ export async function sendOrderConfirmationEmail(orderNumber: string) {
     "Thanks for your purchase! Your order has been confirmed and is being prepared for shipping.",
   );
 
-  return sendOrderEmail(subject, text, html, order.user.email);
+  return sendCustomerAndAdminEmail({
+    customerEmail: order.user.email,
+    subject,
+    text,
+    html,
+  });
 }
 
 export async function sendPaymentFailureEmail(orderNumber: string) {
@@ -233,7 +238,12 @@ export async function sendPaymentFailureEmail(orderNumber: string) {
     "We were unable to process payment for your order. The order has been cancelled and no charges were captured.",
   );
 
-  return sendOrderEmail(subject, text, html, order.user.email);
+  return sendCustomerAndAdminEmail({
+    customerEmail: order.user.email,
+    subject,
+    text,
+    html,
+  });
 }
 
 export async function sendOrderStatusUpdateEmail(orderNumber: string, status: string) {
@@ -269,7 +279,12 @@ export async function sendOrderStatusUpdateEmail(orderNumber: string, status: st
   }
 
   const { subject, text, html } = buildCustomerOrderEmail(order, heading, intro);
-  return sendOrderEmail(subject, text, html, order.user.email);
+  return sendCustomerAndAdminEmail({
+    customerEmail: order.user.email,
+    subject,
+    text,
+    html,
+  });
 }
 
 export async function sendAdminOrderNotificationEmail(orderNumber: string, event: "received" | "payment_failed" | "status_update" = "received", status?: string) {
