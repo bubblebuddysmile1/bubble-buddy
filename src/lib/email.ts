@@ -67,6 +67,11 @@ export type EmailPayload = {
   html?: string;
 };
 
+function isValidEmail(email?: string | null) {
+  if (!email) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 export async function sendEmail(payload: EmailPayload) {
   const resend = getResendClient();
   const fromAddress = getFromAddress();
@@ -76,17 +81,27 @@ export async function sendEmail(payload: EmailPayload) {
     return false;
   }
 
-  const recipients = (Array.isArray(payload.to) ? payload.to : [payload.to]).filter(Boolean);
+  const recipients = (Array.isArray(payload.to) ? payload.to : [payload.to])
+    .filter(Boolean)
+    .filter((email) => {
+      if (!isValidEmail(email)) {
+        console.warn(`[email] Invalid email format, skipping: ${email}`);
+        return false;
+      }
+      return true;
+    });
+
   if (!recipients.length) {
-    console.warn("[email] No recipients provided. Skipping email send.");
+    console.warn("[email] No valid recipients provided. Skipping email send.");
     return false;
   }
 
   if (fromAddress.includes("onboarding@resend.dev")) {
-    console.warn("[email] Using Resend sandbox sender. Emails will only be delivered to verified recipients or a verified domain. Set EMAIL_FROM to a verified Resend address.");
+    console.warn("[email] Using Resend sandbox sender. Emails will only be delivered to verified recipients. Set EMAIL_FROM to a verified domain.");
   }
 
   try {
+    console.log(`[email] Attempting to send email from: ${fromAddress} to: ${recipients.join(", ")}`);
     const response = await resend.emails.send({
       from: fromAddress,
       to: recipients,
@@ -96,11 +111,11 @@ export async function sendEmail(payload: EmailPayload) {
     });
 
     if (response.error) {
-      console.error("[email] Resend failed to send email:", response.error);
+      console.error("[email] Resend API returned error:", JSON.stringify(response.error));
       return false;
     }
 
-    console.log(`[email] Email sent successfully via Resend to: ${recipients.join(", ")}`);
+    console.log(`[email] Email queued successfully. ID: ${response.data?.id}`);
     return true;
   } catch (error) {
     console.error("[email] Failed to send email with Resend:", error);
@@ -110,12 +125,18 @@ export async function sendEmail(payload: EmailPayload) {
 
 export async function sendCustomerAndAdminEmail(payload: Omit<EmailPayload, "to"> & { customerEmail?: string | null; includeAdmin?: boolean }) {
   const recipients = [
-    ...(payload.customerEmail ? [payload.customerEmail] : []),
+    ...(payload.customerEmail && isValidEmail(payload.customerEmail) ? [payload.customerEmail] : []),
     ...(payload.includeAdmin === false ? [] : parseRecipients(getAdminEmail())),
-  ].filter(Boolean);
+  ].filter((email) => {
+    if (!isValidEmail(email)) {
+      console.warn(`[email] Invalid recipient email filtered out: ${email}`);
+      return false;
+    }
+    return true;
+  });
 
   if (!recipients.length) {
-    console.warn("[email] No recipients available for customer/admin email notification.");
+    console.warn("[email] No valid recipients available for customer/admin email notification.");
     return false;
   }
 
