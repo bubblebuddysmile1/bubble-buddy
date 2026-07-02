@@ -1,12 +1,17 @@
 import { Resend } from "resend";
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_ADDRESS = process.env.EMAIL_FROM ?? "Bubble Buddy <onboarding@resend.dev>";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? "support@bubblebuddy.com";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? SUPPORT_EMAIL;
 
-const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return null;
+  }
+
+  return new Resend(apiKey);
+}
 
 function parseRecipients(value?: string | null) {
   if (!value) return [];
@@ -24,15 +29,19 @@ export type EmailPayload = {
 };
 
 export async function sendEmail(payload: EmailPayload) {
+  const resend = getResendClient();
+  const fromAddress = process.env.EMAIL_FROM ?? "Bubble Buddy <onboarding@resend.dev>";
+
   if (!resend) {
     console.warn("[email] Resend API key is missing. Skipping email send.");
     return false;
   }
 
+  const recipients = Array.isArray(payload.to) ? payload.to : [payload.to];
   try {
     const response = await resend.emails.send({
-      from: FROM_ADDRESS,
-      to: Array.isArray(payload.to) ? payload.to : [payload.to],
+      from: fromAddress,
+      to: recipients,
       subject: payload.subject,
       text: payload.text,
       html: payload.html,
@@ -43,6 +52,7 @@ export async function sendEmail(payload: EmailPayload) {
       return false;
     }
 
+    console.log(`[email] Email sent successfully via Resend to: ${recipients.join(", ")}`);
     return true;
   } catch (error) {
     console.error("[email] Failed to send email with Resend:", error);
