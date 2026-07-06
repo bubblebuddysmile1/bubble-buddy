@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound, redirect } from "next/navigation";
-import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import OrderReturnRequest from "@/components/order/OrderReturnRequest";
 import OrderTrackingTimeline from "@/components/order/OrderTrackingTimeline";
@@ -21,17 +19,6 @@ function formatCurrency(amount: number | string) {
 }
 
 async function getOrderForUser(orderNumber: string) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
-  if (!token) {
-    redirect(`/auth?returnTo=/orders/${orderNumber}`);
-  }
-
-  const payload = verifyAuthToken(token);
-  if (!payload) {
-    redirect(`/auth?returnTo=/orders/${orderNumber}`);
-  }
-
   return prisma.order.findUnique({
     where: { orderNumber },
     include: {

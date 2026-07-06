@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import ProfileEditForm from "@/components/profile/ProfileEditForm";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -8,13 +7,10 @@ import { prisma } from "@/lib/prisma";
 async function getProfileData() {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
-  if (!token) {
-    redirect("/auth?returnTo=/profile");
-  }
+  const payload = token ? verifyAuthToken(token) : null;
 
-  const payload = verifyAuthToken(token);
-  if (!payload) {
-    redirect("/auth?returnTo=/profile");
+  if (!payload?.id) {
+    return null;
   }
 
   const user = await prisma.user.findUnique({
@@ -46,7 +42,7 @@ async function getProfileData() {
   });
 
   if (!user) {
-    redirect("/auth?returnTo=/profile");
+    return null;
   }
 
   return user;
@@ -54,6 +50,30 @@ async function getProfileData() {
 
 export default async function ProfilePage() {
   const user = await getProfileData();
+
+  if (!user) {
+    return (
+      <main className="min-h-screen bg-background text-foreground py-12">
+        <div className="container mx-auto px-4">
+          <div className="rounded-[2rem] border border-border bg-card p-8 shadow-lg">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">Your account</p>
+            <h1 className="mt-3 text-4xl font-bold">Welcome</h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+              You can continue browsing and checkout as a guest. Sign in later to manage your orders and saved items.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/shop" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">
+                Continue shopping
+              </Link>
+              <Link href="/auth" className="rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition hover:bg-muted">
+                Sign in
+              </Link>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   const createdAt = new Date(user.createdAt).toLocaleDateString("en-IN", {
     year: "numeric",

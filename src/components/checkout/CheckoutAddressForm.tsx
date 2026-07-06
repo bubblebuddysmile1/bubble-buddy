@@ -53,10 +53,21 @@ export default function CheckoutAddressForm({
           autoComplete="name"
         />
         <CheckoutField
+          id="email"
+          label="Email"
+          type="email"
+          placeholder="you@example.com"
+          value={values.email}
+          onChange={(e) => onChange("email", e.target.value)}
+          error={errors.email}
+          className="sm:col-span-2"
+          autoComplete="email"
+        />
+        <CheckoutField
           id="phone"
           label="Phone"
           type="tel"
-        placeholder="+91 "
+          placeholder="+91"
           value={values.phone}
           onChange={(e) => onChange("phone", e.target.value)}
           error={errors.phone}

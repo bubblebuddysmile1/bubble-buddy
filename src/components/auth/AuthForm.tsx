@@ -28,6 +28,7 @@ export default function AuthForm() {
   const initialMode = searchParams?.get("mode") === "signup" ? "signup" : "signin";
 
   const [mode, setMode] = useState<"signin" | "signup">(initialMode);
+  const [otpMode, setOtpMode] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,6 +51,23 @@ export default function AuthForm() {
       password,
       ...(mode === "signup" ? { name } : {}),
     };
+
+    if (otpMode) {
+      const response = await fetch("/api/auth/otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp: password }),
+      });
+      const data = await response.json();
+      setLoading(false);
+      if (!response.ok) {
+        setError(data.error || "Unable to sign in with OTP.");
+        return;
+      }
+      setSuccess(data.message || "Signed in successfully.");
+      router.push(returnTo);
+      return;
+    }
 
     const response = await fetch(`/api/auth/${mode}`, {
       method: "POST",
@@ -104,7 +122,7 @@ export default function AuthForm() {
           postServerCart((cartItems as CartItem[]).map((it) => ({ id: it.id, quantity: it.quantity }))),
           postServerWishlist((wishlistItems as WishlistProduct[]).map((it) => ({ id: it.id }))),
         ]);
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
@@ -229,12 +247,12 @@ export default function AuthForm() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="block text-xs font-medium text-muted-foreground">Password</label>
+                    <label className="block text-xs font-medium text-muted-foreground">{otpMode ? "OTP code" : "Password"}</label>
                     <Input
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
-                      type="password"
-                      placeholder="Enter password"
+                      type={otpMode ? "text" : "password"}
+                      placeholder={otpMode ? "Enter the 6-digit code" : "Enter password"}
                       required
                       className="bg-background/90"
                     />
@@ -246,7 +264,9 @@ export default function AuthForm() {
                     <input type="checkbox" className="h-4 w-4 rounded border-border bg-card" />
                     Remember me
                   </label>
-                  <Link href="/" className="font-semibold text-primary hover:underline">Forgot?</Link>
+                  <button type="button" onClick={() => setOtpMode((value) => !value)} className="font-semibold text-primary hover:underline">
+                    {otpMode ? "Use password login" : "Use OTP login"}
+                  </button>
                 </div>
 
                 <div className="space-y-3">
@@ -255,7 +275,7 @@ export default function AuthForm() {
                     className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/15 transition duration-300 hover:-translate-y-0.5"
                     data-loading={loading ? true : false}
                   >
-                    {loading ? "Working..." : mode === "signin" ? "Sign in" : "Get a free consultation →"}
+                    {loading ? "Working..." : otpMode ? "Verify OTP" : mode === "signin" ? "Sign in" : "Get a free consultation →"}
                   </Button>
 
                   <Button

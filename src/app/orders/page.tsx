@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -20,13 +19,10 @@ function formatStatus(status: string) {
 async function getUserOrders() {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
-  if (!token) {
-    redirect("/auth?returnTo=/orders");
-  }
+  const payload = token ? verifyAuthToken(token) : null;
 
-  const payload = verifyAuthToken(token);
-  if (!payload) {
-    redirect("/auth?returnTo=/orders");
+  if (!payload?.id) {
+    return [];
   }
 
   return prisma.order.findMany({

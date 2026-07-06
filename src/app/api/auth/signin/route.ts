@@ -25,6 +25,8 @@ export async function POST(req: NextRequest) {
       name: true,
       phone: true,
       role: true,
+      authType: true,
+      accountStatus: true,
       failedLoginAttempts: true,
       lockedUntil: true,
     },
@@ -59,6 +61,10 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
+  }
+
+  if (!user.password) {
+    return NextResponse.json({ error: "Please verify your account and set a password before signing in with a password." }, { status: 403 });
   }
 
   const isValid = await bcrypt.compare(password, user.password);
@@ -123,7 +129,7 @@ export async function POST(req: NextRequest) {
 
   const token = createAuthToken({
     id: user.id,
-    email: user.email,
+    email: user.email ?? email,
     name: user.name,
     role: user.role,
   });

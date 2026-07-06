@@ -1,30 +1,10 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import WishlistPageClient from "@/components/wishlist/WishlistPageClient";
-import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 
 export const metadata = {
   title: "Wishlist",
 };
 
-async function verifyWishlistAuth() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
-  if (!token) {
-    redirect("/auth?returnTo=/wishlist");
-  }
-
-  const payload = verifyAuthToken(token);
-  if (!payload) {
-    redirect("/auth?returnTo=/wishlist");
-  }
-
-  return payload;
-}
-
-export default async function WishlistPage() {
-  await verifyWishlistAuth();
-
+export default function WishlistPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-background py-12 text-foreground">
       <div className="pointer-events-none absolute -left-16 top-8 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />

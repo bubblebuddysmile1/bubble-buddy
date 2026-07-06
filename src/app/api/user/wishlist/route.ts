@@ -9,6 +9,15 @@ export async function GET(req: NextRequest) {
   const payload = verifyAuthToken(token);
   if (!payload) return NextResponse.json({ items: [] }, { status: 401 });
 
+  const user = await prisma.user.findUnique({
+    where: { id: payload.id },
+    select: { id: true, accountStatus: true },
+  });
+
+  if (!user || user.accountStatus !== "ACTIVE") {
+    return NextResponse.json({ items: [], message: "Please verify your account before using wishlist features." }, { status: 403 });
+  }
+
   const items = await prisma.favorite.findMany({
     where: { userId: payload.id },
     include: { product: true },
@@ -31,6 +40,15 @@ export async function POST(req: NextRequest) {
 
   const payload = verifyAuthToken(token);
   if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const user = await prisma.user.findUnique({
+    where: { id: payload.id },
+    select: { id: true, accountStatus: true },
+  });
+
+  if (!user || user.accountStatus !== "ACTIVE") {
+    return NextResponse.json({ error: "Please verify your account before using wishlist features." }, { status: 403 });
+  }
 
   const body = await req.json();
   const items: { id: number }[] = Array.isArray(body) ? body : body.items ?? [];

@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
+import { ensureCheckoutAutoAuthUser } from "@/lib/account-auth";
 import { getCheckoutTotals } from "@/lib/checkout";
 import { getMaxRedeemablePoints, loyaltyDiscountFromRedeem } from "@/lib/loyalty";
 import {
@@ -13,22 +14,41 @@ import {
 import { createPaymentOrderSchema } from "@/lib/validations/payment";
 import { prisma } from "@/lib/prisma";
 import { getPromotionByCode, getPromotionDiscountAmount, getPromotionValidationMessage, isPromotionActive } from "@/lib/promotions";
+import { authCookieOptions } from "@/lib/auth";
 import type { CartItem } from "@/types/cart";
 
 export async function POST(request: Request) {
   try {
-    // Authentication check
+    const json = await request.json();
     const cookieStore = await cookies();
     const token = cookieStore.get(COOKIE_NAME)?.value;
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized. Please login to continue." }, { status: 401 });
+    const existingPayload = token ? verifyAuthToken(token) : null;
+
+    let payload = existingPayload;
+    let authToken: string | null = null;
+
+    if (!payload) {
+      const email = String(json?.address?.email ?? "").trim().toLowerCase();
+      const phone = String(json?.address?.phone ?? "").trim();
+      const fullName = String(json?.address?.fullName ?? "").trim();
+      const autoAuth = await ensureCheckoutAutoAuthUser({
+        email,
+        phone,
+        name: fullName,
+        address: json?.address,
+      });
+
+      if (autoAuth.kind === "existing_active") {
+        return NextResponse.json({ error: autoAuth.message }, { status: 409 });
+      }
+
+      payload = autoAuth.user ? { id: autoAuth.user.id, email: autoAuth.user.email ?? email, name: autoAuth.user.name, role: autoAuth.user.role } : null;
+      authToken = autoAuth.token ?? null;
     }
 
-    const payload = verifyAuthToken(token);
     if (!payload) {
-      return NextResponse.json({ error: "Unauthorized. Invalid session." }, { status: 401 });
+      return NextResponse.json({ error: "Unable to prepare checkout. Please try again." }, { status: 400 });
     }
-    const json = await request.json();
     const parsed = createPaymentOrderSchema.safeParse(json);
 
     if (!parsed.success) {
@@ -116,18 +136,29 @@ export async function POST(request: Request) {
     const amount = toSmallestCurrencyUnit(totals.total);
     const receipt = `bb_${Date.now()}`;
 
+    const responsePayload = {
+      mock: false,
+      orderId: "",
+      amount,
+      currency,
+      keyId: "",
+      receipt,
+      totals,
+      address,
+    };
+
     if (isMockPaymentMode()) {
       const mockOrderId = `order_mock_${Date.now()}`;
-      return NextResponse.json({
+      const response = NextResponse.json({
+        ...responsePayload,
         mock: true,
         orderId: mockOrderId,
-        amount,
-        currency,
         keyId: "mock_key",
-        receipt,
-        totals,
-        address,
       });
+      if (authToken) {
+        response.cookies.set(COOKIE_NAME, authToken, authCookieOptions);
+      }
+      return response;
     }
 
     const razorpay = createRazorpayClient();
@@ -143,16 +174,18 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({
-      mock: false,
+    const response = NextResponse.json({
+      ...responsePayload,
       orderId: order.id,
       amount: order.amount,
       currency: order.currency,
       keyId: getRazorpayKeyId(),
       receipt: order.receipt,
-      totals,
-      address,
     });
+    if (authToken) {
+      response.cookies.set(COOKIE_NAME, authToken, authCookieOptions);
+    }
+    return response;
   } catch (error) {
     console.error("[payments/create-order]", error);
     return NextResponse.json(

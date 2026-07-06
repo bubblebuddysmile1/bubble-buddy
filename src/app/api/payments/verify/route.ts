@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
+import { issueVerificationOtp } from "@/lib/account-auth";
 import { persistOrderAfterPayment, confirmOrder, cancelOrder } from "@/lib/orders";
 import { isMockPaymentMode, createRazorpayClient } from "@/lib/razorpay";
 import { verifyPaymentSchema } from "@/lib/validations/payment";
@@ -87,6 +88,11 @@ export async function POST(request: Request) {
     if (paymentSuccessful || paymentFetchFailed) {
       finalOrder = await confirmOrder(razorpay_order_id, razorpay_payment_id, razorpay_signature);
       await notifyOrderConfirmation(finalOrder.orderNumber);
+      if (user?.id) {
+        await issueVerificationOtp(user.id, user.email ?? address.email ?? null).catch((error) => {
+          console.error("[payments/verify] Failed to issue verification OTP", error);
+        });
+      }
     } else {
       finalOrder = await cancelOrder(razorpay_order_id);
       await notifyPaymentFailure(finalOrder.orderNumber);
@@ -108,6 +114,8 @@ export async function POST(request: Request) {
       paymentId: razorpay_payment_id,
       orderNumber: finalOrder.orderNumber,
       dbOrderId: finalOrder.id,
+      verificationRequired: Boolean(user?.id),
+      email: user?.email ?? address.email ?? null,
     });
   } catch (error) {
     console.error("[payments/verify]", error);

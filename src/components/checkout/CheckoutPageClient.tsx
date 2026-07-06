@@ -412,6 +412,10 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
                 <p className="mt-1 font-medium text-foreground">{values.fullName || "—"}</p>
               </div>
               <div>
+                <p className="text-xs text-muted-foreground">Email</p>
+                <p className="mt-1 font-semibold text-primary text-base">{values.email || "—"}</p>
+              </div>
+              <div>
                 <p className="text-xs text-muted-foreground">Phone number</p>
                 <p className="mt-1 font-semibold text-primary text-base">{values.phone || "—"}</p>
               </div>

@@ -1,30 +1,10 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import CartPageClient from "@/components/cart/CartPageClient";
-import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 
 export const metadata = {
   title: "Your cart",
 };
 
-async function verifyCartAuth() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
-  if (!token) {
-    redirect("/auth?returnTo=/cart");
-  }
-
-  const payload = verifyAuthToken(token);
-  if (!payload) {
-    redirect("/auth?returnTo=/cart");
-  }
-
-  return payload;
-}
-
-export default async function CartPage() {
-  await verifyCartAuth();
-
+export default function CartPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-background py-12 text-foreground">
       <div className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />

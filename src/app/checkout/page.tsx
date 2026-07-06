@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import CheckoutPageClient from "@/components/checkout/CheckoutPageClient";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
@@ -10,27 +9,17 @@ export const metadata = {
   title: "Checkout",
 };
 
-async function verifyCheckoutAuth() {
+export default async function CheckoutPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
-  if (!token) {
-    redirect("/auth?returnTo=/checkout");
-  }
+  const payload = token ? verifyAuthToken(token) : null;
 
-  const payload = verifyAuthToken(token);
-  if (!payload) {
-    redirect("/auth?returnTo=/checkout");
-  }
-
-  return payload;
-}
-
-export default async function CheckoutPage() {
-  const payload = await verifyCheckoutAuth();
-  const user = await prisma.user.findUnique({
-    where: { id: payload.id },
-    select: { loyaltyPoints: true },
-  });
+  const user = payload?.id
+    ? await prisma.user.findUnique({
+        where: { id: payload.id },
+        select: { loyaltyPoints: true },
+      })
+    : null;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-background py-12 text-foreground">

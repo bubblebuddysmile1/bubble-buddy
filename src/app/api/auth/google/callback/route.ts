@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
 
   const token = createAuthToken({
     id: user.id,
-    email: user.email,
+    email: user.email ?? email,
     name: user.name,
     role: user.role,
   });

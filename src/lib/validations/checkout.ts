@@ -6,6 +6,10 @@ export const checkoutAddressSchema = z.object({
     .trim()
     .min(2, "Please enter your full name")
     .max(80, "Name is too long"),
+  email: z
+    .string()
+    .trim()
+    .email("Please enter a valid email address"),
   phone: z
     .string()
     .trim()
@@ -36,6 +40,7 @@ export type CheckoutAddressForm = z.infer<typeof checkoutAddressSchema>;
 
 export const checkoutAddressDefaultValues: CheckoutAddressForm = {
   fullName: "",
+  email: "",
   phone: "",
   line1: "",
   line2: "",
