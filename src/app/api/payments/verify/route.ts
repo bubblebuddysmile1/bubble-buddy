@@ -53,6 +53,13 @@ export async function POST(request: Request) {
     const cookieStore = await cookies();
     const token = cookieStore.get(COOKIE_NAME)?.value;
     const user = token ? verifyAuthToken(token) : null;
+    const authUser = user
+      ? await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { accountStatus: true, email: true },
+        })
+      : null;
+    const verificationRequired = authUser?.accountStatus !== "ACTIVE";
 
     // Create order with PENDING status
     const savedOrder = await persistOrderAfterPayment({
@@ -88,8 +95,8 @@ export async function POST(request: Request) {
     if (paymentSuccessful || paymentFetchFailed) {
       finalOrder = await confirmOrder(razorpay_order_id, razorpay_payment_id, razorpay_signature);
       await notifyOrderConfirmation(finalOrder.orderNumber);
-      if (user?.id) {
-        await issueVerificationOtp(user.id, user.email ?? address.email ?? null).catch((error) => {
+      if (verificationRequired && user?.id) {
+        await issueVerificationOtp(user.id, authUser?.email ?? address.email ?? null).catch((error) => {
           console.error("[payments/verify] Failed to issue verification OTP", error);
         });
       }
@@ -114,8 +121,8 @@ export async function POST(request: Request) {
       paymentId: razorpay_payment_id,
       orderNumber: finalOrder.orderNumber,
       dbOrderId: finalOrder.id,
-      verificationRequired: Boolean(user?.id),
-      email: user?.email ?? address.email ?? null,
+      verificationRequired,
+      email: authUser?.email ?? address.email ?? null,
     });
   } catch (error) {
     console.error("[payments/verify]", error);

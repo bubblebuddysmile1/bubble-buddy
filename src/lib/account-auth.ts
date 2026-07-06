@@ -199,9 +199,6 @@ export async function setPasswordForUser(userId: number, password: string) {
     where: { id: userId },
     data: {
       password: hashedPassword,
-      accountStatus: "ACTIVE",
-      emailVerified: true,
-      phoneVerified: true,
       verificationToken: null,
       verificationExpiresAt: null,
     },

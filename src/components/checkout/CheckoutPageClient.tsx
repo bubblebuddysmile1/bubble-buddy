@@ -151,6 +151,10 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
       });
       if (verifyData.orderNumber) failParams.set("order_number", verifyData.orderNumber);
       if (mock) failParams.set("mock", "1");
+      if (verifyData.verificationRequired) {
+        failParams.set("redirectToComplete", "1");
+        if (verifyData.email) failParams.set("email", verifyData.email);
+      }
       setIsSubmitting(false);
       router.push(`/payment/failure?${failParams.toString()}`);
       return;
@@ -162,6 +166,10 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
     });
     if (verifyData.orderNumber) params.set("order_number", verifyData.orderNumber);
     if (mock) params.set("mock", "1");
+    if (verifyData.verificationRequired) {
+      params.set("redirectToComplete", "1");
+      if (verifyData.email) params.set("email", verifyData.email);
+    }
 
     setIsSubmitting(false);
     setIsConfirmationOpen(false);
@@ -253,28 +261,36 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
     setIsSubmitting(true);
 
     try {
+      const payload = {
+        address: pendingAddress,
+        items: items.map(({ id, slug, name, price, currency, quantity, stockQuantity }) => ({
+          id,
+          slug,
+          name,
+          price,
+          currency,
+          quantity,
+          stockQuantity,
+        })),
+        couponCode: appliedPromotion?.code,
+        redeemPoints: effectiveRedeemPoints,
+      };
+
+      console.log("[checkout] Sending create-order payload:", payload);
+
       const orderRes = await fetch("/api/payments/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          address: pendingAddress,
-          items: items.map(({ id, slug, name, price, currency, quantity, stockQuantity }) => ({
-            id,
-            slug,
-            name,
-            price,
-            currency,
-            quantity,
-            stockQuantity,
-          })),
-          couponCode: appliedPromotion?.code,
-          redeemPoints: effectiveRedeemPoints,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const orderData: CreateOrderResponse = await orderRes.json();
 
       if (!orderRes.ok) {
+        console.error("[checkout] Create-order failed:", {
+          status: orderRes.status,
+          error: orderData,
+        });
         setIsSubmitting(false);
         router.push("/payment/failure?reason=create_order_failed");
         return;

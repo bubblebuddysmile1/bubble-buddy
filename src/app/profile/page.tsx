@@ -157,6 +157,21 @@ export default async function ProfilePage() {
                 </div>
               </div>
 
+              <div className="rounded-[1.75rem] border border-border bg-background/80 p-6">
+                <h2 className="text-xl font-semibold">Complete your account</h2>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  If you have not yet verified your email or set a password, complete your account setup here.
+                </p>
+                <div className="mt-5">
+                  <Link
+                    href={`/auth/complete?email=${encodeURIComponent(user.email ?? "")}`}
+                    className="inline-flex rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                  >
+                    Verify email & set password
+                  </Link>
+                </div>
+              </div>
+
               {user.orders.length > 0 && (
                 <div className="rounded-[1.75rem] border border-border bg-background/80 p-6">
                   <div className="flex items-center justify-between gap-3">

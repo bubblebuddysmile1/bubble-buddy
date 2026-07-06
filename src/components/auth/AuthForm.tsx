@@ -253,9 +253,12 @@ export default function AuthForm() {
                       onChange={(event) => setPassword(event.target.value)}
                       type={otpMode ? "text" : "password"}
                       placeholder={otpMode ? "Enter the 6-digit code" : "Enter password"}
-                      required
+                      required={!otpMode}
                       className="bg-background/90"
                     />
+                    {otpMode && (
+                      <p className="text-xs text-muted-foreground">Leave blank and submit to request a new OTP via email.</p>
+                    )}
                   </div>
                 </div>
 
@@ -275,7 +278,15 @@ export default function AuthForm() {
                     className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/15 transition duration-300 hover:-translate-y-0.5"
                     data-loading={loading ? true : false}
                   >
-                    {loading ? "Working..." : otpMode ? "Verify OTP" : mode === "signin" ? "Sign in" : "Get a free consultation →"}
+                    {loading
+                      ? "Working..."
+                      : otpMode
+                      ? password
+                        ? "Verify OTP"
+                        : "Send OTP"
+                      : mode === "signin"
+                      ? "Sign in"
+                      : "Get a free consultation →"}
                   </Button>
 
                   <Button

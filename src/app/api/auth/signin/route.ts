@@ -63,6 +63,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
   }
 
+  if (user.accountStatus !== "ACTIVE") {
+    return NextResponse.json({ error: "Please verify your account before signing in with a password." }, { status: 403 });
+  }
+
   if (!user.password) {
     return NextResponse.json({ error: "Please verify your account and set a password before signing in with a password." }, { status: 403 });
   }

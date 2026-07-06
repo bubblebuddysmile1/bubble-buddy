@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Copy } from "lucide-react";
@@ -16,6 +16,18 @@ export default function PaymentSuccessClient() {
   const orderNumber = searchParams.get("order_number") ?? "";
   const paymentId = searchParams.get("payment_id") ?? "";
   const mock = searchParams.get("mock") === "1";
+  const redirectToComplete = searchParams.get("redirectToComplete") === "1";
+  const completeEmail = searchParams.get("email") ?? "";
+
+  const accountSetupUrl = useMemo(() => {
+    const params = new URLSearchParams({
+      order_id: orderId,
+      payment_id: paymentId,
+    });
+    if (orderNumber) params.set("order_number", orderNumber);
+    if (completeEmail) params.set("email", completeEmail);
+    return `/auth/complete?${params.toString()}`;
+  }, [completeEmail, orderId, orderNumber, paymentId]);
 
   useEffect(() => {
     // Clear cart on successful payment
@@ -45,6 +57,17 @@ export default function PaymentSuccessClient() {
             </span>
           )}
           <p>Your payment was verified successfully. We will deliver to your shipping address soon.</p>
+          {redirectToComplete && (
+            <div className="mt-3 rounded-2xl bg-primary/10 p-3 text-sm text-primary">
+              <p>Your order is confirmed. You can complete your account setup right after this payment confirmation.</p>
+              <Link
+                href={accountSetupUrl}
+                className="mt-3 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+              >
+                Complete account setup
+              </Link>
+            </div>
+          )}
           {(orderNumber || orderId) && (
             <div className="mt-6 space-y-3">
               <div className="rounded-2xl bg-muted/60 p-4 text-left">

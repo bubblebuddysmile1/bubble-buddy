@@ -52,6 +52,10 @@ export async function POST(request: Request) {
     const parsed = createPaymentOrderSchema.safeParse(json);
 
     if (!parsed.success) {
+      console.error("[payments/create-order] Validation failed:", {
+        requestBody: json,
+        errors: parsed.error.flatten(),
+      });
       return NextResponse.json(
         { error: "Invalid checkout data.", details: parsed.error.flatten() },
         { status: 400 },
@@ -64,6 +68,41 @@ export async function POST(request: Request) {
       image: "",
       category: undefined,
     }));
+
+    const checkoutUser = payload?.id
+      ? await prisma.user.findUnique({
+          where: { id: payload.id },
+          select: { id: true, loyaltyPoints: true, email: true, name: true, role: true, accountStatus: true },
+        })
+      : null;
+
+    if (!checkoutUser && payload?.id) {
+      const fallbackEmail = String(address?.email ?? "").trim().toLowerCase() || null;
+      const fallbackPhone = String(address?.phone ?? "").trim() || null;
+      const fallbackName = String(address?.fullName ?? "").trim() || null;
+
+      const createdUser = await prisma.user.create({
+        data: {
+          id: payload.id,
+          email: fallbackEmail,
+          phone: fallbackPhone,
+          name: fallbackName,
+          authType: "CHECKOUT_AUTO",
+          accountStatus: "PENDING",
+          emailVerified: false,
+          phoneVerified: false,
+          password: null,
+        },
+        select: { id: true, loyaltyPoints: true, email: true, name: true, role: true, accountStatus: true },
+      });
+
+      payload = {
+        id: createdUser.id,
+        email: createdUser.email ?? payload.email ?? fallbackEmail ?? "",
+        name: createdUser.name,
+        role: createdUser.role,
+      };
+    }
 
     const products: Array<{ id: number; stockQuantity: number }> = await prisma.product.findMany({
       where: { id: { in: items.map((item) => item.id) } },
@@ -112,10 +151,12 @@ export async function POST(request: Request) {
     const promotionDiscount = promotion ? getPromotionDiscountAmount(promotion, subtotal) : 0;
     const discountedSubtotal = Math.max(0, subtotal - promotionDiscount);
 
-    const user = await prisma.user.findUnique({
-      where: { id: payload.id },
-      select: { loyaltyPoints: true },
-    });
+    const user = payload?.id
+      ? await prisma.user.findUnique({
+          where: { id: payload.id },
+          select: { loyaltyPoints: true },
+        })
+      : null;
 
     if (!user) {
       return NextResponse.json({ error: "Unable to load your account." }, { status: 400 });

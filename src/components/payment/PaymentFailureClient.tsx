@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { AlertCircle, RotateCcw, Home } from "lucide-react";
+import { AlertCircle, RotateCcw } from "lucide-react";
 import PaymentStatusLayout from "@/components/payment/PaymentStatusLayout";
 
 const REASON_MESSAGES: Record<string, string> = {
@@ -17,9 +18,21 @@ export default function PaymentFailureClient() {
   const reason = searchParams.get("reason") ?? "unknown";
   const orderId = searchParams.get("order_id") ?? "";
   const orderNumber = searchParams.get("order_number") ?? "";
+  const redirectToComplete = searchParams.get("redirectToComplete") === "1";
+  const email = searchParams.get("email") ?? "";
   const message =
     REASON_MESSAGES[reason] ??
     "Something went wrong during payment. You can try again from checkout.";
+
+  const accountSetupUrl = useMemo(() => {
+    const params = new URLSearchParams({
+      order_id: orderId,
+      payment_id: "",
+    });
+    if (orderNumber) params.set("order_number", orderNumber);
+    if (email) params.set("email", email);
+    return `/auth/complete?${params.toString()}`;
+  }, [email, orderId, orderNumber]);
 
   return (
     <PaymentStatusLayout
@@ -30,6 +43,17 @@ export default function PaymentFailureClient() {
       description={
         <>
           <p>{message}</p>
+          {redirectToComplete && (
+            <div className="mt-3 rounded-2xl bg-primary/10 p-3 text-sm text-primary">
+              <p>Your payment status is shown here. You can complete your account setup after reviewing this result.</p>
+              <Link
+                href={accountSetupUrl}
+                className="mt-3 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+              >
+                Complete account setup
+              </Link>
+            </div>
+          )}
           {(orderNumber || orderId) && (
             <div className="mt-6 space-y-3">
               <p className="text-xs text-muted-foreground">Your order was created but payment was not confirmed:</p>
