@@ -1,10 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export default function AccountCompletePage() {
+function AccountCompletePageContent() {
   const router = useRouter();
   const search = useSearchParams();
   const email = String(search?.get("email") ?? "");
@@ -156,5 +156,13 @@ export default function AccountCompletePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AccountCompletePage() {
+  return (
+    <Suspense fallback={<div className="min-h-[60vh] flex items-center justify-center px-4"><div className="w-full max-w-xl rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">Loading account setup…</div></div>}>
+      <AccountCompletePageContent />
+    </Suspense>
   );
 }
