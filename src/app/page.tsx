@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import CategoriesSection from "@/components/store/CategoriesSection";
 import HeroSection from "@/components/store/HeroSection";
 import BestSellingProducts from "@/components/store/BestSellingProducts";
@@ -6,9 +7,31 @@ import AdvancedPromoSection from "@/components/store/AdvancedPromoSection";
 import ProductList from "@/components/store/ProductList";
 import PromoBannerSection from "@/components/store/PromoBannerSection";
 
+export const metadata: Metadata = {
+  title: "Premium Beauty Essentials",
+  description:
+    "Discover premium skincare, haircare, and makeup essentials at Bubble Buddy with curated collections and secure shopping.",
+};
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Store",
+            name: "Bubble Buddy",
+            url: process.env.NEXT_PUBLIC_APP_URL || "https://bubblebuddysmile.com",
+            description:
+              "Bubble Buddy offers premium skincare, haircare, and makeup essentials with secure checkout and fast delivery.",
+            areaServed: "Pakistan",
+            priceRange: "$",
+            sameAs: ["https://www.instagram.com/"],
+          }),
+        }}
+      />
       <HeroSection />
       <CategoriesSection />
       <BestSellingProducts />
