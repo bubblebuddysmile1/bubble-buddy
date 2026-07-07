@@ -198,6 +198,20 @@ model NewsletterSubscription {
   user           User?     @relation(fields: [userId], references: [id])
 }
 
+model ContactMessage {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String
+  phone       String?
+  subject     String
+  message     String   @db.Text
+  orderNumber String?
+  isPriority  Boolean  @default(false)
+  status      String   @default("NEW")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Favorite {
   id        Int      @id @default(autoincrement())
   userId    Int

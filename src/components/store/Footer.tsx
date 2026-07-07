@@ -252,7 +252,21 @@ export default function Footer() {
             >
               Terms & Conditions
             </Link>
-            
+
+            <Link
+              href="/shipping-policy"
+              className="hover:text-primary transition-colors duration-200 text-xs sm:text-sm"
+            >
+              Shipping Policy
+            </Link>
+
+            <Link
+              href="/refund-policy"
+              className="hover:text-primary transition-colors duration-200 text-xs sm:text-sm"
+            >
+              Refund Policy
+            </Link>
+
           </div>
         </div>
       </div>

@@ -239,7 +239,7 @@ export default function TermsAndConditionsPage() {
                 <strong>Bubble Buddy Smile</strong>
               </p>
               <p className="text-muted-foreground">
-                Email: support@buddybubble.com<br />
+                Email: bubblebuddysmile.team@gmail.com<br />
                 Phone: +91 98888 88727<br />
                 Address: Tricity Plaza, 316, Peer Muchalla Rd, Sector 20, Zirakpur, Sanauli, Punjab 140603
               </p>

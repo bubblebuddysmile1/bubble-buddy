@@ -38,6 +38,8 @@ export async function GET() {
     { path: "/auth", lastmod: undefined },
     { path: "/terms-and-conditions", lastmod: undefined },
     { path: "/privacy-policy", lastmod: undefined },
+    { path: "/shipping-policy", lastmod: undefined },
+    { path: "/refund-policy", lastmod: undefined },
   ];
 
   const urls = [
