@@ -72,6 +72,14 @@ export default function RootLayout({
   return (
     <html
       lang="en">
+      <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2PD2J69XE"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-Z2PD2J69XE');`,
+          }}
+        />
+      </head>
       <body>
         <AppChrome>{children}</AppChrome>
       </body>
