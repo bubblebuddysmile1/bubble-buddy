@@ -103,7 +103,7 @@ function UserMenu() {
         <ChevronDown className="h-4 w-4 text-muted-foreground" />
       </summary>
 
-      <div className="absolute right-0 z-30 mt-3 min-w-55 overflow-hidden rounded-3xl border border-border bg-card p-3 shadow-xl">
+      <div className="absolute right-0 z-30 mt-1 min-w-55 overflow-hidden rounded-3xl border border-border bg-card p-3 shadow-xl">
         {user ? (
           <div className="space-y-2">
             <div className="rounded-3xl bg-muted p-3 text-sm">
@@ -176,6 +176,8 @@ function UserMenu() {
 export default function Navbar() {
   const [hoveredDropdown, setHoveredDropdown] = useState<string | null>(null);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -258,14 +260,36 @@ export default function Navbar() {
             </Sheet>
 
             <Link href="/" className="text-xl md:text-2xl font-bold text-primary">
-              Bubble Buddy
+              Bubble Buddy smile
             </Link>
           </div>
 
           {/* SEARCH BAR — Desktop */}
           <div className="hidden md:flex flex-1 max-w-xl relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={() => {
+                const q = String(searchQuery ?? "").trim();
+                const params = new URLSearchParams();
+                if (q) params.set("q", q);
+                router.push(`/shop?${params.toString()}`);
+              }}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            >
+              <Search size={18} />
+            </button>
             <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const q = String(searchQuery ?? "").trim();
+                  const params = new URLSearchParams();
+                  if (q) params.set("q", q);
+                  router.push(`/shop?${params.toString()}`);
+                }
+              }}
               placeholder="Search beauty products..."
               className="pl-10 rounded-full bg-input text-foreground border-border focus-visible:border-ring focus-visible:ring-ring/50"
             />
@@ -284,8 +308,30 @@ export default function Navbar() {
         {/* MOBILE SEARCH */}
         <div className="pb-4 md:hidden">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={() => {
+                const q = String(searchQuery ?? "").trim();
+                const params = new URLSearchParams();
+                if (q) params.set("q", q);
+                router.push(`/shop?${params.toString()}`);
+              }}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            >
+              <Search size={18} />
+            </button>
             <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const q = String(searchQuery ?? "").trim();
+                  const params = new URLSearchParams();
+                  if (q) params.set("q", q);
+                  router.push(`/shop?${params.toString()}`);
+                }
+              }}
               placeholder="Search products..."
               className="pl-10 rounded-full bg-input text-foreground border-border focus-visible:border-ring focus-visible:ring-ring/50"
             />
@@ -311,7 +357,7 @@ export default function Navbar() {
                 Categories
                 <ChevronDown className="h-4 w-4 transition-transform duration-150" />
               </summary>
-              <div className="absolute left-1/2 top-full z-20 mt-2 min-w-48 -translate-x-1/2 rounded-3xl border border-border bg-card p-2 shadow-xl">
+              <div className="absolute left-1/2 top-full z-20 mt-1 min-w-48 -translate-x-1/2 rounded-3xl border border-border bg-card p-2 shadow-xl">
                 {categories.map((category) => (
                   <Link
                     key={category.slug}

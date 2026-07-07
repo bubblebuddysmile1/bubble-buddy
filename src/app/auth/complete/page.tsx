@@ -11,22 +11,27 @@ function AccountCompletePageContent() {
   const orderId = String(search?.get("order_id") ?? "");
   const paymentId = String(search?.get("payment_id") ?? "");
   const orderNumber = String(search?.get("order_number") ?? "");
-  const dbOrderId = String(search?.get("dbOrderId") ?? "");
 
-  const [loading, setLoading] = useState(false);
+  const [sendLoading, setSendLoading] = useState(false);
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const buildSuccessRedirect = () => {
-    const params = new URLSearchParams({ order_id: orderId, payment_id: paymentId });
-    if (orderNumber) params.set("order_number", orderNumber);
-    return `/payment/success?${params.toString()}`;
+    if (orderId && paymentId) {
+      const params = new URLSearchParams({ order_id: orderId, payment_id: paymentId });
+      if (orderNumber) params.set("order_number", orderNumber);
+      return `/payment/success?${params.toString()}`;
+    }
+
+    return "/shop";
   };
 
   const handleSendOtp = async () => {
-    setLoading(true);
+    setSendLoading(true);
     setError(null);
     setMessage(null);
     try {
@@ -41,15 +46,15 @@ function AccountCompletePageContent() {
       } else {
         setMessage(data.message || "OTP sent. Check your email.");
       }
-    } catch (err) {
+    } catch {
       setError("Unable to send OTP.");
     } finally {
-      setLoading(false);
+      setSendLoading(false);
     }
   };
 
   const handleVerifyOtp = async () => {
-    setLoading(true);
+    setVerifyLoading(true);
     setError(null);
     setMessage(null);
     try {
@@ -62,13 +67,12 @@ function AccountCompletePageContent() {
       if (!res.ok) {
         setError(data.error || "OTP verification failed.");
       } else {
-        // verified and server sets auth cookie
         router.push(buildSuccessRedirect());
       }
-    } catch (err) {
+    } catch {
       setError("OTP verification failed.");
     } finally {
-      setLoading(false);
+      setVerifyLoading(false);
     }
   };
 
@@ -77,7 +81,7 @@ function AccountCompletePageContent() {
       setError("Enter a password to continue.");
       return;
     }
-    setLoading(true);
+    setPasswordLoading(true);
     setError(null);
     setMessage(null);
     try {
@@ -92,10 +96,10 @@ function AccountCompletePageContent() {
       } else {
         setMessage(data.message || "Password set. Check your email for verification OTP.");
       }
-    } catch (err) {
+    } catch {
       setError("Unable to set password.");
     } finally {
-      setLoading(false);
+      setPasswordLoading(false);
     }
   };
 
@@ -132,8 +136,8 @@ function AccountCompletePageContent() {
             />
             <p className="text-xs text-muted-foreground">Save a password now so you can log in after verification without OTP.</p>
             <div className="flex gap-2 mt-2">
-              <Button onClick={handleSetPassword} disabled={loading}>{loading ? "Working…" : "Set password"}</Button>
-              <Button variant="secondary" onClick={() => setPassword("")}>Clear</Button>
+              <Button type="button" onClick={handleSetPassword} disabled={passwordLoading}>{passwordLoading ? "Working…" : "Set password"}</Button>
+              <Button type="button" variant="secondary" onClick={() => setPassword("")}>Clear</Button>
             </div>
           </div>
 
@@ -142,9 +146,9 @@ function AccountCompletePageContent() {
           <div className="space-y-2">
             <label className="text-xs font-medium text-muted-foreground">Verify with email OTP</label>
             <div className="flex flex-col gap-2 sm:flex-row">
-              <Button onClick={handleSendOtp} disabled={loading}>{loading ? "Sending…" : "Send / Resend OTP"}</Button>
+              <Button type="button" onClick={handleSendOtp} disabled={sendLoading}>{sendLoading ? "Sending…" : "Send / Resend OTP"}</Button>
               <Input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="6-digit code" />
-              <Button onClick={handleVerifyOtp} disabled={loading || !otp}>{loading ? "Verifying…" : "Verify OTP"}</Button>
+              <Button type="button" onClick={handleVerifyOtp} disabled={verifyLoading || !otp}>{verifyLoading ? "Verifying…" : "Verify OTP"}</Button>
             </div>
             <p className="text-xs text-muted-foreground">If you already have a password, you can also sign in from the regular login page after verification.</p>
           </div>
@@ -152,7 +156,7 @@ function AccountCompletePageContent() {
           {message && <div className="rounded-md bg-primary/10 p-2 text-sm text-primary">{message}</div>}
           {error && <div className="rounded-md bg-destructive/10 p-2 text-sm text-destructive">{error}</div>}
 
-          <div className="mt-4 text-sm text-muted-foreground">After verification you'll be redirected to your order confirmation.</div>
+          <div className="mt-4 text-sm text-muted-foreground">After verification you&apos;ll be redirected to your order confirmation.</div>
         </div>
       </div>
     </div>
