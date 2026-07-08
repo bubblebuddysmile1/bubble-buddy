@@ -55,6 +55,45 @@ export default function CategoriesSection() {
     loadCategories();
   }, []);
 
+  const slides = categories.length === 0
+    ? Array.from({ length: 5 }).map((_, i) => (
+        <SwiperSlide key={`skeleton-${i}`}>
+          <div className="group relative overflow-hidden rounded-3xl block">
+            <div className="relative h-40 w-full overflow-hidden rounded-2xl">
+              <div className="h-40 w-full bg-muted" />
+              <div className="absolute inset-0 bg-black/20" />
+            </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
+              <div className="h-6 w-32 bg-white/20 rounded-md" />
+              <div className="mt-2 h-4 w-20 bg-white/15 rounded-md" />
+            </div>
+          </div>
+        </SwiperSlide>
+      ))
+    : categories.map((category) => (
+        <SwiperSlide key={category.id}>
+          <Link
+            href={category.link}
+            className="group relative overflow-hidden rounded-3xl block"
+          >
+            <div className="relative h-40 w-full overflow-hidden rounded-2xl">
+              <Image
+                src={category.image}
+                alt={category.title}
+                fill
+                className="object-cover transition duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition" />
+            </div>
+
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
+              <h3 className="text-lg font-semibold">{category.title}</h3>
+              <span className="mt-2 text-xs uppercase tracking-wider border-b border-white pb-0.5">Shop Now</span>
+            </div>
+          </Link>
+        </SwiperSlide>
+      ));
+
   return (
     <section className="py-4 bg-background">
 
@@ -76,44 +115,7 @@ export default function CategoriesSection() {
               1280: { slidesPerView: 5, spaceBetween: 16 },
             }}
           >
-            {categories.map((category) => (
-              <SwiperSlide key={category.id}>
-                <Link
-                  href={category.link}
-                  className="group relative overflow-hidden rounded-3xl block"
-                >
-
-                  {/* IMAGE */}
-                  <div className="relative h-40 w-full overflow-hidden rounded-2xl">
-
-                    <Image
-                      src={category.image}
-                      alt={category.title}
-                      fill
-                      className="object-cover transition duration-500 group-hover:scale-110"
-                    />
-
-                    {/* OVERLAY */}
-                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition" />
-
-                  </div>
-
-                  {/* CONTENT */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
-
-                    <h3 className="text-lg font-semibold">
-                      {category.title}
-                    </h3>
-
-                    <span className="mt-2 text-xs uppercase tracking-wider border-b border-white pb-0.5">
-                      Shop Now
-                    </span>
-
-                  </div>
-
-                </Link>
-              </SwiperSlide>
-            ))}
+            {slides}
           </Swiper>
         </div>
 

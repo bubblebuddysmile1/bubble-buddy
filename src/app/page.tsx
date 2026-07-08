@@ -22,11 +22,11 @@ export default function Home() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Store",
-            name: "Bubble Buddy",
+            name: "Bubble Buddy Smile",
             url: process.env.NEXT_PUBLIC_APP_URL || "https://bubblebuddysmile.com",
             description:
               "Bubble Buddy offers premium skincare, haircare, and makeup essentials with secure checkout and fast delivery.",
-            areaServed: "Pakistan",
+            areaServed: "India",
             priceRange: "$",
             sameAs: ["https://www.instagram.com/"],
           }),

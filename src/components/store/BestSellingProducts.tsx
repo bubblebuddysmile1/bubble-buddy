@@ -78,8 +78,19 @@ export default function BestSellingProducts() {
             {error}
           </div>
         ) : loading ? (
-          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            Loading best sellers...
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="group relative overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-lg">
+                  <div className="h-40 w-full bg-muted rounded-[1.5rem]" />
+                  <div className="mt-5 space-y-4">
+                    <div className="h-4 w-24 bg-muted rounded-md" />
+                    <div className="h-6 w-3/4 bg-muted rounded-md" />
+                    <div className="h-4 w-1/2 bg-muted rounded-md" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : products.length === 0 ? (
           <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">

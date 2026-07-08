@@ -76,8 +76,26 @@ export default function ProductList() {
             {error}
           </div>
         ) : loading ? (
-          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            Loading products...
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="overflow-hidden rounded-[2rem] border border-border bg-card p-4 shadow-lg">
+                  <div className="h-52 w-full bg-muted rounded-[1.75rem]" />
+                  <div className="mt-4 space-y-3">
+                    <div className="h-4 w-3/4 bg-muted rounded-md" />
+                    <div className="h-4 w-1/2 bg-muted rounded-md" />
+                  </div>
+                  <div className="mt-5 flex items-center justify-between gap-3">
+                    <div className="h-6 w-20 bg-muted rounded-md" />
+                    <div className="flex items-center gap-2">
+                      <div className="h-9 w-24 bg-muted rounded-full" />
+                      <div className="h-9 w-12 bg-muted rounded-full" />
+                      <div className="h-9 w-16 bg-muted rounded-full" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <>

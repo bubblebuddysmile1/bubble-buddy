@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     "cosmetics online",
     "beauty essentials",
   ],
+  icons: [
+    { rel: "icon", url: "/favican.png" },
+  ],  
   applicationName: "Bubble Buddy smile",
   authors: [{ name: "Bubble Buddy smile" }],
   creator: "Bubble Buddy smile",

@@ -57,8 +57,21 @@ export default function CategoryProducts({ categorySlug }: CategoryProductsProps
   return (
     <section className="space-y-6">
       {isLoading ? (
-        <div className="rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">
-          Loading products...
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="animate-pulse">
+              <div className="rounded-[2rem] border border-border bg-card p-0 shadow-lg">
+                <div className="relative h-80 overflow-hidden bg-muted">
+                  <div className="h-full w-full bg-muted" />
+                </div>
+                <div className="space-y-4 p-6">
+                  <div className="h-4 w-24 bg-muted rounded-md" />
+                  <div className="h-6 w-3/4 bg-muted rounded-md" />
+                  <div className="h-4 w-20 bg-muted rounded-md" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : error ? (
         <div className="rounded-[2rem] border border-destructive/20 bg-destructive/5 p-10 text-center text-sm text-destructive">
