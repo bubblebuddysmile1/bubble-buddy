@@ -57,10 +57,53 @@ export async function ensureCheckoutAutoAuthUser(input: {
 
   const existingAccount = await checkExistingAccount(normalizedEmail, normalizedPhone);
   if (existingAccount === "active_exists") {
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          ...(normalizedEmail ? [{ email: normalizedEmail }] : []),
+          ...(normalizedPhone ? [{ phone: normalizedPhone }] : []),
+        ],
+      },
+      select: {
+        id: true,
+        email: true,
+        phone: true,
+        name: true,
+        role: true,
+        accountStatus: true,
+        authType: true,
+      },
+    });
+
+    if (!existingUser) {
+      return {
+        kind: "created" as const,
+        message: null,
+        user: null,
+        token: null,
+      };
+    }
+
+    const token = createAuthToken({
+      id: existingUser.id,
+      email: existingUser.email ?? normalizedEmail ?? "",
+      name: existingUser.name,
+      role: existingUser.role,
+    });
+
+    await logActivity({
+      userId: existingUser.id,
+      eventType: "AUDIT_TRAIL",
+      action: "Checkout auto-auth session",
+      description: `Checkout session continued for existing account ${existingUser.email ?? normalizedEmail ?? existingUser.phone ?? "checkout user"}`,
+      metadata: JSON.stringify({ authType: "CHECKOUT_AUTO", email: normalizedEmail, phone: normalizedPhone }),
+    });
+
     return {
       kind: "existing_active" as const,
-      message: "This email is already registered. Please log in to continue.",
-      user: null,
+      message: null,
+      user: existingUser,
+      token,
     };
   }
 

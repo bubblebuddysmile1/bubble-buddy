@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Skeleton from "@/components/ui/Skeleton";
 import StarRating from "@/components/ui/StarRating";
 
 type Review = {
@@ -100,8 +101,25 @@ export default function ProductReviews({ productId, productSlug, averageRating, 
         <div>
           <h3 className="font-semibold">Customer reviews</h3>
           <div className="mt-4 space-y-4">
-            {loading && <div>Loading...</div>}
-            {!loading && reviews.length === 0 && <div className="text-sm text-muted-foreground">No reviews yet.</div>}
+            {loading ? (
+              <div className="space-y-4">
+                {Array.from({ length: 2 }).map((_, index) => (
+                  <div key={index} className="rounded-[1.25rem] border border-border bg-card p-4 shadow-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <Skeleton className="h-4 w-24 rounded-full" />
+                      <Skeleton className="h-4 w-20 rounded-full" />
+                    </div>
+                    <Skeleton className="mt-3 h-4 w-3/4 rounded-md" />
+                    <Skeleton className="mt-2 h-3 w-full rounded-md" />
+                    <Skeleton className="mt-2 h-3 w-5/6 rounded-md" />
+                  </div>
+                ))}
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="rounded-[1.25rem] border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+                No reviews yet.
+              </div>
+            ) : null}
             {reviews.map((r) => (
               <div key={r.id} className="rounded border p-3">
                 <div className="flex items-center justify-between">

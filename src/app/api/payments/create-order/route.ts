@@ -38,12 +38,12 @@ export async function POST(request: Request) {
         address: json?.address,
       });
 
-      if (autoAuth.kind === "existing_active") {
-        return NextResponse.json({ error: autoAuth.message }, { status: 409 });
+      if (autoAuth.kind === "existing_active" || autoAuth.kind === "created") {
+        payload = autoAuth.user ? { id: autoAuth.user.id, email: autoAuth.user.email ?? email, name: autoAuth.user.name, role: autoAuth.user.role } : null;
+        authToken = autoAuth.token ?? null;
+      } else {
+        return NextResponse.json({ error: "Unable to prepare checkout. Please try again." }, { status: 409 });
       }
-
-      payload = autoAuth.user ? { id: autoAuth.user.id, email: autoAuth.user.email ?? email, name: autoAuth.user.name, role: autoAuth.user.role } : null;
-      authToken = autoAuth.token ?? null;
     }
 
     if (!payload) {

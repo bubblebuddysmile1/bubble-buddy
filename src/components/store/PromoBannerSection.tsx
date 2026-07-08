@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { ArrowRight } from "lucide-react";
+import Skeleton from "@/components/ui/Skeleton";
 
 type CategoryBanner = {
   id: number;
@@ -68,8 +69,19 @@ export default function PromoBannerSection() {
             {error}
           </div>
         ) : loading ? (
-          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            Loading promo banners...
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="overflow-hidden rounded-[2rem] border border-border bg-card p-0 shadow-lg">
+                <div className="relative h-72 w-full overflow-hidden rounded-[1.75rem] bg-muted p-6">
+                  <Skeleton className="h-full w-full rounded-[1.5rem]" />
+                  <div className="absolute inset-0 flex flex-col justify-end gap-3 p-6">
+                    <Skeleton className="h-4 w-24 rounded-full" />
+                    <Skeleton className="h-8 w-3/4 rounded-md" />
+                    <Skeleton className="h-10 w-36 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : banners.length === 0 ? (
           <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">

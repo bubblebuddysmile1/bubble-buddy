@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Skeleton from "@/components/ui/Skeleton";
 import type { ActivePromotion } from "./OfferDiscountSection";
 
 function formatCountdown(target: Date): string {
@@ -78,8 +79,26 @@ export default function FlashSaleSection() {
             {error}
           </div>
         ) : loading ? (
-          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            Loading flash sale deals...
+          <div className="grid gap-6 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="rounded-[2rem] border border-border bg-card p-6 shadow-lg shadow-black/5">
+                <div className="flex items-center justify-between gap-3">
+                  <Skeleton className="h-7 w-24 rounded-full" />
+                  <Skeleton className="h-7 w-20 rounded-full" />
+                </div>
+                <div className="mt-6 space-y-3">
+                  <Skeleton className="h-6 w-3/4 rounded-md" />
+                  <Skeleton className="h-4 w-full rounded-md" />
+                  <Skeleton className="h-4 w-5/6 rounded-md" />
+                </div>
+                <div className="mt-6 space-y-3 rounded-[1.5rem] border border-border bg-muted p-5">
+                  <Skeleton className="h-3 w-24 rounded-full" />
+                  <Skeleton className="h-8 w-32 rounded-md" />
+                  <Skeleton className="h-4 w-40 rounded-md" />
+                  <Skeleton className="h-9 w-32 rounded-full" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : flashPromotions.length === 0 ? (
           <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">

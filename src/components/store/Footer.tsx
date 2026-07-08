@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Skeleton from "@/components/ui/Skeleton";
 
 import { Mail, MessageCircle } from "lucide-react";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
@@ -180,9 +181,13 @@ export default function Footer() {
 
             <div className="mt-3 sm:mt-4 flex flex-col gap-2 sm:gap-3 text-sm sm:text-base text-muted-foreground">
               {loading ? (
-                <p className="text-xs sm:text-sm text-muted-foreground animate-pulse">
-                  Loading categories...
-                </p>
+                <div className="space-y-3">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-3/4 rounded-full" />
+                    </div>
+                  ))}
+                </div>
               ) : categories.length > 0 ? (
                 categories.slice(0, 6).map((category) => (
                   <Link

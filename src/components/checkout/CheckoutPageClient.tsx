@@ -292,7 +292,8 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           error: orderData,
         });
         setIsSubmitting(false);
-        router.push("/payment/failure?reason=create_order_failed");
+        const failReason = orderData?.error ? encodeURIComponent(String(orderData.error)) : "create_order_failed";
+        router.push(`/payment/failure?reason=${failReason}`);
         return;
       }
 
