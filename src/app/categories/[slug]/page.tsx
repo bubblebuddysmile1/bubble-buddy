@@ -6,6 +6,9 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
+export const revalidate = 60;
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
   const categories = await prisma.category.findMany({
     where: { isActive: true },

@@ -13,6 +13,9 @@ import { prisma } from "@/lib/prisma";
 
 type PageParams = Promise<{ slug: string }>;
 
+export const revalidate = 60;
+export const dynamicParams = true;
+
 type ProductDetailPayload = Prisma.ProductGetPayload<{
   include: {
     category: { select: { name: true; slug: true } };

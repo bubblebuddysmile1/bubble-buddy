@@ -1,30 +1,13 @@
-"use client";
-
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import type { Prisma } from "@prisma/client";
 import ShopProductCard from "@/components/store/ShopProductCard";
 import { toCartProduct } from "@/lib/cart";
+import { prisma } from "@/lib/prisma";
 
 type CategoryOption = { id: number; name: string; slug: string };
 
-type ApiProduct = {
-  id: number;
-  slug: string;
-  name: string;
-  description: string;
-  price: string;
-  currency: string;
-  stockQuantity: number;
-  thumbnail: string | null;
-  category: { name: string; slug: string } | null;
-  featured: boolean;
-};
-
-type ProductsResponse = {
-  products: ApiProduct[];
-  total: number;
-  page: number;
-  perPage: number;
+type ShopBrowserProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 const sortOptions = [
@@ -34,76 +17,71 @@ const sortOptions = [
   { value: "price_desc", label: "Price: High to Low" },
 ];
 
-export default function ShopBrowser() {
-  const [categories, setCategories] = useState<CategoryOption[]>([]);
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("");
-  const searchParams = useSearchParams();
-  const [sort, setSort] = useState("featured");
-  const [page, setPage] = useState(1);
-  const [perPage] = useState(12);
-  const [products, setProducts] = useState<ApiProduct[]>([]);
-  const [total, setTotal] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+const perPage = 12;
 
-  // derive effective category from local state or URL query param
-  const urlCategory = searchParams?.get("category") ?? "";
-  const effectiveCategory = category || urlCategory;
+function buildShopUrl(params: Record<string, string | undefined>) {
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) searchParams.set(key, value);
+  });
+  const queryString = searchParams.toString();
+  return queryString ? `/shop?${queryString}` : "/shop";
+}
 
-  useEffect(() => {
-    async function loadCategories() {
-      try {
-        const response = await fetch("/api/categories", { cache: "no-store" });
-        const data = await response.json();
-        setCategories(data.categories ?? []);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    loadCategories();
-  }, []);
+export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
+  const resolvedSearchParams = (await searchParams) ?? {};
+  const query = typeof resolvedSearchParams.q === "string" ? resolvedSearchParams.q : "";
+  const categorySlug = typeof resolvedSearchParams.category === "string" ? resolvedSearchParams.category : "";
+  const sort = typeof resolvedSearchParams.sort === "string" ? resolvedSearchParams.sort : "featured";
+  const page = Number.parseInt(typeof resolvedSearchParams.page === "string" ? resolvedSearchParams.page : "1", 10) || 1;
 
-  const queryString = useMemo(() => {
-    const searchParams = new URLSearchParams();
-    if (query.trim()) searchParams.set("q", query.trim());
-    if (effectiveCategory) searchParams.set("category", effectiveCategory);
-    if (sort) searchParams.set("sort", sort);
-    searchParams.set("page", String(page));
-    searchParams.set("limit", String(perPage));
-    return searchParams.toString();
-  }, [effectiveCategory, page, perPage, query, sort]);
-
-  useEffect(() => {
-    async function loadProducts() {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const response = await fetch(`/api/products?${queryString}`, { cache: "no-store" });
-        if (!response.ok) {
-          throw new Error("Unable to load products.");
+  const where: Prisma.ProductWhereInput = {
+    isActive: true,
+    ...(query
+      ? {
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            { description: { contains: query, mode: "insensitive" } },
+            { sku: { contains: query, mode: "insensitive" } },
+          ],
         }
+      : {}),
+    ...(categorySlug ? { category: { slug: categorySlug, isActive: true } } : {}),
+  };
 
-        const data: ProductsResponse = await response.json();
-        setProducts(data.products ?? []);
-        setTotal(data.total ?? 0);
-      } catch (err) {
-        console.error(err);
-        setError("Could not fetch products. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    }
+  const orderBy: Prisma.ProductOrderByWithRelationInput | Prisma.ProductOrderByWithRelationInput[] =
+    sort === "price_asc"
+      ? { price: "asc" }
+      : sort === "price_desc"
+        ? { price: "desc" }
+        : sort === "newest"
+          ? { createdAt: "desc" }
+          : [{ featured: "desc" }, { createdAt: "desc" }];
 
-    loadProducts();
-  }, [queryString]);
+  const [categories, products, total] = await Promise.all([
+    prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, slug: true },
+    }),
+    prisma.product.findMany({
+      where,
+      orderBy,
+      skip: (page - 1) * perPage,
+      take: perPage,
+      include: {
+        category: { select: { name: true, slug: true } },
+      },
+    }),
+    prisma.product.count({ where }),
+  ]);
 
   const totalPages = Math.max(1, Math.ceil(total / perPage));
+  const safePage = Math.min(page, totalPages);
 
   return (
     <section className="space-y-8">
-      <div className="flex flex-col gap-4 rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-end sm:justify-between">
+      <form method="get" action="/shop" className="flex flex-col gap-4 rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-end sm:justify-between">
         <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_240px]">
           <label className="space-y-2">
             <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
@@ -111,11 +89,8 @@ export default function ShopBrowser() {
             </span>
             <input
               type="search"
-              value={query}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                setPage(1);
-              }}
+              name="q"
+              defaultValue={query}
               placeholder="Search by name, description, or SKU"
               className="w-full rounded-3xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
@@ -126,11 +101,8 @@ export default function ShopBrowser() {
               Category
             </span>
             <select
-              value={effectiveCategory}
-              onChange={(event) => {
-                setCategory(event.target.value);
-                setPage(1);
-              }}
+              name="category"
+              defaultValue={categorySlug}
               className="w-full rounded-3xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
               <option value="">All categories</option>
@@ -143,66 +115,73 @@ export default function ShopBrowser() {
           </label>
         </div>
 
-        <label className="space-y-2 w-full max-w-xs">
-          <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            Sort by
-          </span>
-          <select
-            value={sort}
-            onChange={(event) => {
-              setSort(event.target.value);
-              setPage(1);
-            }}
-            className="w-full rounded-3xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-          >
-            {sortOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+        <div className="flex w-full max-w-xs flex-col gap-3">
+          <label className="space-y-2">
+            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+              Sort by
+            </span>
+            <select
+              name="sort"
+              defaultValue={sort}
+              className="w-full rounded-3xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+            >
+              {sortOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+            >
+              Apply
+            </button>
+            <Link href="/shop" className="text-sm font-semibold text-primary hover:underline">
+              Reset
+            </Link>
+          </div>
+        </div>
+      </form>
 
       <div className="flex flex-col gap-4 rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-muted-foreground">
             Showing <span className="font-semibold text-foreground">{products.length}</span> of <span className="font-semibold text-foreground">{total}</span> products
           </p>
-          <p className="text-xs text-muted-foreground">Page {page} of {totalPages}</p>
+          <p className="text-xs text-muted-foreground">Page {safePage} of {totalPages}</p>
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            disabled={page <= 1 || isLoading}
-            onClick={() => setPage((current) => Math.max(1, current - 1))}
+          <Link
+            href={buildShopUrl({
+              q: query || undefined,
+              category: categorySlug || undefined,
+              sort: sort === "featured" ? undefined : sort,
+              page: String(Math.max(1, safePage - 1)),
+            })}
             className="inline-flex items-center justify-center rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
           >
             Previous
-          </button>
-          <button
-            type="button"
-            disabled={page >= totalPages || isLoading}
-            onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+          </Link>
+          <Link
+            href={buildShopUrl({
+              q: query || undefined,
+              category: categorySlug || undefined,
+              sort: sort === "featured" ? undefined : sort,
+              page: String(Math.min(totalPages, safePage + 1)),
+            })}
             className="inline-flex items-center justify-center rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
           >
             Next
-          </button>
+          </Link>
         </div>
       </div>
 
-      {error ? (
-        <div className="rounded-[2rem] border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive">
-          {error}
-        </div>
-      ) : null}
-
-      {isLoading ? (
-        <div className="rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">
-          Loading products...
-        </div>
-      ) : products.length === 0 ? (
+      {products.length === 0 ? (
         <div className="rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           No products found for the selected filters.
         </div>
@@ -211,7 +190,10 @@ export default function ShopBrowser() {
           {products.map((product) => (
             <ShopProductCard
               key={product.id}
-              product={toCartProduct(product)}
+              product={toCartProduct({
+                ...product,
+                price: product.price.toString(),
+              })}
               description={product.description}
               featured={product.featured}
             />

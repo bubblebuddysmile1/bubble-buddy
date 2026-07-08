@@ -1,7 +1,7 @@
-'use client';
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { prisma } from "@/lib/prisma";
+
+export const revalidate = 60;
 
 export type ActivePromotion = {
   id: number;
@@ -32,73 +32,44 @@ function formatCountdown(target: Date): string {
   return parts.join(" ");
 }
 
-export default function OfferDiscountSection() {
-  const [promotions, setPromotions] = useState<ActivePromotion[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [, setNow] = useState(new Date());
-
-  useEffect(() => {
-    const interval = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    async function loadPromotions() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const response = await fetch("/api/promotions?active=1&limit=4");
-        const data = await response.json();
-
-        if (!response.ok) {
-          setError(data.error ?? "Unable to load offers.");
-          setPromotions([]);
-          return;
-        }
-
-        setPromotions(data.promotions ?? []);
-      } catch {
-        setError("Unable to load offers.");
-        setPromotions([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadPromotions();
-  }, []);
+export default async function OfferDiscountSection() {
+  const now = new Date();
+  const promotions = await prisma.promotion.findMany({
+    where: {
+      isActive: true,
+      AND: [
+        { OR: [{ activeFrom: null }, { activeFrom: { lte: now } }] },
+        { OR: [{ activeUntil: null }, { activeUntil: { gte: now } }] },
+      ],
+    },
+    take: 4,
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
-    <section className="py-16 bg-background">
+    <section className="bg-background py-16">
       <div className="container mx-auto px-4">
         <div className="mb-10 text-center">
           <p className="text-xs uppercase tracking-[0.32em] text-primary">Offers & Discounts</p>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-          Exclusive beauty deals and special savings on your favorite essentials. 💖          </p>
+            Exclusive beauty deals and special savings on your favorite essentials. 💖
+          </p>
         </div>
 
-        {error ? (
-          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-destructive">
-            {error}
-          </div>
-        ) : loading ? (
-          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            Loading offers...
-          </div>
-        ) : promotions.length === 0 ? (
+        {promotions.length === 0 ? (
           <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
             No active promotions available yet. Add coupons in admin to populate this section.
           </div>
         ) : (
           <div className="grid gap-6 xl:grid-cols-4">
             {promotions.map((promotion) => {
+              const discountValue = Number(promotion.discountValue ?? 0);
+              const minOrderAmount = Number(promotion.minOrderAmount ?? 0);
               const badge = promotion.discountType === "PERCENTAGE"
-                ? `${promotion.discountValue}% off`
-                : `₹${promotion.discountValue} off`;
+                ? `${discountValue}% off`
+                : `₹${discountValue} off`;
               const activeRange = promotion.activeFrom || promotion.activeUntil
-                ? `Valid ${promotion.activeFrom ? promotion.activeFrom.slice(0, 10) : "now"} to ${promotion.activeUntil ? promotion.activeUntil.slice(0, 10) : "end"}`
+                ? `Valid ${promotion.activeFrom ? promotion.activeFrom.toISOString().slice(0, 10) : "now"} to ${promotion.activeUntil ? promotion.activeUntil.toISOString().slice(0, 10) : "end"}`
                 : "Ongoing offer";
 
               return (
@@ -120,12 +91,12 @@ export default function OfferDiscountSection() {
                       </p>
                     </div>
 
-                            <div className="rounded-[1.5rem] border border-border bg-background p-5">
+                    <div className="rounded-[1.5rem] border border-border bg-background p-5">
                       <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Offer</p>
                       <p className="mt-2 text-xl font-semibold text-foreground">{badge}</p>
-                      {promotion.minOrderAmount > 0 && (
+                      {minOrderAmount > 0 && (
                         <p className="mt-1 text-sm text-muted-foreground">
-                          Minimum order ₹{promotion.minOrderAmount.toFixed(2)}
+                          Minimum order ₹{minOrderAmount.toFixed(2)}
                         </p>
                       )}
                       {promotion.activeUntil ? (

@@ -1,7 +1,18 @@
-import { Suspense } from "react";
+import type { Metadata } from "next";
 import ShopBrowser from "@/components/store/ShopBrowser";
 
-export default function ShopPage() {
+export const metadata: Metadata = {
+  title: "Shop - Bubble Buddy",
+  description: "Browse skincare, haircare, and beauty products with filters and fast loading pages.",
+};
+
+export const revalidate = 60;
+
+type ShopPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default function ShopPage({ searchParams }: ShopPageProps) {
   return (
     <main className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4">
@@ -13,10 +24,7 @@ export default function ShopPage() {
           </p>
         </div>
 
-        <Suspense fallback={<div className="rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">Loading shop browser...</div>}>
-          <ShopBrowser />
-        </Suspense>
-
+        <ShopBrowser searchParams={searchParams} />
       </div>
     </main>
   );

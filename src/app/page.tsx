@@ -13,6 +13,8 @@ export const metadata: Metadata = {
     "Discover premium skincare, haircare, and makeup essentials at Bubble Buddy with curated collections and secure shopping.",
 };
 
+export const revalidate = 60;
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -56,7 +58,7 @@ export default function Home() {
           </span>
           <div className="h-px flex-1 bg-gradient from-transparent via-[#c9a97a] to-transparent" />
         </div>
-
+<BestSellingProducts />
       </div>
       <AdvancedPromoSection />
       <PromoBannerSection/>
