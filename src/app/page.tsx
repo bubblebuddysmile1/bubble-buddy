@@ -15,7 +15,28 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
-export default function Home() {
+export default async function Home() {
+  const { prisma } = await import("@/lib/prisma");
+
+  const latestProducts = await prisma.product.findMany({
+    where: { isActive: true },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+    select: { id: true, name: true, slug: true, thumbnail: true, price: true, currency: true },
+  });
+
+  function decimalToNumber(value: unknown): number | null {
+    if (value == null) return null;
+    const v = value as { toNumber?: () => number };
+    if (typeof v.toNumber === "function") return v.toNumber();
+    return Number(value as unknown as number);
+  }
+
+  const latestProductsNormalized = latestProducts.map((p) => ({
+    ...p,
+    price: decimalToNumber(p.price),
+  }));
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <script
@@ -34,7 +55,7 @@ export default function Home() {
           }),
         }}
       />
-      <HeroSection />
+      <HeroSection products={latestProductsNormalized} />
       <CategoriesSection />
       <BestSellingProducts />
       <OfferDiscountSection />
