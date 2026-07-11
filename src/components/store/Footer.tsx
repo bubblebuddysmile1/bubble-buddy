@@ -23,6 +23,8 @@ export default function Footer() {
   const [categories, setCategories] = useState<CategoryLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -56,11 +58,41 @@ export default function Footer() {
     };
   }, []);
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle newsletter subscription
-    console.log("Newsletter subscription:", email);
-    setEmail("");
+    setFeedback(null);
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setFeedback({ type: "error", message: "Please enter your email address." });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmedEmail }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Unable to subscribe right now.");
+      }
+
+      setFeedback({ type: "success", message: data?.message || "Thanks for subscribing!" });
+      setEmail("");
+    } catch (error) {
+      setFeedback({
+        type: "error",
+        message: error instanceof Error ? error.message : "Unable to subscribe right now.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -222,17 +254,28 @@ export default function Footer() {
                   type="email"
                   placeholder="Enter your email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (feedback) setFeedback(null);
+                  }}
                   required
                   className="bg-input text-foreground placeholder:text-muted-foreground flex-1 h-10 sm:h-11 text-sm sm:text-base"
                 />
                 <Button
                   type="submit"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 h-10 sm:h-11 px-4 sm:px-6"
+                  disabled={isSubmitting}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 h-10 sm:h-11 px-4 sm:px-6 disabled:opacity-70"
                 >
-                  Join
+                  {isSubmitting ? "Joining..." : "Join"}
                 </Button>
               </div>
+              {feedback && (
+                <p
+                  className={`mt-2 text-sm ${feedback.type === "success" ? "text-green-600" : "text-red-600"}`}
+                >
+                  {feedback.message}
+                </p>
+              )}
             </form>
           </div>
         </div>
