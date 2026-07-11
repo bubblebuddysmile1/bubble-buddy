@@ -8,11 +8,26 @@ type CategoryProductsProps = {
   categorySlug: string;
 };
 
-export default async function CategoryProducts({ categorySlug }: CategoryProductsProps) {
-  const category = await prisma.category.findUnique({
-    where: { slug: categorySlug },
+async function getCategoryBySlug(slug: string) {
+  return prisma.category.findUnique({
+    where: { slug },
     select: { id: true },
   });
+}
+
+async function getCategoryProducts(categoryId: number) {
+  return prisma.product.findMany({
+    where: { isActive: true, categoryId },
+    take: 24,
+    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    include: {
+      category: { select: { name: true, slug: true } },
+    },
+  });
+}
+
+export default async function CategoryProducts({ categorySlug }: CategoryProductsProps) {
+  const category = await getCategoryBySlug(categorySlug);
 
   if (!category) {
     return (
@@ -22,14 +37,7 @@ export default async function CategoryProducts({ categorySlug }: CategoryProduct
     );
   }
 
-  const products = await prisma.product.findMany({
-    where: { isActive: true, categoryId: category.id },
-    take: 24,
-    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-    include: {
-      category: { select: { name: true, slug: true } },
-    },
-  });
+  const products = await getCategoryProducts(category.id);
 
   if (products.length === 0) {
     return (

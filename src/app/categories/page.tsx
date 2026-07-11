@@ -1,8 +1,33 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
-export const metadata = {
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") || "https://bubblebuddy.com";
+
+export const metadata: Metadata = {
   title: "Categories - Bubble Buddy",
+  description: "Browse all Bubble Buddy product categories and discover beauty essentials for skincare, haircare, and makeup.",
+  keywords: ["beauty categories", "skincare categories", "haircare categories", "Bubble Buddy categories"],
+  alternates: {
+    canonical: `${siteUrl}/categories`,
+  },
+  openGraph: {
+    title: "Categories - Bubble Buddy",
+    description: "Browse all Bubble Buddy product categories and discover beauty essentials for skincare, haircare, and makeup.",
+    url: `${siteUrl}/categories`,
+    type: "website",
+    images: [{ url: `${siteUrl}/category/1.jpg`, alt: "Bubble Buddy categories" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Categories - Bubble Buddy",
+    description: "Browse all Bubble Buddy product categories and discover beauty essentials for skincare, haircare, and makeup.",
+    images: [`${siteUrl}/category/1.jpg`],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default async function CategoriesPage() {
@@ -12,8 +37,20 @@ export default async function CategoriesPage() {
     select: { id: true, name: true, slug: true, description: true, image: true },
   });
 
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: categories.map((category, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: category.name,
+      url: `${siteUrl}/categories/${category.slug}`,
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground py-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       <div className="container mx-auto px-4">
         <div className="mb-10 text-center">
           <p className="text-xs uppercase tracking-[0.32em] text-primary">Product categories</p>

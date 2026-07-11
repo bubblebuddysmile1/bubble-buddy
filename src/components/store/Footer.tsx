@@ -124,7 +124,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="mailto:chat@bubblebuddysmile.com"
+                href="mailto:bubblebuddysmile.developer@gmail.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Open chat"
@@ -134,7 +134,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="mailto:info@bubblebuddysmile.com"
+                href="mailto:bubblebuddysmile.team@gmail.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Send email"

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import CategoryProducts from "@/components/store/CategoryProducts";
@@ -6,8 +7,17 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") || "https://bubblebuddy.com";
+
 export const revalidate = 60;
 export const dynamicParams = true;
+
+async function getCategoryBySlug(slug: string) {
+  return prisma.category.findUnique({
+    where: { slug },
+    select: { id: true, name: true, description: true, image: true, isActive: true },
+  });
+}
 
 export async function generateStaticParams() {
   const categories = await prisma.category.findMany({
@@ -18,36 +28,77 @@ export async function generateStaticParams() {
   return categories.map((category) => ({ slug: category.slug }));
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const category = await prisma.category.findUnique({
-    where: { slug },
-    select: { name: true, description: true },
-  });
+  const category = await getCategoryBySlug(slug);
 
   if (!category) {
     return { title: "Category not found" };
   }
 
+  const canonicalUrl = `${siteUrl}/categories/${slug}`;
+  const description = category.description ?? `Shop products in the ${category.name} category.`;
+  const imageUrl = category.image ? new URL(category.image, siteUrl).toString() : `${siteUrl}/category/1.jpg`;
+
   return {
     title: `${category.name} - Bubble Buddy`,
-    description: category.description ?? `Shop products in the ${category.name} category.`,
+    description,
+    keywords: [category.name, `${category.name} products`, "Bubble Buddy", "beauty products"],
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: `${category.name} - Bubble Buddy`,
+      description,
+      url: canonicalUrl,
+      type: "website",
+      images: [{ url: imageUrl, alt: `${category.name} products` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${category.name} - Bubble Buddy`,
+      description,
+      images: [imageUrl],
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
   };
 }
 
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
-  const category = await prisma.category.findUnique({
-    where: { slug },
-    select: { name: true, description: true, image: true, isActive: true },
-  });
+  const category = await getCategoryBySlug(slug);
 
   if (!category || !category.isActive) {
     notFound();
   }
 
+  const canonicalUrl = `${siteUrl}/categories/${slug}`;
+  const description = category.description ?? `Explore products in the ${category.name} category.`;
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: category.name,
+    description,
+    url: canonicalUrl,
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: category.name,
+          url: canonicalUrl,
+        },
+      ],
+    },
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground py-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       <div className="container mx-auto px-4">
         <div className="mb-10 grid gap-8 lg:grid-cols-[1fr_minmax(260px,320px)] items-center">
           <div className="space-y-4">
