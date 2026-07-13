@@ -183,7 +183,7 @@ export default function ContactPage() {
                       name="email"
                       value={form.email}
                       onChange={handleChange}
-                      placeholder="gmail"
+                      placeholder="Enter your Gmail address"
                       className="w-full rounded-xl border border-border bg-card/80 px-4 py-3 text-foreground placeholder:text-muted-foreground transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                       required
                     />
