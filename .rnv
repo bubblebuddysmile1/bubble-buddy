@@ -1,0 +1,31 @@
+# Tracked repo environment config for Bubble Buddy.
+# Replace placeholder values with actual environment values if you want to track them.
+# Do not store live secrets in public repos; use this file only for safe defaults or placeholders.
+
+DATABASE_URL=postgresql://username:password@localhost:5432/bubble_buddy
+NEXT_PUBLIC_APP_URL=https://bubblebuddysmile.com/
+
+JWT_SECRET=replace-with-jwt-secret
+NODE_ENV=development
+
+RESEND_API_KEY=replace-with-resend-api-key
+EMAIL_FROM=Bubble Buddy <noreply@bubblebuddysmile.com>
+ADMIN_EMAIL=bubblebuddysmile.developer@gmail.com
+SUPPORT_EMAIL=bubblebuddysmile.team@gmail.com
+
+CLOUDINARY_CLOUD_NAME=replace-with-cloud-name
+CLOUDINARY_API_KEY=replace-with-cloudinary-api-key
+CLOUDINARY_API_SECRET=replace-with-cloudinary-api-secret
+CLOUDINARY_UPLOAD_FOLDER=bubble-buddy/products
+
+NEXT_PUBLIC_RAZORPAY_KEY_ID=replace-with-razorpay-key-id
+RAZORPAY_KEY_ID=replace-with-razorpay-key-id
+RAZORPAY_KEY_SECRET=replace-with-razorpay-key-secret
+MOCK_PAYMENTS=false
+
+TWILIO_ACCOUNT_SID=replace-with-twilio-account-sid
+TWILIO_AUTH_TOKEN=replace-with-twilio-auth-token
+TWILIO_WHATSAPP_FROM=+1234567890
+
+GOOGLE_CLIENT_ID=replace-with-google-client-id
+GOOGLE_CLIENT_SECRET=replace-with-google-client-secret
