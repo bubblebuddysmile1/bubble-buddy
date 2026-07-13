@@ -103,9 +103,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold">Email</h3>
-                      <a href="mailto:support@buddybubble.com" className="text-sm text-muted-foreground transition-colors hover:text-primary">support@buddybubble.com</a>
-                      <br />
-                      <a href="mailto:partners@buddybubble.com" className="text-sm text-muted-foreground transition-colors hover:text-primary">partners@buddybubble.com</a>
+                      <a href="mailto:bubblebuddysmile.team@gmail.com" className="text-sm text-muted-foreground transition-colors hover:text-primary">bubblebuddysmile.team@gmail.com</a>
                     </div>
                   </div>
                 </div>
@@ -185,7 +183,7 @@ export default function ContactPage() {
                       name="email"
                       value={form.email}
                       onChange={handleChange}
-                      placeholder="john@example.com"
+                      placeholder="gmail"
                       className="w-full rounded-xl border border-border bg-card/80 px-4 py-3 text-foreground placeholder:text-muted-foreground transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                       required
                     />

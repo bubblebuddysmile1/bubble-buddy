@@ -116,9 +116,7 @@ export default function ProductReviews({ productId, productSlug, averageRating, 
                 ))}
               </div>
             ) : reviews.length === 0 ? (
-              <div className="rounded-[1.25rem] border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
-                No reviews yet.
-              </div>
+              <div className="rounded-[1.25rem] border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">              </div>
             ) : null}
             {reviews.map((r) => (
               <div key={r.id} className="rounded border p-3">
