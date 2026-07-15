@@ -60,7 +60,6 @@ export default async function Home() {
       <BestSellingProducts />
       <OfferDiscountSection />
       <ProductList />
-      <BestSellingProducts />
       <AdvancedPromoSection />
       <PromoBannerSection/>
     </div>
