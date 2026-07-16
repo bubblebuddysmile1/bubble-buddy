@@ -216,9 +216,7 @@ export default function WelcomePopup() {
             <h2 id="welcome-popup-title" className="text-2xl font-semibold text-foreground sm:text-3xl">
               Our Best Sellers
             </h2>
-            <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-              Discover the premium beauty essentials customers are loving most right now.
-            </p>
+
           </div>
         </div>
 
@@ -235,14 +233,14 @@ export default function WelcomePopup() {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="overflow-hidden rounded-[1.5rem] border border-border/60 bg-card/90 p-3 shadow-sm shadow-black/5">
+              <div className="overflow-hidden rounded-[1.5rem] border border-border/60 bg-card/90 px-2 py-1 shadow-sm shadow-black/5">
                 <div className="relative overflow-hidden rounded-[1.25rem] bg-muted/60">
                   <div className="absolute inset-0 bg-linear-to-b from-transparent via-background/20 to-background/40" />
                   <Image
                     src={products[activeIndex]?.image ?? "/category/1.jpg"}
                     alt={products[activeIndex]?.name ?? "Featured product"}
-                    width={800}
-                    height={520}
+                    width={700}
+                    height={480}
                     className="h-56 w-full object-cover sm:h-64"
                   />
                 </div>
@@ -260,6 +258,9 @@ export default function WelcomePopup() {
                     <div className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
                       {products[activeIndex] ? `${products[activeIndex].currency} ${products[activeIndex].price.toFixed(2)}` : ""}
                     </div>
+                    {products[activeIndex] && (
+                      <AddToCartButton product={products[activeIndex]} size="sm" label="Add to cart" className="rounded-full" />
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between gap-3">
@@ -281,15 +282,7 @@ export default function WelcomePopup() {
                       View details
                     </Link>
                   </div>
-
-                  <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3">
-                    <p className="text-sm text-muted-foreground">
-                      Handpicked favorites for your glow-up routine.
-                    </p>
-                    {products[activeIndex] && (
-                      <AddToCartButton product={products[activeIndex]} size="sm" label="Add to cart" className="rounded-full" />
-                    )}
-                  </div>
+                  
                 </div>
               </div>
             </div>

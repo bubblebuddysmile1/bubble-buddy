@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductImageGallery from "@/components/store/ProductImageGallery";
 import ProductDetailCart from "@/components/store/ProductDetailCart";
+import ProductTabs from "@/components/store/ProductTabs";
 import RelatedProducts from "@/components/store/RelatedProducts";
 import ProductReviews from "@/components/store/ProductReviews";
 import RecentlyViewedSection from "@/components/store/RecentlyViewedSection";
@@ -21,7 +22,12 @@ type ProductDetailPayload = Prisma.ProductGetPayload<{
     category: { select: { name: true; slug: true } };
     images: true;
   };
-}>;
+}> & {
+  benefits?: string | null;
+  howToApply?: string | null;
+  faq?: string | null;
+  details?: string | null;
+};
 
 type RelatedProduct = Prisma.ProductGetPayload<{
   include: {
@@ -38,7 +44,7 @@ async function getProductBySlug(slug: string): Promise<ProductDetailPayload | nu
       },
       images: { orderBy: { sortOrder: "asc" } },
     },
-  });
+  }) as Promise<ProductDetailPayload | null>;
 }
 
 async function getRelatedProducts(
@@ -163,9 +169,6 @@ export default async function ProductDetailPage({ params }: { params: PageParams
   const relatedProducts = await getRelatedProducts(product.categoryId, product.id);
   const frequentlyBoughtTogetherProducts = await getFrequentlyBoughtTogetherProducts(product.id);
   const cartProduct = toCartProduct(product);
-  const compareAtPrice = product.compareAtPrice
-    ? parseProductPrice(product.compareAtPrice)
-    : null;
 
   return (
     <main className="min-h-screen bg-background text-foreground py-12">
@@ -187,8 +190,9 @@ export default async function ProductDetailPage({ params }: { params: PageParams
           </Link>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
+          {/* Left Column: Product Images */}
+          <section className="rounded-[2rem] border border-border bg-card p-8 shadow-lg">
             <ProductImageGallery
               productName={product.name}
               thumbnail={product.thumbnail}
@@ -196,40 +200,100 @@ export default async function ProductDetailPage({ params }: { params: PageParams
             />
           </section>
 
-          <section className="space-y-6 rounded-[2rem] border border-border bg-card p-6 shadow-lg">
-            <div className="space-y-4">
+          {/* Right Column: Product Details */}
+          <section className="space-y-6">
+            {/* Product Info Card */}
+            <div className="space-y-4 rounded-[2rem] border border-border bg-card p-8 shadow-lg">
               <div>
-                <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">
-                  Description
+                <p className="text-xs uppercase tracking-[0.32em] text-primary">
+                  {product.category?.name ?? "Uncategorized"}
                 </p>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                  {product.description}
-                </p>
+                <h2 className="mt-3 text-3xl font-bold text-foreground">
+                  {product.name}
+                </h2>
               </div>
-              {product.details && (
-                <div>
-                  <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">
-                    Details
+
+              {/* Price Section */}
+              <div className="space-y-2">
+                <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">
+                  Price
+                </p>
+                <div className="flex items-baseline gap-3">
+                  <p className="text-4xl font-bold text-foreground">
+                    {product.currency} {product.price.toString()}
                   </p>
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">{product.details}</p>
+                  {product.compareAtPrice &&
+                    parseProductPrice(product.compareAtPrice) > parseProductPrice(product.price) && (
+                      <p className="text-lg text-muted-foreground line-through">
+                        {product.currency}{" "}
+                        {parseProductPrice(product.compareAtPrice).toFixed(2)}
+                      </p>
+                    )}
                 </div>
-              )}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-3xl bg-background p-4">
-                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">SKU</p>
-                  <p className="mt-2 text-sm text-foreground">{product.sku}</p>
+              </div>
+
+              {/* Stock and Reviews Section */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-2xl bg-background p-4">
+                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
+                    Stock
+                  </p>
+                  <p className="mt-2 text-xl font-semibold text-foreground">
+                    {product.stockQuantity > 0 ? (
+                      <span className="text-green-600">
+                        {product.stockQuantity} Available
+                      </span>
+                    ) : (
+                      <span className="text-red-600">Out of Stock</span>
+                    )}
+                  </p>
                 </div>
-                <div className="rounded-3xl bg-background p-4">
-                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Stock</p>
-                  <p className="mt-2 text-sm text-foreground">{product.stockQuantity} available</p>
+                <div className="rounded-2xl bg-background p-4">
+                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
+                    Reviews
+                  </p>
+                  <p className="mt-2 text-xl font-semibold text-foreground">
+                    {product.reviewCount ?? 0} Reviews
+                  </p>
+                  {product.averageRating && (
+                    <p className="mt-1 text-sm text-yellow-500">
+                      ★ {(product.averageRating as number).toFixed(1)}
+                    </p>
+                  )}
                 </div>
+              </div>
+
+              {/* SKU */}
+              <div className="rounded-2xl bg-background p-4">
+                <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
+                  SKU
+                </p>
+                <p className="mt-2 text-sm text-foreground">{product.sku}</p>
               </div>
             </div>
 
-            <ProductDetailCart product={cartProduct} compareAtPrice={compareAtPrice} />
+            {/* Action Buttons Card */}
+            <ProductDetailCart
+              product={cartProduct}
+              compareAtPrice={
+                product.compareAtPrice
+                  ? parseProductPrice(product.compareAtPrice)
+                  : null
+              }
+            />
           </section>
         </div>
 
+        {/* Product Tabs Section */}
+        <ProductTabs
+          description={product.description}
+          benefits={product.benefits}
+          howToApply={product.howToApply}
+          faq={product.faq}
+          details={product.details}
+        />
+
+        {/* Reviews Section */}
         <ProductReviews
           productId={product.id}
           productSlug={product.slug}

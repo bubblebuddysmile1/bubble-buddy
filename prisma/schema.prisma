@@ -85,7 +85,10 @@ model Product {
   name           String
   slug           String         @unique
   description    String
-  details        String?
+  benefits       String?        @db.Text
+  howToApply     String?        @db.Text
+  faq            String?        @db.Text
+  details        String?        @db.Text
   price          Decimal        @db.Decimal(10, 2)
   compareAtPrice Decimal?       @db.Decimal(10, 2)
   currency       String         @default("USD")

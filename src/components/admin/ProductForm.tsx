@@ -16,6 +16,9 @@ export type ProductFormValues = {
   sku: string;
   slug: string;
   description: string;
+  benefits: string;
+  howToApply: string;
+  faq: string;
   details: string;
   price: string;
   compareAtPrice: string;
@@ -39,6 +42,9 @@ const defaultValues: ProductFormValues = {
   sku: "",
   slug: "",
   description: "",
+  benefits: "",
+  howToApply: "",
+  faq: "",
   details: "",
   price: "",
   compareAtPrice: "",
@@ -84,6 +90,9 @@ export default function ProductForm({
       price: values.price,
       compareAtPrice: values.compareAtPrice || null,
       thumbnail: values.thumbnail || null,
+      benefits: values.benefits || null,
+      howToApply: values.howToApply || null,
+      faq: values.faq || null,
       details: values.details || null,
     };
 
@@ -144,6 +153,36 @@ export default function ProductForm({
             required
             rows={4}
             className="w-full rounded-3xl border border-input bg-input/30 px-4 py-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          />
+        </label>
+        <label className="space-y-2 text-sm md:col-span-2">
+          <span className="font-medium">Benefits</span>
+          <textarea
+            value={values.benefits}
+            onChange={(e) => updateField("benefits", e.target.value)}
+            rows={3}
+            className="w-full rounded-3xl border border-input bg-input/30 px-4 py-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            placeholder="Enter product benefits (supports HTML)"
+          />
+        </label>
+        <label className="space-y-2 text-sm md:col-span-2">
+          <span className="font-medium">How To Apply</span>
+          <textarea
+            value={values.howToApply}
+            onChange={(e) => updateField("howToApply", e.target.value)}
+            rows={3}
+            className="w-full rounded-3xl border border-input bg-input/30 px-4 py-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            placeholder="Enter application instructions (supports HTML)"
+          />
+        </label>
+        <label className="space-y-2 text-sm md:col-span-2">
+          <span className="font-medium">FAQ</span>
+          <textarea
+            value={values.faq}
+            onChange={(e) => updateField("faq", e.target.value)}
+            rows={4}
+            className="w-full rounded-3xl border border-input bg-input/30 px-4 py-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            placeholder="Enter FAQs (supports HTML)"
           />
         </label>
         <label className="space-y-2 text-sm md:col-span-2">

@@ -23,6 +23,9 @@ function normalizeProduct(product: ProductWithCategoryAndImages) {
     name: product.name,
     slug: product.slug,
     description: product.description,
+    benefits: product.benefits,
+    howToApply: product.howToApply,
+    faq: product.faq,
     details: product.details,
     price: product.price?.toString() ?? null,
     compareAtPrice: product.compareAtPrice?.toString() ?? null,
@@ -80,6 +83,9 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   if (body.sku !== undefined) updates.sku = String(body.sku).trim();
   if (body.slug !== undefined) updates.slug = String(body.slug).trim();
   if (body.description !== undefined) updates.description = String(body.description).trim();
+  if (body.benefits !== undefined) updates.benefits = body.benefits ? String(body.benefits).trim() : null;
+  if (body.howToApply !== undefined) updates.howToApply = body.howToApply ? String(body.howToApply).trim() : null;
+  if (body.faq !== undefined) updates.faq = body.faq ? String(body.faq).trim() : null;
   if (body.details !== undefined) updates.details = body.details ? String(body.details).trim() : null;
   if (body.price !== undefined) updates.price = String(body.price);
   if (body.compareAtPrice !== undefined) updates.compareAtPrice = body.compareAtPrice ? String(body.compareAtPrice) : null;

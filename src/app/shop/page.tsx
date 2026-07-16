@@ -29,4 +29,3 @@ export default function ShopPage({ searchParams }: ShopPageProps) {
     </main>
   );
 }
-  

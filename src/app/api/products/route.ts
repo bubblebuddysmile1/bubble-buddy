@@ -39,6 +39,9 @@ function normalizeProduct(product: ProductWithCategory) {
     name: product.name,
     slug: product.slug,
     description: product.description,
+    benefits: product.benefits,
+    howToApply: product.howToApply,
+    faq: product.faq,
     details: product.details,
     price: product.price?.toString() ?? null,
     compareAtPrice: product.compareAtPrice?.toString() ?? null,
@@ -191,6 +194,9 @@ export async function POST(req: NextRequest) {
   const sku = String(body?.sku ?? "").trim();
   const slug = String(body?.slug ?? "").trim();
   const description = String(body?.description ?? "").trim();
+  const benefits = body?.benefits ? String(body.benefits).trim() : null;
+  const howToApply = body?.howToApply ? String(body.howToApply).trim() : null;
+  const faq = body?.faq ? String(body.faq).trim() : null;
   const details = body?.details ? String(body.details).trim() : null;
   const currency = String(body?.currency ?? "USD").trim();
   const thumbnail = body?.thumbnail ? String(body.thumbnail).trim() : null;
@@ -225,6 +231,9 @@ export async function POST(req: NextRequest) {
       sku,
       slug,
       description,
+      benefits,
+      howToApply,
+      faq,
       details,
       price,
       compareAtPrice: compareAtPrice ?? undefined,
