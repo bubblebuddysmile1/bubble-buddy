@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Shipping Policy - Bubble Buddy",
+  title: "Shipping Policy | Bubble Buddy Smile",
   description: "Shipping policy for Bubble Buddy Smile orders",
 };
 

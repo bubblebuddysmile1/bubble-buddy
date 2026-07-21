@@ -1,5 +1,6 @@
 "use client";
 
+import { Metadata } from "next";
 import { useState } from "react";
 
 const initialForm = {
@@ -11,6 +12,14 @@ const initialForm = {
   orderNumber: "",
   priority: false,
 };
+
+export const metadata: Metadata = {
+  title: "Contact Us | Bubble Buddy Smile",
+  description:
+    "Get in touch with Bubble Buddy Smile for order support, product queries or partnership enquiries.",
+  alternates: { canonical: "https://bubblebuddysmile.com/contact-us" },
+};
+
 
 export default function ContactPage() {
   const [form, setForm] = useState(initialForm);

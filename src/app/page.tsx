@@ -8,10 +8,40 @@ import ProductList from "@/components/store/ProductList";
 import PromoBannerSection from "@/components/store/PromoBannerSection";
 
 export const metadata: Metadata = {
-  title: "Premium Beauty Essentials",
+  title: "Bubble Buddy Smile | Premium Skincare, Haircare & Beauty Essentials Online",
   description:
-    "Discover premium skincare, haircare, and makeup essentials at Bubble Buddy with curated collections and secure shopping.",
+    "Shop premium skincare, haircare & makeup essentials at Bubble Buddy Smile. Clean, effective beauty products with fast delivery & secure checkout.",
+  keywords: [
+    "bubble buddy smile",
+    "beauty store online india",
+    "skincare products",
+    "haircare essentials",
+    "makeup online","bubble beauty","bubble buddy","face care product","skin product"
+  ],
+  alternates: { canonical: "https://bubblebuddysmile.com/" },
+  openGraph: {
+    title: "Bubble Buddy Smile | Premium Beauty Essentials",
+    description:
+      "Discover premium skincare, haircare & makeup essentials designed to make you glow naturally.",
+    url: "https://bubblebuddysmile.com/",
+    siteName: "Bubble Buddy Smile",
+    type: "website",
+    images: [
+      {
+        url: "https://bubblebuddysmile.com/category/1.jpg",
+        alt: "Bubble Buddy Smile beauty products",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bubble Buddy Smile | Premium Beauty Essentials",
+    description:
+      "Shop premium skincare, haircare & makeup essentials with secure checkout and fast delivery.",
+    images: ["https://bubblebuddysmile.com/category/1.jpg"],
+  },
 };
+
 
 export const revalidate = 60;
 

@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import FlashSaleSection from "@/components/store/FlashSaleSection";
+import { Metadata } from "next";
 
-export const metadata = {
-  title: "Offers & Promotions - Bubble Buddy",
-  description: "Exclusive offers and promotions for Bubble Buddy Smile products",
+export const metadata: Metadata = {
+  title: "Beauty Deals & Discounts | Bubble Buddy Smile Offers",
+  description:
+    "Grab exclusive deals on skincare & haircare essentials. Limited-time offers with coupon codes — save more on every order.",
+  alternates: { canonical: "https://bubblebuddysmile.com/offers" },
 };
+
 
 export default function OffersPage() {
   return (

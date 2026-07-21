@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Terms & Conditions - Bubble Buddy",
+  title: "Terms & Conditions | Bubble Buddy Smile",
   description: "Terms and conditions for using Bubble Buddy Smile services",
 };
 

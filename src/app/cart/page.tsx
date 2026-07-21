@@ -1,7 +1,7 @@
 import CartPageClient from "@/components/cart/CartPageClient";
 
 export const metadata = {
-  title: "Your cart",
+  title: "Your cart bubble buddy smile",
 };
 
 export default function CartPage() {

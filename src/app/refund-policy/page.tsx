@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Refund Policy - Bubble Buddy",
+  title: "Refund & Return Policy | Bubble Buddy Smile",
   description: "Refund policy for Bubble Buddy Smile orders",
 };
 

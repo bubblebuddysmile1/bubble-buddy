@@ -2,9 +2,19 @@ import type { Metadata } from "next";
 import ShopBrowser from "@/components/store/ShopBrowser";
 
 export const metadata: Metadata = {
-  title: "Shop - Bubble Buddy",
-  description: "Browse skincare, haircare, and beauty products with filters and fast loading pages.",
+  title: "Shop Beauty Products Online | Bubble Buddy Smile",
+  description:
+    "Browse our full range of skincare, haircare & makeup essentials. Filter by category, price & bestsellers — fast shipping across India.",
+  keywords: ["buy skincare online", "shop beauty products", "haircare online india","face wash","primium"],
+  alternates: { canonical: "https://bubblebuddysmile.com/shop" },
+  openGraph: {
+    title: "Shop All Products | Bubble Buddy Smile",
+    description: "Explore our full collection of beauty essentials — face care, skincare, haircare & more.",
+    url: "https://bubblebuddysmile.com/shop",
+    type: "website",
+  },
 };
+
 
 export const revalidate = 60;
 

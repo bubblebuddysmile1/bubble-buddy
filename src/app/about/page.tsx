@@ -3,12 +3,21 @@ import { Headphones, Leaf, ShieldCheck, Sparkles, Truck } from 'lucide-react'
 import BestSellingProducts from '@/components/store/BestSellingProducts'
 import PromoBannerSection from '@/components/store/PromoBannerSection'
 import FlashSaleSection from '@/components/store/FlashSaleSection'
+import { Metadata } from 'next'
 
-export const metadata = {
-  title: 'About Bubble Buddy Smile | Premium Skincare, Haircare & Makeup',
+export const metadata: Metadata = {
+  title: "About Us | Bubble Buddy Smile — Our Beauty Story",
   description:
-    'Learn how Bubble Buddy Smile brings premium skincare, haircare, and makeup essentials to customers with quality ingredients, trusted values, and friendly support.',
-}
+    "Learn the story behind Bubble Buddy Smile — clean, effective beauty products made from ingredients you can trust.",
+  alternates: { canonical: "https://bubblebuddysmile.com/about" },
+  openGraph: {
+    title: "About Bubble Buddy Smile",
+    description: "Our journey to bring clean, effective and honest beauty essentials to your daily routine.",
+    url: "https://bubblebuddysmile.com/about",
+    type: "website",
+  },
+};
+
 
 const features = [
   {
