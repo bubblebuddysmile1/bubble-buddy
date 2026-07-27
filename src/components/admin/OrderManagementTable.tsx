@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -64,6 +65,15 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
   );
   const [loadingId, setLoadingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const tableViewportRef = useRef<HTMLDivElement>(null);
+
+  const scrollTable = (direction: "left" | "right") => {
+    const container = tableViewportRef.current;
+    if (!container) return;
+
+    const amount = container.clientWidth * 0.9;
+    container.scrollBy({ left: direction === "left" ? -amount : amount, behavior: "smooth" });
+  };
 
   const handleSaveStatus = async (orderId: number) => {
     const status = statusSelections[orderId] as StatusOption;
@@ -105,9 +115,35 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
     <div className="space-y-4">
       {error && <p className="rounded-3xl border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">{error}</p>}
 
-      <div className="overflow-x-auto rounded-4xl border border-border bg-card shadow-lg">
-        <table className="w-full min-w-240 text-left text-sm">
-          <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+      <div className="relative">
+        <div className="absolute left-3 top-1/2 z-20 -translate-y-1/2">
+          <Button
+            type="button"
+            size="icon"
+            variant="outline"
+            className="h-9 w-9 rounded-full bg-background/95 shadow-sm"
+            onClick={() => scrollTable("left")}
+            aria-label="Scroll orders table left"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="absolute right-3 top-1/2 z-20 -translate-y-1/2">
+          <Button
+            type="button"
+            size="icon"
+            variant="outline"
+            className="h-9 w-9 rounded-full bg-background/95 shadow-sm"
+            onClick={() => scrollTable("right")}
+            aria-label="Scroll orders table right"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div ref={tableViewportRef} className="max-h-[75vh] overflow-auto rounded-4xl border border-border bg-card shadow-lg scroll-smooth">
+          <table className="w-full border-collapse text-left text-sm">
+            <thead className="sticky top-0 z-10 border-b border-border bg-muted/80 text-xs uppercase tracking-wide text-muted-foreground backdrop-blur">
             <tr>
               <th className="px-5 py-4">Order</th>
               <th className="px-5 py-4">Customer</th>
@@ -193,7 +229,8 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -13,9 +13,6 @@ const initialForm = {
   priority: false,
 };
 
-
-
-
 export default function ContactPage() {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
