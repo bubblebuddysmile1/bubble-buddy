@@ -5,6 +5,7 @@ const host = new URL(APP_URL).host;
 
 const ROBOTS_TXT = `User-agent: *
 Allow: /
+Allow: /public/
 Disallow: /admin/
 Disallow: /api/
 Sitemap: ${APP_URL}/sitemap.xml

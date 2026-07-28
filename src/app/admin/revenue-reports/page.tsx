@@ -2,36 +2,55 @@ import AdminHeader from "@/components/admin/AdminHeader";
 import { prisma } from "@/lib/prisma";
 import { DollarSign, TrendingUp, Receipt, PieChart, ArrowUpRight, ArrowDownRight } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminRevenueReportsPage() {
-  const [totalRevenue, orders, revenueByStatus, revenueByMonth] = await Promise.all([
-    prisma.order.aggregate({
-      where: { paymentStatus: "PAID" },
-      _sum: { totalAmount: true },
-    }),
-    prisma.order.findMany({
-      where: { paymentStatus: "PAID" },
-      select: {
-        totalAmount: true,
-        taxAmount: true,
-        shippingAmount: true,
-        discountAmount: true,
-        placedAt: true,
-        status: true,
-      },
-      orderBy: { placedAt: "desc" },
-    }),
-    prisma.order.groupBy({
-      by: ["status"],
-      where: { paymentStatus: "PAID" },
-      _sum: { totalAmount: true },
-      _count: true,
-    }),
-    prisma.order.groupBy({
-      by: ["placedAt"],
-      where: { paymentStatus: "PAID" },
-      _sum: { totalAmount: true },
-    }),
-  ]);
+  let totalRevenue = { _sum: { totalAmount: null as { toNumber: () => number } | null } };
+  let orders: Array<{
+    totalAmount: { toNumber: () => number };
+    taxAmount: { toNumber: () => number };
+    shippingAmount: { toNumber: () => number };
+    discountAmount: { toNumber: () => number };
+    placedAt: Date | null;
+    status: string;
+  }> = [];
+  let revenueByStatus: Array<{ status: string; _count: number; _sum: { totalAmount: { toNumber: () => number } | null } }> = [];
+  let revenueByMonth: Array<{ placedAt: Date | null; _sum: { totalAmount: { toNumber: () => number } | null } }> = [];
+
+  try {
+    [totalRevenue, orders, revenueByStatus, revenueByMonth] = await Promise.all([
+      prisma.order.aggregate({
+        where: { paymentStatus: "PAID" },
+        _sum: { totalAmount: true },
+      }),
+      prisma.order.findMany({
+        where: { paymentStatus: "PAID" },
+        select: {
+          totalAmount: true,
+          taxAmount: true,
+          shippingAmount: true,
+          discountAmount: true,
+          placedAt: true,
+          status: true,
+        },
+        orderBy: { placedAt: "desc" },
+      }),
+      prisma.order.groupBy({
+        by: ["status"],
+        where: { paymentStatus: "PAID" },
+        _sum: { totalAmount: true },
+        _count: true,
+      }),
+      prisma.order.groupBy({
+        by: ["placedAt"],
+        where: { paymentStatus: "PAID" },
+        _sum: { totalAmount: true },
+      }),
+    ]);
+  } catch (error) {
+    console.error("[admin revenue reports]", error);
+  }
 
   const revenue = totalRevenue._sum.totalAmount?.toNumber() || 0;
   const totalTax = orders.reduce((sum, order) => sum + order.taxAmount.toNumber(), 0);

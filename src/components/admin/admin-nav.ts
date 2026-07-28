@@ -28,6 +28,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard, exact: true },
   { label: "Products", href: "/admin/products", icon: Package },
   { label: "Categories", href: "/admin/categories", icon: FolderTree },
+  { label: "Blogs", href: "/admin/blogs", icon: Mail },
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
   { label: "Promotions", href: "/admin/promotions", icon: Tag },
   { label: "Customers", href: "/admin/customers", icon: Users },
