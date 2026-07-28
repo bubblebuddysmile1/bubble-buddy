@@ -230,6 +230,7 @@ export default function BlogManager() {
         <label className="block space-y-2 text-sm">
           <span className="font-medium">Main content *</span>
           <textarea value={form.content} onChange={(e) => setForm((prev) => ({ ...prev, content: e.target.value }))} rows={10} className="w-full rounded-3xl border border-input bg-input/30 px-4 py-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50" required />
+          <p className="text-xs text-muted-foreground">Tip: internal links add karne ke liye [text](/shop) ya [text](/blogs/slug) use karein.</p>
         </label>
 
         <label className="block space-y-2 text-sm">
