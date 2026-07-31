@@ -2,7 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthPayload } from "@/lib/admin-auth";
 
-function normalizeReview(r: any) {
+type ReviewRecord = {
+  id: number;
+  rating: number;
+  title: string | null;
+  body: string | null;
+  approved: boolean;
+  user: { id: number; name: string | null; email: string | null } | null;
+  productId: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+function normalizeReview(r: ReviewRecord) {
   return {
     id: r.id,
     rating: r.rating,

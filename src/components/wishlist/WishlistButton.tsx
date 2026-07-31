@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Heart } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,10 +22,7 @@ export default function WishlistButton({
 }: WishlistButtonProps) {
   const toggleItem = useWishlistStore((s) => s.toggleItem);
   const isSaved = useWishlistStore((s) => selectIsInWishlist(s, product.id));
-  const [mounted, setMounted] = useState(false);
   const [pulse, setPulse] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -35,7 +32,7 @@ export default function WishlistButton({
     window.setTimeout(() => setPulse(false), 500);
   };
 
-  const saved = mounted && isSaved;
+  const saved = isSaved;
 
   return (
     <button

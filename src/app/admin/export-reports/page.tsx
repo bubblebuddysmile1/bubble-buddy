@@ -55,6 +55,7 @@ export default function ExportReportsPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
+      // eslint-disable-next-line react-hooks/purity
       a.download = `${reportType}-${exportType}-${Date.now()}.${format === "excel" ? "xls" : format}`;
       document.body.appendChild(a);
       a.click();
@@ -211,7 +212,7 @@ export default function ExportReportsPage() {
           <h2 className="text-xl font-semibold text-foreground">Export History</h2>
           <div className="mt-4">
             <p className="text-sm text-muted-foreground">
-              Your recent export history will appear here. This feature tracks all reports you've downloaded
+              Your recent export history will appear here. This feature tracks all reports you have downloaded
               for easy access and audit purposes.
             </p>
             <div className="mt-4 rounded-3xl bg-background/80 px-4 py-8 text-center">

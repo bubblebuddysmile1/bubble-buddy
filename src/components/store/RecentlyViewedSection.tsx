@@ -31,29 +31,43 @@ export default function RecentlyViewedSection({ currentSlug }: { currentSlug: st
   useEffect(() => {
     const slugs = getRecentlyViewedSlugs().filter((slug) => slug !== currentSlug);
     if (slugs.length === 0) {
-      setProducts([]);
       return;
     }
 
-    setIsLoading(true);
-    fetch(`/api/products?slugs=${encodeURIComponent(slugs.join(","))}`, {
-      cache: "no-store",
-    })
-      .then(async (response) => {
+    let ignore = false;
+
+    const loadProducts = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/products?slugs=${encodeURIComponent(slugs.join(","))}`, {
+          cache: "no-store",
+        });
+
         if (!response.ok) {
           throw new Error("Unable to load recently viewed products.");
         }
 
         const data = await response.json();
-        setProducts(Array.isArray(data.products) ? data.products : []);
-      })
-      .catch((error) => {
+        if (!ignore) {
+          setProducts(Array.isArray(data.products) ? data.products : []);
+        }
+      } catch (error) {
         console.error(error);
-        setProducts([]);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+        if (!ignore) {
+          setProducts([]);
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadProducts();
+
+    return () => {
+      ignore = true;
+    };
   }, [currentSlug]);
 
   if (isLoading || products.length === 0) {

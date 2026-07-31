@@ -1,11 +1,9 @@
-import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME, authCookieOptions, createAuthToken } from "@/lib/auth";
 import { logActivity } from "@/lib/activity-log";
 import { sendEmail } from "@/lib/email";
-import type { AuthType, AccountStatus } from "@prisma/client";
 
 export type ExistingAccountState = "no_account" | "pending_claimable" | "active_exists";
 
@@ -256,7 +254,7 @@ export function buildAuthResponse(user: { id: number; email: string | null; name
     id: user.id,
     email: user.email ?? "",
     name: user.name,
-    role: user.role as any,
+    role: user.role as "CUSTOMER" | "ADMIN",
   });
   response.cookies.set(COOKIE_NAME, token, authCookieOptions);
   return response;

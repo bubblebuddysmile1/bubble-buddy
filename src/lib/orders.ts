@@ -70,12 +70,19 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
   );
 
   return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    let shippingAddressId: number | undefined;
-    let billingAddressId: number | undefined;
-
     // Always persist the provided shipping/billing address so admin can view it,
     // associate with user when available.
-    const addressData: any = {
+    const addressData: {
+      recipient: string;
+      line1: string;
+      line2: string | null;
+      city: string;
+      state: string;
+      postalCode: string;
+      country: string;
+      phone: string;
+      userId?: number;
+    } = {
       recipient: input.address.fullName,
       line1: input.address.line1,
       line2: input.address.line2 ?? null,
@@ -90,8 +97,8 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
     }
 
     const address = await tx.address.create({ data: addressData });
-    shippingAddressId = address.id;
-    billingAddressId = address.id;
+    const shippingAddressId = address.id;
+    const billingAddressId = address.id;
 
     if (input.user?.id && (input.redeemPoints ?? 0) > 0) {
       const user = await tx.user.findUnique({

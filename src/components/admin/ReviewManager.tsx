@@ -1,8 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
 
+type ReviewItem = {
+  id: number;
+  approved: boolean;
+  title?: string | null;
+  body?: string | null;
+  createdAt: string;
+  user?: { name?: string | null; email?: string | null } | null;
+  product?: { name?: string | null } | null;
+};
+
 export default function ReviewManager() {
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -26,7 +36,7 @@ export default function ReviewManager() {
         setError(data.error ?? `Failed to load reviews (${res.status})`);
         setReviews([]);
       }
-    } catch (err) {
+    } catch {
       setError("Unable to load reviews. Please refresh the page.");
       setReviews([]);
     } finally {
@@ -34,7 +44,22 @@ export default function ReviewManager() {
     }
   }
 
-  useEffect(() => { load(); }, [page]);
+  useEffect(() => {
+    let ignore = false;
+
+    const run = async () => {
+      await load(page);
+      if (ignore) {
+        return;
+      }
+    };
+
+    void run();
+
+    return () => {
+      ignore = true;
+    };
+  }, [page]);
 
   async function toggleApprove(id: number, approve: boolean) {
     const res = await fetch(`/api/admin/reviews`, {

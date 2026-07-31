@@ -42,7 +42,6 @@ type AppliedPromotion = {
 export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClientProps) {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
-  const [mounted, setMounted] = useState(false);
   const [values, setValues] = useState<CheckoutAddressValues>(CheckoutValidation.checkoutAddressDefaultValues);
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutAddressValues, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,15 +56,17 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
   const [appliedPromotion, setAppliedPromotion] = useState<AppliedPromotion | null>(null);
   const [redeemPoints, setRedeemPoints] = useState(0);
   const [redeemError, setRedeemError] = useState<string | null>(null);
-
-  useEffect(() => setMounted(true), []);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!mounted) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (items.length === 0 && !isSubmitting && !isConfirmationOpen) {
       router.replace("/cart");
     }
-  }, [mounted, items.length, isSubmitting, isConfirmationOpen, router]);
+  }, [items.length, isSubmitting, isConfirmationOpen, router]);
 
   const promotionDefinition = useMemo(
     () =>

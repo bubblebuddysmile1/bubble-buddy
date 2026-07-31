@@ -10,17 +10,7 @@ import { useWishlistStore } from "@/store/wishlist-store";
 export default function WishlistPageClient() {
   const items = useWishlistStore((s) => s.items);
   const clearWishlist = useWishlistStore((s) => s.clearWishlist);
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
-  }
 
   if (items.length === 0) {
     return (

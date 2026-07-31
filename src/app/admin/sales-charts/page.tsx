@@ -44,9 +44,9 @@ export default async function AdminSalesChartsPage() {
     return getWeekKey(date);
   }).reverse();
 
+  const now = new Date();
   const last6Months = Array.from({ length: 6 }, (_, i) => {
-    const date = new Date();
-    date.setMonth(date.getMonth() - i);
+    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   }).reverse();
 

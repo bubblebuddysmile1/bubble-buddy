@@ -62,7 +62,11 @@ export default function CategoryManager() {
   };
 
   useEffect(() => {
-    loadCategories();
+    const timer = window.setTimeout(() => {
+      void loadCategories();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   const resetForm = () => {

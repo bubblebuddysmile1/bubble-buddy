@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(200, Math.max(1, Number(searchParams.get("limit") ?? "50")));
   const approvedParam = searchParams.get("approved");
 
-  const where: any = {};
+  const where: { approved?: boolean } = {};
   if (approvedParam === "1") where.approved = true;
   if (approvedParam === "0") where.approved = false;
 

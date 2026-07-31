@@ -3,16 +3,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
 
-const blogPrisma = prisma as unknown as {
-  blogPost: {
-    findUnique: (args: Record<string, unknown>) => Promise<any>;
-    findMany: (args: Record<string, unknown>) => Promise<any[]>;
-    update: (args: Record<string, unknown>) => Promise<any>;
-    delete: (args: Record<string, unknown>) => Promise<any>;
-  };
-};
-
-function normalizePost(post: {
+type BlogPostRecord = {
   id: number;
   title: string;
   slug: string;
@@ -30,7 +21,18 @@ function normalizePost(post: {
   publishedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
-}) {
+};
+
+const blogPrisma = prisma as unknown as {
+  blogPost: {
+    findUnique: (args: Record<string, unknown>) => Promise<BlogPostRecord | null>;
+    findMany: (args: Record<string, unknown>) => Promise<BlogPostRecord[]>;
+    update: (args: Record<string, unknown>) => Promise<BlogPostRecord>;
+    delete: (args: Record<string, unknown>) => Promise<unknown>;
+  };
+};
+
+function normalizePost(post: BlogPostRecord) {
   return {
     id: post.id,
     title: post.title,

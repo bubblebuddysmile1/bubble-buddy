@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Activity, AlertCircle, CheckCircle, Clock, ShieldCheck, TrendingUp, Users, ShoppingCart, Package } from "lucide-react";
 
 export default async function AdminMetricsPage() {
+  // eslint-disable-next-line react-hooks/purity
   const periodStart = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
   const [

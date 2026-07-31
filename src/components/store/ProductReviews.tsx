@@ -12,8 +12,8 @@ type Review = {
   createdAt: string;
 };
 
-export default function ProductReviews({ productId, productSlug, averageRating, reviewCount }:
-  { productId: number; productSlug: string; averageRating?: number | null; reviewCount?: number | null }) {
+export default function ProductReviews({ productId, averageRating, reviewCount }:
+  { productId: number; averageRating?: number | null; reviewCount?: number | null }) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -25,29 +25,37 @@ export default function ProductReviews({ productId, productSlug, averageRating, 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
-  async function load(currentPage = page) {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/reviews?productId=${productId}&page=${currentPage}&limit=${perPage}`);
-      if (res.ok) {
-        const data = await res.json();
-        setReviews(data.reviews ?? []);
-        setTotal(data.total ?? 0);
-        setDisplayReviewCount(data.total ?? 0);
-        setDisplayAverageRating(data.averageRating ?? displayAverageRating);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
-    setPage(1);
-    setDisplayReviewCount(reviewCount ?? 0);
-    setDisplayAverageRating(averageRating ?? 0);
-  }, [productId, reviewCount, averageRating]);
+    let ignore = false;
 
-  useEffect(() => { load(page); }, [productId, page]);
+    async function load(currentPage: number) {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/reviews?productId=${productId}&page=${currentPage}&limit=${perPage}`);
+        if (!res.ok) {
+          return;
+        }
+
+        const data = await res.json();
+        if (!ignore) {
+          setReviews(data.reviews ?? []);
+          setTotal(data.total ?? 0);
+          setDisplayReviewCount(data.total ?? 0);
+          setDisplayAverageRating(data.averageRating ?? averageRating ?? 0);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void load(page);
+
+    return () => {
+      ignore = true;
+    };
+  }, [averageRating, page, productId]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -61,7 +69,7 @@ export default function ProductReviews({ productId, productSlug, averageRating, 
       setBody("");
       setRating(5);
       setPage(1);
-      load(1);
+      
     } else {
       const err = await res.json();
       alert(err?.error ?? "Failed to submit review");
@@ -153,7 +161,7 @@ export default function ProductReviews({ productId, productSlug, averageRating, 
                 Next
               </button>
             </div>
-          )}
+          )}  
         </div>
       </div>
     </section>

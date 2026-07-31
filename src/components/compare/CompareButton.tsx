@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Columns } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,10 +22,7 @@ export default function CompareButton({
 }: CompareButtonProps) {
   const toggleItem = useCompareStore((s) => s.toggleItem);
   const isCompared = useCompareStore((s) => selectIsInCompare(s, product.id));
-  const [mounted, setMounted] = useState(false);
   const [pulse, setPulse] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -35,7 +32,7 @@ export default function CompareButton({
     window.setTimeout(() => setPulse(false), 400);
   };
 
-  const compared = mounted && isCompared;
+  const compared = isCompared;
 
   return (
     <button

@@ -82,7 +82,11 @@ export default function BlogManager() {
   };
 
   useEffect(() => {
-    void loadPosts();
+    const timer = window.setTimeout(() => {
+      void loadPosts();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   const resetForm = () => {

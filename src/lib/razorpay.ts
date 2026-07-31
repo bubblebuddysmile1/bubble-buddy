@@ -1,14 +1,10 @@
 import Razorpay from "razorpay";
 
 export function isRazorpayConfigured(): boolean {
-  return Boolean(
-    process.env.RAZORPAY_KEY_ID &&
-      process.env.RAZORPAY_KEY_SECRET &&
-      process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-  );
+  return Boolean(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET);
 }
 
-/** Use mock payment flow when keys are missing or MOCK_PAYMENTS=true */
+/** Use mock payment flow when server-side credentials are missing or MOCK_PAYMENTS=true */
 export function isMockPaymentMode(): boolean {
   return process.env.MOCK_PAYMENTS === "true" || !isRazorpayConfigured();
 }

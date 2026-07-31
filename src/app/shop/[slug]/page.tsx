@@ -295,8 +295,8 @@ export default async function ProductDetailPage({ params }: { params: PageParams
 
         {/* Reviews Section */}
         <ProductReviews
+          key={product.id}
           productId={product.id}
-          productSlug={product.slug}
           averageRating={product.averageRating}
           reviewCount={product.reviewCount}
         />

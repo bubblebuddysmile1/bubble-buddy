@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ShoppingBag, Sparkles, Trash2 } from "lucide-react";
@@ -13,19 +12,7 @@ import { useCartStore } from "@/store/cart-store";
 export default function CartPageClient() {
   const items = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clearCart);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
   const { subtotal, shipping, total, currency, itemCount } = getCheckoutTotals(items);
-
-  if (!mounted) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
-  }
 
   if (items.length === 0) {
     return (

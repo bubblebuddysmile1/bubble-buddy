@@ -85,7 +85,7 @@ export default function PromoBannerSection() {
           </div>
         ) : banners.length === 0 ? (
           <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            No category banners configured yet. Enable "Show in promo banners" from category admin.
+            No category banners configured yet. Enable the promo banner option from category admin.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

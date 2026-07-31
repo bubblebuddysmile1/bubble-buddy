@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+type ExportRow = Record<string, string | number | boolean | null>;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { reportType, exportType, format } = body;
 
-    let data: any[] = [];
+    let data: ExportRow[] = [];
     let filename = "";
 
     switch (reportType) {
@@ -66,7 +68,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function getSalesData(exportType: string) {
-  const where: any = { paymentStatus: "PAID" };
+  const where: Record<string, unknown> = { paymentStatus: "PAID" };
   
   if (exportType === "daily") {
     const today = new Date();
@@ -157,7 +159,7 @@ async function getInventoryData(exportType: string) {
 }
 
 async function getCustomerData(exportType: string) {
-  const where: any = { role: "CUSTOMER" };
+  const where: Record<string, unknown> = { role: "CUSTOMER" };
   
   if (exportType === "new") {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -321,7 +323,7 @@ async function getProductData(exportType: string) {
   }));
 }
 
-function convertToCSV(data: any[]): string {
+function convertToCSV(data: ExportRow[]): string {
   if (data.length === 0) return "";
 
   const headers = Object.keys(data[0]);

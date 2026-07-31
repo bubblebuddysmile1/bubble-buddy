@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -92,7 +92,11 @@ export default function PromotionManager() {
   };
 
   useEffect(() => {
-    loadPromotions();
+    const timer = window.setTimeout(() => {
+      void loadPromotions();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   const resetForm = () => {
