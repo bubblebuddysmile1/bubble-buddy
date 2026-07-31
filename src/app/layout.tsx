@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   ],
   icons: [
     { rel: "icon", url: "/favican.png" },
+    { rel: "icon", url: "/favican.svg" },
   ],  
   applicationName: "Bubble Buddy smile",
   authors: [{ name: "Bubble Buddy smile" }],

@@ -315,7 +315,7 @@ export default function AuthForm() {
 
                 <div className="text-center text-xs text-muted-foreground">
                   By continuing, you agree to our <Link href="/terms" className="text-primary hover:underline">terms</Link>.
-                  Need bulk orders? <Link href="/contact" className="text-primary hover:underline">Contact sales</Link>
+                  Need bulk orders? <Link href="/contact-us" className="text-primary hover:underline">Contact sales</Link>
                 </div>
               </form>
             </div>

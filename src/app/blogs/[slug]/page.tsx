@@ -323,7 +323,7 @@ export default async function BlogDetailPage({ params }: Props) {
       </div>
     </main>
     <ProductList/>
-    
+              
     </>
   );
 }
