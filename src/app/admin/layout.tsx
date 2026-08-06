@@ -23,7 +23,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <AdminMobileNav />
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 sm:px-4 lg:px-6 lg:py-6">
+          <div className="mx-auto w-full max-w-7xl">{children}</div>
+        </main>
       </div>
     </div>
   );

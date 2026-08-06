@@ -177,6 +177,7 @@ function UserMenu() {
 export default function Navbar() {
   const [hoveredDropdown, setHoveredDropdown] = useState<string | null>(null);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
+  const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -214,7 +215,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
 
             {/* MOBILE MENU */}
-            <Sheet>
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger
                 className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-4xl border border-transparent bg-clip-padding text-md font-medium transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
                 aria-label="Open menu"
@@ -229,6 +230,7 @@ export default function Navbar() {
                     <Link
                       key={item.href}
                       href={item.href}
+                      onClick={() => setMenuOpen(false)}
                       className="w-full px-4 py-3 text-md font-medium text-foreground transition hover:text-primary hover:bg-muted rounded-md"
                     >
                       {item.label}
@@ -247,6 +249,7 @@ export default function Navbar() {
                             <Link
                               key={category.slug}
                               href={`/categories/${category.slug}`}
+                              onClick={() => setMenuOpen(false)}
                               className="block rounded-2xl px-3 py-2 text-md text-muted-foreground transition hover:bg-muted hover:text-primary"
                             >
                               {category.name}

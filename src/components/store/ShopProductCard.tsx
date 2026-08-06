@@ -42,7 +42,7 @@ export default function ShopProductCard({
 
   return (
     <article className="group overflow-hidden rounded-[2rem] border border-border bg-card p-0 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
-      <div className="relative h-80 overflow-hidden bg-muted">
+      <div className="relative h-52 md:h-80 overflow-hidden bg-muted">
         <Link href={`/shop/${product.slug}`} className="relative block h-full">
           <Image
             src={product.image}
@@ -59,7 +59,7 @@ export default function ShopProductCard({
           </div>
         )}
       </div>
-      <div className="space-y-4 p-6">
+      <div className="space-y-4 p-4 md:p-6">
         <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.24em] text-primary">
           <span>{product.category ?? "Uncategorized"}</span>
           {featured && (
@@ -70,7 +70,7 @@ export default function ShopProductCard({
         </div>
         <div>
           <Link href={`/shop/${product.slug}`}>
-            <h2 className="text-2xl font-semibold text-foreground transition hover:text-primary">
+            <h2 className="text-lg md:text-2xl font-semibold text-foreground transition hover:text-primary">
               {product.name}
             </h2>
           </Link>
@@ -80,7 +80,7 @@ export default function ShopProductCard({
         <div className="flex flex-col gap-3">
           <div>
             <p className="text-sm text-muted-foreground">Price</p>
-            <p className="text-xl font-semibold text-foreground">
+            <p className="text-lg md:text-xl font-semibold text-foreground">
               {formatCartMoney(product.price, product.currency)}
             </p>
           </div>

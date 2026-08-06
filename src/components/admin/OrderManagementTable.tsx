@@ -123,7 +123,7 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
     <div className="space-y-4">
       {error && <p className="rounded-3xl border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">{error}</p>}
 
-      <div className="relative">
+      <div className="relative hidden md:block">
         <div className="absolute left-3 top-1/2 z-20 -translate-y-1/2">
           <Button
             type="button"
@@ -152,115 +152,199 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
         <div ref={tableViewportRef} className="max-h-[75vh] overflow-auto rounded-4xl border border-border bg-card shadow-lg scroll-smooth">
           <table className="w-full border-collapse text-left text-sm">
             <thead className="sticky top-0 z-10 border-b border-border bg-muted/80 text-xs uppercase tracking-wide text-muted-foreground backdrop-blur">
-            <tr>
-              <th className="px-5 py-4">Order</th>
-              <th className="px-5 py-4">Customer</th>
-              <th className="px-5 py-4">Mobile</th>
-              <th className="px-5 py-4">Address</th>
-              <th className="px-5 py-4">Total</th>
-              <th className="px-5 py-4">Items</th>
-              <th className="px-5 py-4">Placed</th>
-              <th className="px-5 py-4">Payment</th>
-              <th className="px-5 py-4">Return reason</th>
-              <th className="px-5 py-4">Return Allowed</th>
-              <th className="px-5 py-4">Status</th>
-              <th className="px-5 py-4 text-right">Update</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((order) => (
-              <tr key={order.id} className="border-b border-border/70 last:border-0">
-                <td className="px-5 py-4">
-                  <p className="font-semibold text-foreground">#{order.orderNumber}</p>
-                </td>
-                <td className="px-5 py-4 text-muted-foreground">
-                  <div className="max-w-55 truncate">
-                    <p className="font-medium text-foreground">{order.customerName ?? "Guest"}</p>
-                    <p className="text-xs">{order.customerEmail ?? "No email"}</p>
-                                        {order.customerPhone && <p className="text-xs text-primary">{order.customerPhone}</p>}
-                  </div>
-                </td>
-                <td className="px-5 py-4 text-muted-foreground">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground">{order.shippingName ?? order.customerName ?? "—"}</p>
-                    <p className="text-xs">{order.shippingPhone ?? order.customerPhone ?? "—"}</p>
-                  </div>
-                </td>
-                <td className="px-5 py-4 text-muted-foreground max-w-72">
-                  {order.shippingAddress ? (
-                    <p className="text-xs text-muted-foreground truncate">{order.shippingAddress}</p>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">—</p>
-                  )}
-                </td>
-                <td className="px-5 py-4 font-semibold text-foreground">${order.totalAmount}</td>
-                <td className="px-5 py-4 text-muted-foreground">{order.itemCount}</td>
-                <td className="px-5 py-4 text-muted-foreground">
-                  {order.placedAt ? new Date(order.placedAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "—"}
-                </td>
-                <td className="px-5 py-4 text-muted-foreground">{formatStatus(order.paymentStatus)}</td>
-                <td className="px-5 py-4 text-muted-foreground max-w-56 truncate">{order.returnReason ?? "—"}</td>
-                <td className="px-5 py-4">
-                  <label className="inline-flex items-center gap-2 text-sm text-foreground">
-                    <input
-                      type="checkbox"
-                      checked={returnAllowedSelections[order.id]}
-                      disabled={loadingId === order.id}
-                      onChange={(event) =>
-                        setReturnAllowedSelections((current) => ({
-                          ...current,
-                          [order.id]: event.target.checked,
-                        }))
-                      }
-                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                    />
-                    Allow return
-                  </label>
-                </td>
-                <td className="px-5 py-4">
-                  <span className={cn("inline-flex rounded-full px-3 py-1 text-xs font-semibold", getStatusBadgeClasses(order.status))}>
-                    {formatStatus(order.status)}
-                  </span>
-                </td>
-                <td className="px-5 py-4 text-right">
-                  <div className="flex justify-end gap-2">
-                    <select
-                      className="rounded-full border border-border bg-input/70 px-3 py-2 text-sm text-foreground outline-none transition hover:border-primary"
-                      value={statusSelections[order.id]}
-                      disabled={loadingId === order.id}
-                      onChange={(event) =>
-                        setStatusSelections((current) => ({
-                          ...current,
-                          [order.id]: event.target.value,
-                        }))
-                      }
-                    >
-                      {statusOptions.map((statusOption) => (
-                        <option key={statusOption} value={statusOption}>
-                          {formatStatus(statusOption)}
-                        </option>
-                      ))}
-                    </select>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      disabled={
-                        loadingId === order.id ||
-                        (statusSelections[order.id] === order.status &&
-                          returnAllowedSelections[order.id] === order.returnAllowed)
-                      }
-                      onClick={() => handleSaveStatus(order.id)}
-                    >
-                      {loadingId === order.id ? "Updating…" : "Save"}
-                    </Button>
-                  </div>
-                </td>
+              <tr>
+                <th className="px-5 py-4">Order</th>
+                <th className="px-5 py-4">Customer</th>
+                <th className="px-5 py-4">Mobile</th>
+                <th className="px-5 py-4">Address</th>
+                <th className="px-5 py-4">Total</th>
+                <th className="px-5 py-4">Items</th>
+                <th className="px-5 py-4">Placed</th>
+                <th className="px-5 py-4">Payment</th>
+                <th className="px-5 py-4">Return reason</th>
+                <th className="px-5 py-4">Return Allowed</th>
+                <th className="px-5 py-4">Status</th>
+                <th className="px-5 py-4 text-right">Update</th>
               </tr>
-            ))}
-          </tbody>
+            </thead>
+            <tbody>
+              {rows.map((order) => (
+                <tr key={order.id} className="border-b border-border/70 last:border-0">
+                  <td className="px-5 py-4">
+                    <p className="font-semibold text-foreground">#{order.orderNumber}</p>
+                  </td>
+                  <td className="px-5 py-4 text-muted-foreground">
+                    <div className="max-w-55 truncate">
+                      <p className="font-medium text-foreground">{order.customerName ?? "Guest"}</p>
+                      <p className="text-xs">{order.customerEmail ?? "No email"}</p>
+                      {order.customerPhone && <p className="text-xs text-primary">{order.customerPhone}</p>}
+                    </div>
+                  </td>
+                  <td className="px-5 py-4 text-muted-foreground">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground">{order.shippingName ?? order.customerName ?? "—"}</p>
+                      <p className="text-xs">{order.shippingPhone ?? order.customerPhone ?? "—"}</p>
+                    </div>
+                  </td>
+                  <td className="px-5 py-4 text-muted-foreground max-w-72">
+                    {order.shippingAddress ? (
+                      <p className="text-xs text-muted-foreground truncate">{order.shippingAddress}</p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">—</p>
+                    )}
+                  </td>
+                  <td className="px-5 py-4 font-semibold text-foreground">${order.totalAmount}</td>
+                  <td className="px-5 py-4 text-muted-foreground">{order.itemCount}</td>
+                  <td className="px-5 py-4 text-muted-foreground">
+                    {order.placedAt ? new Date(order.placedAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "—"}
+                  </td>
+                  <td className="px-5 py-4 text-muted-foreground">{formatStatus(order.paymentStatus)}</td>
+                  <td className="px-5 py-4 text-muted-foreground max-w-56 truncate">{order.returnReason ?? "—"}</td>
+                  <td className="px-5 py-4">
+                    <label className="inline-flex items-center gap-2 text-sm text-foreground">
+                      <input
+                        type="checkbox"
+                        checked={returnAllowedSelections[order.id]}
+                        disabled={loadingId === order.id}
+                        onChange={(event) =>
+                          setReturnAllowedSelections((current) => ({
+                            ...current,
+                            [order.id]: event.target.checked,
+                          }))
+                        }
+                        className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                      />
+                      Allow return
+                    </label>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className={cn("inline-flex rounded-full px-3 py-1 text-xs font-semibold", getStatusBadgeClasses(order.status))}>
+                      {formatStatus(order.status)}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <select
+                        className="rounded-full border border-border bg-input/70 px-3 py-2 text-sm text-foreground outline-none transition hover:border-primary"
+                        value={statusSelections[order.id]}
+                        disabled={loadingId === order.id}
+                        onChange={(event) =>
+                          setStatusSelections((current) => ({
+                            ...current,
+                            [order.id]: event.target.value,
+                          }))
+                        }
+                      >
+                        {statusOptions.map((statusOption) => (
+                          <option key={statusOption} value={statusOption}>
+                            {formatStatus(statusOption)}
+                          </option>
+                        ))}
+                      </select>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        disabled={
+                          loadingId === order.id ||
+                          (statusSelections[order.id] === order.status &&
+                            returnAllowedSelections[order.id] === order.returnAllowed)
+                        }
+                        onClick={() => handleSaveStatus(order.id)}
+                      >
+                        {loadingId === order.id ? "Updating…" : "Save"}
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="space-y-3 md:hidden">
+        {rows.map((order) => (
+          <div key={order.id} className="rounded-[1.5rem] border border-border bg-card p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-foreground">#{order.orderNumber}</p>
+                <p className="text-xs text-muted-foreground">
+                  {order.customerName ?? "Guest"} · {order.customerEmail ?? "No email"}
+                </p>
+              </div>
+              <span className={cn("inline-flex rounded-full px-3 py-1 text-xs font-semibold", getStatusBadgeClasses(order.status))}>
+                {formatStatus(order.status)}
+              </span>
+            </div>
+
+            <div className="mt-4 space-y-2 text-sm">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">Total</span>
+                <span className="font-semibold text-foreground">${order.totalAmount}</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">Items</span>
+                <span className="text-foreground">{order.itemCount}</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">Placed</span>
+                <span className="text-foreground">
+                  {order.placedAt ? new Date(order.placedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—"}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-3 rounded-2xl border border-border/60 bg-background/70 p-3">
+              <label className="flex items-center justify-between gap-3 text-sm text-foreground">
+                <span>Allow return</span>
+                <input
+                  type="checkbox"
+                  checked={returnAllowedSelections[order.id]}
+                  disabled={loadingId === order.id}
+                  onChange={(event) =>
+                    setReturnAllowedSelections((current) => ({
+                      ...current,
+                      [order.id]: event.target.checked,
+                    }))
+                  }
+                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                />
+              </label>
+              <select
+                className="w-full rounded-full border border-border bg-input/70 px-3 py-2 text-sm text-foreground outline-none transition hover:border-primary"
+                value={statusSelections[order.id]}
+                disabled={loadingId === order.id}
+                onChange={(event) =>
+                  setStatusSelections((current) => ({
+                    ...current,
+                    [order.id]: event.target.value,
+                  }))
+                }
+              >
+                {statusOptions.map((statusOption) => (
+                  <option key={statusOption} value={statusOption}>
+                    {formatStatus(statusOption)}
+                  </option>
+                ))}
+              </select>
+              <Button
+                type="button"
+                size="sm"
+                className="w-full"
+                variant="outline"
+                disabled={
+                  loadingId === order.id ||
+                  (statusSelections[order.id] === order.status &&
+                    returnAllowedSelections[order.id] === order.returnAllowed)
+                }
+                onClick={() => handleSaveStatus(order.id)}
+              >
+                {loadingId === order.id ? "Updating…" : "Save"}
+              </Button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

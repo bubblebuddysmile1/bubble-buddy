@@ -89,6 +89,7 @@ export default async function Home() {
       <CategoriesSection />
       <BestSellingProducts />
       <OfferDiscountSection />
+      
       <ProductList />
       <AdvancedPromoSection />
       <PromoBannerSection/>

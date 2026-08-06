@@ -380,7 +380,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center">
-      <div className="w-full max-w-6xl space-y-6 px-4">
+      <div className="w-full max-w-6xl space-y-6 px-3 sm:px-4 lg:px-6">
       {paymentMode === "mock" && (
         <div className="checkout-back-enter rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-center text-sm text-amber-900">
           Mock payment mode — Razorpay keys not set. Payments are simulated for testing.

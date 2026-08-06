@@ -81,8 +81,8 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
 
   return (
     <section className="space-y-8">
-      <form method="get" action="/shop" className="flex flex-col gap-4 rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-end sm:justify-between">
-        <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_240px]">
+      <form method="get" action="/shop" className="flex flex-col gap-3 rounded-[2rem] border border-border bg-card p-4 sm:p-6 shadow-sm sm:flex-row sm:items-end sm:justify-between">
+        <div className="grid grid-cols-2 gap-2 flex-1 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_240px]">
           <label className="space-y-2">
             <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
               Search products
@@ -92,7 +92,7 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
               name="q"
               defaultValue={query}
               placeholder="Search by name, description, or SKU"
-              className="w-full rounded-3xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-3xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </label>
 
@@ -103,7 +103,7 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
             <select
               name="category"
               defaultValue={categorySlug}
-              className="w-full rounded-3xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-3xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
               <option value="">All categories</option>
               {categories.map((item) => (
@@ -115,7 +115,7 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
           </label>
         </div>
 
-        <div className="flex w-full max-w-xs flex-col gap-3">
+        <div className="flex w-full max-w-xs flex-col gap-2 sm:gap-3">
           <label className="space-y-2">
             <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
               Sort by
@@ -123,7 +123,7 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
             <select
               name="sort"
               defaultValue={sort}
-              className="w-full rounded-3xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-3xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
               {sortOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -136,7 +136,7 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
           <div className="flex items-center gap-3">
             <button
               type="submit"
-              className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+              className="inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 sm:w-auto"
             >
               Apply
             </button>
@@ -147,7 +147,27 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
         </div>
       </form>
 
-      <div className="flex flex-col gap-4 rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      {products.length === 0 ? (
+        <div className="rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">
+          No products found for the selected filters.
+        </div>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          {products.map((product) => (
+            <ShopProductCard
+              key={product.id}
+              product={toCartProduct({
+                ...product,
+                price: product.price.toString(),
+              })}
+              description={product.description}
+              featured={product.featured}
+            />
+          ))}
+        </div>
+      )}
+
+       <div className="flex flex-col gap-4 rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-muted-foreground">
             Showing <span className="font-semibold text-foreground">{products.length}</span> of <span className="font-semibold text-foreground">{total}</span> products
@@ -181,25 +201,6 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
         </div>
       </div>
 
-      {products.length === 0 ? (
-        <div className="rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">
-          No products found for the selected filters.
-        </div>
-      ) : (
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {products.map((product) => (
-            <ShopProductCard
-              key={product.id}
-              product={toCartProduct({
-                ...product,
-                price: product.price.toString(),
-              })}
-              description={product.description}
-              featured={product.featured}
-            />
-          ))}
-        </div>
-      )}
     </section>
   );
 }

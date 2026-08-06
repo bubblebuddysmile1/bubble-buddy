@@ -16,7 +16,7 @@ export default function CartPageClient() {
 
   if (items.length === 0) {
     return (
-      <div className="cart-empty-enter mx-auto max-w-lg rounded-[2rem] border border-border bg-card p-10 text-center shadow-xl">
+      <div className="cart-empty-enter mx-auto max-w-lg rounded-[2rem] border border-border bg-card p-6 text-center shadow-xl sm:p-10">
         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
           <ShoppingBag className="size-9 text-primary" />
         </div>
@@ -36,7 +36,8 @@ export default function CartPageClient() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
+    <div className="mx-auto w-full max-w-7xl px-1 sm:px-0">
+      <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
@@ -61,7 +62,7 @@ export default function CartPageClient() {
         </div>
       </section>
 
-      <aside className="cart-summary-enter lg:sticky lg:top-24">
+      <aside className="cart-summary-enter w-full lg:sticky lg:top-24">
         <div className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-xl">
           <div className="bg-linear-to-r from-primary/15 via-accent/10 to-secondary/20 px-6 py-5">
             <div className="flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-primary">
@@ -121,6 +122,7 @@ export default function CartPageClient() {
           </p>
         </div>
       </aside>
+      </div>
     </div>
   );
 }

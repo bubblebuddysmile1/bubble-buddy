@@ -28,7 +28,7 @@ export default function CheckoutAddressForm({
         e.preventDefault();
         onSubmit();
       }}
-      className="checkout-form-enter space-y-6 rounded-[2rem] border border-border bg-card p-6 shadow-lg sm:p-8"
+      className="checkout-form-enter space-y-6 rounded-[2rem] border border-border bg-card p-4 shadow-lg sm:p-8"
       noValidate
     >
       <div className="flex items-center gap-3 border-b border-border pb-5">

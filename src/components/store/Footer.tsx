@@ -96,31 +96,30 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-card border-t border-border mt-20 text-foreground">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+    <footer className="bg-card border-t border-border mt-16 sm:mt-20 text-foreground">
+      <div className="w-full px-3 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         {/* MAIN GRID - Responsive */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 sm:gap-6 lg:gap-10">
           {/* BRAND SECTION */}
-          <div className="text-center sm:text-left">
-            <h2 className="text-xl sm:text-2xl font-bold text-primary">
+          <div className="sm:col-span-1">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary text-left">
               bubble buddy smile
             </h2>
 
-            <p className="mt-3 sm:mt-4 text-sm sm:text-base text-muted-foreground leading-relaxed">
-              Discover premium skincare, beauty care, and haircare products
-              designed to make you glow naturally.
+            <p className="mt-3 text-xs sm:text-sm text-muted-foreground leading-relaxed text-left">
+              Premium skincare, beauty care, and haircare products designed for natural glow.
             </p>
 
             {/* SOCIAL ICONS */}
-            <div className="flex items-center justify-center sm:justify-start gap-2 sm:gap-3 mt-4 sm:mt-5">
+            <div className="flex items-center justify-start gap-3 mt-5">
               <a
                 href="https://www.instagram.com/bubble_buddy_smile"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Visit Instagram"
-                className="text-foreground hover:text-primary transition-colors duration-200 h-9 w-9 sm:h-10 sm:w-10"
+                className="flex h-9 w-9 items-center justify-center text-foreground hover:text-primary transition-colors"
               >
-                <FaInstagram className="h-4 w-4 sm:h-5 sm:w-5" />
+                <FaInstagram className="h-4 w-4" />
               </a>
 
               <a
@@ -128,9 +127,9 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Open chat"
-                className="text-foreground hover:text-primary transition-colors duration-200 h-9 w-9 sm:h-10 sm:w-10"
+                className="flex h-9 w-9 items-center justify-center text-foreground hover:text-primary transition-colors"
               >
-                <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+                <MessageCircle className="h-4 w-4" />
               </a>
 
               <a
@@ -138,9 +137,9 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Send email"
-                className="text-foreground hover:text-primary transition-colors duration-200 h-9 w-9 sm:h-10 sm:w-10"
+                className="flex h-9 w-9 items-center justify-center text-foreground hover:text-primary transition-colors"
               >
-                <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Mail className="h-4 w-4" />
               </a>
 
               <a
@@ -148,76 +147,59 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Visit Facebook"
-                className="text-foreground hover:text-primary transition-colors duration-200 h-9 w-9 sm:h-10 sm:w-10"
+                className="flex h-9 w-9 items-center justify-center text-foreground hover:text-primary transition-colors"
               >
-                <FaFacebook className="h-4 w-4 sm:h-5 sm:w-5" />
+                <FaFacebook className="h-4 w-4" />
               </a>
             </div>
           </div>
 
-          {/* QUICK LINKS */}
-          <div className="text-center sm:text-left">
-            <h3 className="font-semibold text-lg sm:text-xl text-foreground">
+          {/* QUICK LINKS & CATEGORIES - 2 Columns */}
+          <div className="sm:col-span-2 grid grid-cols-2 gap-6">
+            {/* QUICK LINKS */}
+            <div>
+            <h3 className="font-semibold text-sm sm:text-base lg:text-lg text-foreground text-left">
               Quick Links
             </h3>
 
-            <div className="mt-3 sm:mt-4 flex flex-col gap-2 sm:gap-3 text-sm sm:text-base text-muted-foreground">
-              <Link
-                href="/"
-                className="hover:text-primary transition-colors duration-200 inline-block"
-              >
+            <div className="mt-4 flex flex-col gap-2 text-xs sm:text-sm text-muted-foreground text-left">
+              <Link href="/" className="hover:text-primary transition-colors">
                 Home
               </Link>
 
-              <Link
-                href="/shop"
-                className="hover:text-primary transition-colors duration-200 inline-block"
-              >
+              <Link href="/shop" className="hover:text-primary transition-colors">
                 Shop
               </Link>
 
-              <Link
-                href="/about"
-                className="hover:text-primary transition-colors duration-200 inline-block"
-              >
+              <Link href="/about" className="hover:text-primary transition-colors">
                 About Us
               </Link>
 
-              <Link
-                href="/offers"
-                className="hover:text-primary transition-colors duration-200 inline-block"
-              >
+              <Link href="/offers" className="hover:text-primary transition-colors">
                 Offers
               </Link>
 
-              <Link
-                href="/contact-us"
-                className="hover:text-primary transition-colors duration-200 inline-block"
-              >
+              <Link href="/contact-us" className="hover:text-primary transition-colors">
                 Contact
               </Link>
-              <Link
-              href="/frequently-asked-questions"
-              className="hover:text-primary transition-colors duration-200 inline-block"
-            >
-              FAQ
-            </Link>
+              
+              <Link href="/frequently-asked-questions" className="hover:text-primary transition-colors">
+                FAQ
+              </Link>
             </div>
           </div>
 
           {/* CATEGORIES */}
-          <div className="text-center sm:text-left">
-            <h3 className="font-semibold text-lg sm:text-xl text-foreground">
+          <div>
+            <h3 className="font-semibold text-sm sm:text-base lg:text-lg text-foreground text-left">
               Categories
             </h3>
 
-            <div className="mt-3 sm:mt-4 flex flex-col gap-2 sm:gap-3 text-sm sm:text-base text-muted-foreground">
+            <div className="mt-4 flex flex-col gap-2 text-xs sm:text-sm text-muted-foreground text-left">
               {loading ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {Array.from({ length: 4 }).map((_, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Skeleton className="h-3 w-3/4 rounded-full" />
-                    </div>
+                    <Skeleton key={index} className="h-3 w-3/4 rounded-full" />
                   ))}
                 </div>
               ) : categories.length > 0 ? (
@@ -225,54 +207,51 @@ export default function Footer() {
                   <Link
                     key={category.slug}
                     href={`/categories/${category.slug}`}
-                    className="hover:text-primary transition-colors duration-200 inline-block truncate"
+                    className="hover:text-primary transition-colors truncate"
                   >
                     {category.name}
                   </Link>
                 ))
               ) : (
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  No categories available.
-                </p>
+                <p className="text-xs text-muted-foreground">No categories available.</p>
               )}
+            </div>
             </div>
           </div>
 
           {/* NEWSLETTER SECTION */}
-          <div className="text-center sm:text-left">
-            <h3 className="font-semibold text-lg sm:text-xl text-foreground">
+          <div className="sm:col-span-1">
+            <h3 className="font-semibold text-sm sm:text-base lg:text-lg text-foreground text-left">
               Stay Updated
             </h3>
 
-            <p className="mt-3 sm:mt-4 text-sm sm:text-base text-muted-foreground">
+            <p className="mt-3 text-xs sm:text-sm text-muted-foreground text-left">
               Subscribe to get beauty tips and offers.
             </p>
 
-            <form onSubmit={handleNewsletterSubmit} className="mt-4">
-              <div className="flex flex-col sm:flex-row gap-3">
+            <form onSubmit={handleNewsletterSubmit} className="mt-4 w-full">
+              <div className="flex flex-col gap-2 w-full">
                 <Input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="your@email.com"
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
                     if (feedback) setFeedback(null);
                   }}
                   required
-                  className="bg-input text-foreground placeholder:text-muted-foreground flex-1 h-10 sm:h-11 text-sm sm:text-base"
+                  className="bg-input text-foreground placeholder:text-muted-foreground w-full h-9 sm:h-10 text-xs sm:text-sm"
                 />
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 h-10 sm:h-11 px-4 sm:px-6 disabled:opacity-70"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 w-full h-9 sm:h-10 text-xs sm:text-sm disabled:opacity-70"
                 >
                   {isSubmitting ? "Joining..." : "Join"}
                 </Button>
               </div>
               {feedback && (
-                <p
-                  className={`mt-2 text-sm ${feedback.type === "success" ? "text-green-600" : "text-red-600"}`}
-                >
+                <p className={`mt-2 text-xs ${feedback.type === "success" ? "text-emerald-600" : "text-destructive"}`}>
                   {feedback.message}
                 </p>
               )}
@@ -281,40 +260,33 @@ export default function Footer() {
         </div>
 
         {/* BOTTOM SECTION - Responsive */}
-        <div className="border-t border-border mt-8 sm:mt-10 lg:mt-12 pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm sm:text-base text-muted-foreground">
-          <p className="text-center sm:text-left text-xs sm:text-sm">
+        <div className="border-t border-border mt-8 sm:mt-10 lg:mt-12 pt-6 sm:pt-8">
+          <p className="text-center text-xs sm:text-sm text-muted-foreground">
             © 2025 bubble buddy smile. All rights reserved.
           </p>
 
-          <div className="flex gap-4 sm:gap-6 flex-wrap justify-center">
-            <Link
-              href="/privacy-policy"
-              className="hover:text-primary transition-colors duration-200 text-xs sm:text-sm"
-            >
+          <div className="flex gap-3 sm:gap-4 lg:gap-6 flex-wrap justify-center mt-4 sm:mt-6">
+            <Link href="/privacy-policy" className="hover:text-primary transition-colors text-xs sm:text-sm">
               Privacy Policy
             </Link>
 
-            <Link
-              href="/terms-and-conditions"
-              className="hover:text-primary transition-colors duration-200 text-xs sm:text-sm"
-            >
+            <span className="text-muted-foreground">•</span>
+
+            <Link href="/terms-and-conditions" className="hover:text-primary transition-colors text-xs sm:text-sm">
               Terms & Conditions
             </Link>
 
-            <Link
-              href="/shipping-policy"
-              className="hover:text-primary transition-colors duration-200 text-xs sm:text-sm"
-            >
+            <span className="text-muted-foreground">•</span>
+
+            <Link href="/shipping-policy" className="hover:text-primary transition-colors text-xs sm:text-sm">
               Shipping Policy
             </Link>
 
-            <Link
-              href="/refund-policy"
-              className="hover:text-primary transition-colors duration-200 text-xs sm:text-sm"
-            >
+            <span className="text-muted-foreground">•</span>
+
+            <Link href="/refund-policy" className="hover:text-primary transition-colors text-xs sm:text-sm">
               Refund Policy
             </Link>
-
           </div>
         </div>
       </div>
