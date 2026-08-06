@@ -32,15 +32,40 @@ export async function POST(request: Request) {
     const { orderNumber, reason } = parsed.data;
     const order = await prisma.order.findUnique({
       where: { orderNumber },
-      select: { id: true, userId: true, status: true },
+      select: {
+        id: true,
+        userId: true,
+        status: true,
+        returnAllowed: true,
+        updatedAt: true,
+        trackingEvents: {
+          where: { status: "DELIVERED" },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { createdAt: true },
+        },
+      },
     });
 
     if (!order || order.userId !== payload.id) {
       return NextResponse.json({ error: "Order not found." }, { status: 404 });
     }
 
+    if (!order.returnAllowed) {
+      return NextResponse.json({ error: "Return requests are not allowed for this order." }, { status: 400 });
+    }
+
     if (order.status !== "DELIVERED") {
       return NextResponse.json({ error: "Return requests are only allowed for delivered orders." }, { status: 400 });
+    }
+
+    const deliveredAt = order.trackingEvents[0]?.createdAt ?? order.updatedAt;
+    const cutoff = new Date(deliveredAt.getTime() + 2 * 24 * 60 * 60 * 1000);
+    if (new Date() > cutoff) {
+      return NextResponse.json(
+        { error: "Return requests are only accepted within 2 days of delivery." },
+        { status: 400 },
+      );
     }
 
     const updatedOrder = await prisma.$transaction(async (tx) => {

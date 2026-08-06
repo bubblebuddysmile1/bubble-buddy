@@ -1,4 +1,3 @@
-﻿Γùç injected env (23) from .env // tip: Γîÿ multiple files { path: ['.env.local', '.env'] }
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 
@@ -386,4 +385,5 @@ ALTER TABLE "Review" ADD CONSTRAINT "Review_productId_fkey" FOREIGN KEY ("produc
 
 -- AddForeignKey
 ALTER TABLE "Review" ADD CONSTRAINT "Review_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
 

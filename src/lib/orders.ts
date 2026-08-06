@@ -133,6 +133,7 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
         discountAmount: new Prisma.Decimal(totals.discount),
         redeemedLoyaltyPoints: input.redeemPoints ?? 0,
         loyaltyPointsEarned: getLoyaltyPointsEarned(totals.total),
+        returnAllowed: false,
         shippingAddressId,
         billingAddressId,
         placedAt: new Date(),

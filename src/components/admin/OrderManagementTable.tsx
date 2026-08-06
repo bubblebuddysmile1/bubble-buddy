@@ -19,6 +19,7 @@ export type AdminOrderRow = {
   totalAmount: string;
   itemCount: number;
   placedAt: string | null;
+  returnAllowed: boolean;
   returnReason?: string | null;
 };
 
@@ -63,6 +64,9 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
   const [statusSelections, setStatusSelections] = useState<Record<number, string>>(
     () => Object.fromEntries(orders.map((order) => [order.id, order.status])),
   );
+  const [returnAllowedSelections, setReturnAllowedSelections] = useState<Record<number, boolean>>(
+    () => Object.fromEntries(orders.map((order) => [order.id, order.returnAllowed])),
+  );
   const [loadingId, setLoadingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const tableViewportRef = useRef<HTMLDivElement>(null);
@@ -80,11 +84,13 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
     setError(null);
     setLoadingId(orderId);
 
+    const returnAllowed = returnAllowedSelections[orderId];
+
     try {
       const response = await fetch("/api/admin/orders", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, status }),
+        body: JSON.stringify({ orderId, status, returnAllowed }),
       });
 
       if (!response.ok) {
@@ -94,7 +100,9 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
 
       const data = await response.json();
       setRows((current) =>
-        current.map((row) => (row.id === orderId ? { ...row, status: data.status } : row)),
+        current.map((row) =>
+          row.id === orderId ? { ...row, status: data.status, returnAllowed } : row,
+        ),
       );
     } catch (error) {
       setError(error instanceof Error ? error.message : "Unable to update order status.");
@@ -154,6 +162,7 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
               <th className="px-5 py-4">Placed</th>
               <th className="px-5 py-4">Payment</th>
               <th className="px-5 py-4">Return reason</th>
+              <th className="px-5 py-4">Return Allowed</th>
               <th className="px-5 py-4">Status</th>
               <th className="px-5 py-4 text-right">Update</th>
             </tr>
@@ -192,6 +201,23 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
                 <td className="px-5 py-4 text-muted-foreground">{formatStatus(order.paymentStatus)}</td>
                 <td className="px-5 py-4 text-muted-foreground max-w-56 truncate">{order.returnReason ?? "—"}</td>
                 <td className="px-5 py-4">
+                  <label className="inline-flex items-center gap-2 text-sm text-foreground">
+                    <input
+                      type="checkbox"
+                      checked={returnAllowedSelections[order.id]}
+                      disabled={loadingId === order.id}
+                      onChange={(event) =>
+                        setReturnAllowedSelections((current) => ({
+                          ...current,
+                          [order.id]: event.target.checked,
+                        }))
+                      }
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                    />
+                    Allow return
+                  </label>
+                </td>
+                <td className="px-5 py-4">
                   <span className={cn("inline-flex rounded-full px-3 py-1 text-xs font-semibold", getStatusBadgeClasses(order.status))}>
                     {formatStatus(order.status)}
                   </span>
@@ -219,7 +245,11 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
                       type="button"
                       size="sm"
                       variant="outline"
-                      disabled={loadingId === order.id || statusSelections[order.id] === order.status}
+                      disabled={
+                        loadingId === order.id ||
+                        (statusSelections[order.id] === order.status &&
+                          returnAllowedSelections[order.id] === order.returnAllowed)
+                      }
                       onClick={() => handleSaveStatus(order.id)}
                     >
                       {loadingId === order.id ? "Updating…" : "Save"}

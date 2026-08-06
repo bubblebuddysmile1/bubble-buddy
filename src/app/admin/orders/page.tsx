@@ -5,7 +5,15 @@ import { prisma } from "@/lib/prisma";
 export default async function AdminOrdersPage() {
   const orders = await prisma.order.findMany({
     orderBy: { placedAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      orderNumber: true,
+      status: true,
+      paymentStatus: true,
+      totalAmount: true,
+      placedAt: true,
+      returnReason: true,
+      returnAllowed: true,
       user: { select: { name: true, email: true, phone: true } },
       shippingAddress: { select: { recipient: true, phone: true, line1: true, line2: true, city: true, state: true, postalCode: true } },
       items: { select: { id: true } },
@@ -28,6 +36,7 @@ export default async function AdminOrdersPage() {
     totalAmount: order.totalAmount.toString(),
     itemCount: order.items.length,
     placedAt: order.placedAt?.toISOString() ?? null,
+    returnAllowed: order.returnAllowed,
     returnReason: order.returnReason,
   }));
 

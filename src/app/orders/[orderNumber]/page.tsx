@@ -162,6 +162,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
             <OrderReturnRequest
               orderNumber={order.orderNumber}
               status={order.status}
+              returnAllowed={order.returnAllowed}
               returnReason={order.returnReason}
             />
           </aside>

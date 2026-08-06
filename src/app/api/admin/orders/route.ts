@@ -18,6 +18,7 @@ const updateOrderSchema = z.object({
     "CANCELLED",
     "RETURNED",
   ]),
+  returnAllowed: z.boolean().optional(),
 });
 
 async function requireAdminSession() {
@@ -50,14 +51,20 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Invalid order update payload." }, { status: 400 });
     }
 
-    const { orderId, status } = parsed.data;
+    const { orderId, status, returnAllowed } = parsed.data;
     const order = await prisma.$transaction(async (tx) => {
+      const updateData: Record<string, unknown> = {
+        status,
+        paymentStatus: status === "RETURNED" ? "REFUNDED" : status === "CANCELLED" ? "FAILED" : undefined,
+      };
+
+      if (returnAllowed !== undefined) {
+        updateData.returnAllowed = returnAllowed;
+      }
+
       const updated = await tx.order.update({
         where: { id: orderId },
-        data: {
-          status,
-          paymentStatus: status === "RETURNED" ? "REFUNDED" : status === "CANCELLED" ? "FAILED" : undefined,
-        },
+        data: updateData,
       });
 
       await tx.orderTrackingEvent.create({

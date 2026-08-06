@@ -6,16 +6,18 @@ import { AlertTriangle, ArrowUpRight } from "lucide-react";
 type OrderReturnRequestProps = {
   orderNumber: string;
   status: string;
+  returnAllowed: boolean;
   returnReason?: string | null;
 };
 
-export default function OrderReturnRequest({ orderNumber, status, returnReason }: OrderReturnRequestProps) {
+export default function OrderReturnRequest({ orderNumber, status, returnAllowed, returnReason }: OrderReturnRequestProps) {
   const [reason, setReason] = useState(returnReason ?? "");
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [requestStatus, setRequestStatus] = useState(status);
 
-  const canRequestReturn = requestStatus === "DELIVERED";
+  const canRequestReturn = requestStatus === "DELIVERED" && returnAllowed;
+  const notReturnable = requestStatus === "DELIVERED" && !returnAllowed;
   const isRequested = requestStatus === "RETURN_REQUESTED";
   const isReturned = requestStatus === "RETURNED";
 
@@ -26,11 +28,14 @@ export default function OrderReturnRequest({ orderNumber, status, returnReason }
     if (isRequested) {
       return "A return request is pending approval. You will be notified once it is reviewed.";
     }
+    if (notReturnable) {
+      return "Return requests are not available for this order because the admin has disabled returns.";
+    }
     if (requestStatus === "SHIPPED") {
       return "This order is still in transit. A return can only be requested once it is delivered.";
     }
     return "You can request a return for this order if items arrive damaged or not as described.";
-  }, [isReturned, isRequested, requestStatus]);
+  }, [isReturned, isRequested, notReturnable, requestStatus]);
 
   const handleRequestReturn = async () => {
     if (!reason.trim()) {
@@ -122,7 +127,12 @@ export default function OrderReturnRequest({ orderNumber, status, returnReason }
           </div>
         ) : null}
 
-        {!canRequestReturn && !isRequested && !isReturned ? (
+        {notReturnable ? (
+          <div className="rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-muted-foreground">
+            Return requests are disabled for this order. Contact customer support if you believe this is an error.
+          </div>
+        ) : null}
+        {!canRequestReturn && !notReturnable && !isRequested && !isReturned ? (
           <div className="rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-muted-foreground">
             Return requests can be made after the order is delivered.
           </div>
