@@ -69,6 +69,7 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
     () => Object.fromEntries(orders.map((order) => [order.id, order.returnAllowed])),
   );
   const [loadingId, setLoadingId] = useState<number | null>(null);
+  const [refundLoadingId, setRefundLoadingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const tableViewportRef = useRef<HTMLDivElement>(null);
 
@@ -109,6 +110,34 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
       setError(error instanceof Error ? error.message : "Unable to update order status.");
     } finally {
       setLoadingId(null);
+    }
+  };
+
+  const handleRefund = async (orderId: number) => {
+    setError(null);
+    setRefundLoadingId(orderId);
+
+    try {
+      const response = await fetch("/api/admin/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      });
+
+      const body = await response.json();
+      if (!response.ok) {
+        throw new Error(body?.error ?? "Unable to process refund.");
+      }
+
+      setRows((current) =>
+        current.map((row) =>
+          row.id === orderId ? { ...row, paymentStatus: body.paymentStatus } : row,
+        ),
+      );
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Unable to process refund.");
+    } finally {
+      setRefundLoadingId(null);
     }
   };
 
@@ -266,6 +295,17 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
                       >
                         {loadingId === order.id ? "Updating…" : "Save"}
                       </Button>
+                      {(order.status === "CANCELLED" || order.status === "RETURNED") && order.paymentStatus === "PAID" && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="destructive"
+                          disabled={loadingId === order.id || refundLoadingId === order.id}
+                          onClick={() => handleRefund(order.id)}
+                        >
+                          {refundLoadingId === order.id ? "Refunding…" : "Refund"}
+                        </Button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -365,6 +405,18 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
                 >
                   {loadingId === order.id ? "Updating…" : "Save"}
                 </Button>
+                {(order.status === "CANCELLED" || order.status === "RETURNED") && order.paymentStatus === "PAID" && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="w-full"
+                    variant="destructive"
+                    disabled={refundLoadingId === order.id}
+                    onClick={() => handleRefund(order.id)}
+                  >
+                    {refundLoadingId === order.id ? "Refunding…" : "Refund"}
+                  </Button>
+                )}
               </div>
             </div>
           ))}
