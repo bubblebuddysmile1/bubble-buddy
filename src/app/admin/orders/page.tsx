@@ -16,7 +16,15 @@ export default async function AdminOrdersPage() {
       returnAllowed: true,
       user: { select: { name: true, email: true, phone: true } },
       shippingAddress: { select: { recipient: true, phone: true, line1: true, line2: true, city: true, state: true, postalCode: true } },
-      items: { select: { id: true } },
+      items: {
+        select: {
+          id: true,
+          name: true,
+          quantity: true,
+          unitPrice: true,
+          totalPrice: true,
+        },
+      },
     },
   });
 
@@ -34,6 +42,13 @@ export default async function AdminOrdersPage() {
     status: order.status,
     paymentStatus: order.paymentStatus,
     totalAmount: order.totalAmount.toString(),
+    items: order.items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice.toString(),
+      totalPrice: item.totalPrice.toString(),
+    })),
     itemCount: order.items.length,
     placedAt: order.placedAt?.toISOString() ?? null,
     returnAllowed: order.returnAllowed,

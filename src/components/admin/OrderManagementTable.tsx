@@ -17,6 +17,7 @@ export type AdminOrderRow = {
   status: string;
   paymentStatus: string;
   totalAmount: string;
+  items: Array<{ id: number; name: string; quantity: number; unitPrice: string; totalPrice: string }>;
   itemCount: number;
   placedAt: string | null;
   returnAllowed: boolean;
@@ -194,7 +195,18 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
                     )}
                   </td>
                   <td className="px-5 py-4 font-semibold text-foreground">${order.totalAmount}</td>
-                  <td className="px-5 py-4 text-muted-foreground">{order.itemCount}</td>
+                  <td className="px-5 py-4 text-muted-foreground max-w-xs">
+                    <div className="space-y-2">
+                      {order.items.map((item) => (
+                        <div key={item.id} className="rounded-2xl bg-background/80 p-2">
+                          <p className="text-sm font-medium text-foreground">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {item.quantity} × ${item.unitPrice}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </td>
                   <td className="px-5 py-4 text-muted-foreground">
                     {order.placedAt ? new Date(order.placedAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "—"}
                   </td>
@@ -294,57 +306,68 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
                 </span>
               </div>
             </div>
+              <div className="mt-4 rounded-3xl bg-background/80 p-4">
+                <h3 className="text-sm font-semibold text-foreground">Order items</h3>
+                <div className="mt-3 space-y-3 text-sm text-muted-foreground">
+                  {order.items.map((item) => (
+                    <div key={item.id} className="rounded-2xl bg-card/70 p-3">
+                      <p className="font-medium text-foreground">{item.name}</p>
+                      <p>{item.quantity} × Rs{item.unitPrice}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-            <div className="mt-4 space-y-3 rounded-2xl border border-border/60 bg-background/70 p-3">
-              <label className="flex items-center justify-between gap-3 text-sm text-foreground">
-                <span>Allow return</span>
-                <input
-                  type="checkbox"
-                  checked={returnAllowedSelections[order.id]}
+              <div className="mt-4 space-y-3 rounded-2xl border border-border/60 bg-background/70 p-3">
+                <label className="flex items-center justify-between gap-3 text-sm text-foreground">
+                  <span>Allow return</span>
+                  <input
+                    type="checkbox"
+                    checked={returnAllowedSelections[order.id]}
+                    disabled={loadingId === order.id}
+                    onChange={(event) =>
+                      setReturnAllowedSelections((current) => ({
+                        ...current,
+                        [order.id]: event.target.checked,
+                      }))
+                    }
+                    className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                  />
+                </label>
+                <select
+                  className="w-full rounded-full border border-border bg-input/70 px-3 py-2 text-sm text-foreground outline-none transition hover:border-primary"
+                  value={statusSelections[order.id]}
                   disabled={loadingId === order.id}
                   onChange={(event) =>
-                    setReturnAllowedSelections((current) => ({
+                    setStatusSelections((current) => ({
                       ...current,
-                      [order.id]: event.target.checked,
+                      [order.id]: event.target.value,
                     }))
                   }
-                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                />
-              </label>
-              <select
-                className="w-full rounded-full border border-border bg-input/70 px-3 py-2 text-sm text-foreground outline-none transition hover:border-primary"
-                value={statusSelections[order.id]}
-                disabled={loadingId === order.id}
-                onChange={(event) =>
-                  setStatusSelections((current) => ({
-                    ...current,
-                    [order.id]: event.target.value,
-                  }))
-                }
-              >
-                {statusOptions.map((statusOption) => (
-                  <option key={statusOption} value={statusOption}>
-                    {formatStatus(statusOption)}
-                  </option>
-                ))}
-              </select>
-              <Button
-                type="button"
-                size="sm"
-                className="w-full"
-                variant="outline"
-                disabled={
-                  loadingId === order.id ||
-                  (statusSelections[order.id] === order.status &&
-                    returnAllowedSelections[order.id] === order.returnAllowed)
-                }
-                onClick={() => handleSaveStatus(order.id)}
-              >
-                {loadingId === order.id ? "Updating…" : "Save"}
-              </Button>
+                >
+                  {statusOptions.map((statusOption) => (
+                    <option key={statusOption} value={statusOption}>
+                      {formatStatus(statusOption)}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="w-full"
+                  variant="outline"
+                  disabled={
+                    loadingId === order.id ||
+                    (statusSelections[order.id] === order.status &&
+                      returnAllowedSelections[order.id] === order.returnAllowed)
+                  }
+                  onClick={() => handleSaveStatus(order.id)}
+                >
+                  {loadingId === order.id ? "Updating…" : "Save"}
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );
