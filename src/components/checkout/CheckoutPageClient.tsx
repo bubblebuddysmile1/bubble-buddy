@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CreditCard, ShoppingBag } from "lucide-react";
+import { CreditCard, RotateCcw, ShieldCheck, ShoppingBag } from "lucide-react";
 import CheckoutAddressFormComponent from "@/components/checkout/CheckoutAddressForm";
 import CheckoutConfirmationSheet from "@/components/checkout/CheckoutConfirmationSheet";
 import CheckoutOrderSummary from "@/components/checkout/CheckoutOrderSummary";
@@ -56,11 +56,6 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
   const [appliedPromotion, setAppliedPromotion] = useState<AppliedPromotion | null>(null);
   const [redeemPoints, setRedeemPoints] = useState(0);
   const [redeemError, setRedeemError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (items.length === 0 && !isSubmitting && !isConfirmationOpen) {
@@ -97,6 +92,84 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
   );
 
   const handleChange = (field: keyof CheckoutAddressValues, value: string) => {
+    if (field === "postalCode") {
+      const nextValue = value;
+      setValues((prev) => ({
+        ...prev,
+        postalCode: nextValue,
+        city: "",
+        state: "",
+        country: "",
+      }));
+
+      const trimmed = nextValue.trim();
+      if (!/^[0-9]{6,}$/.test(trimmed)) {
+        if (isConfirmationOpen) {
+          setIsConfirmationOpen(false);
+          setPendingAddress(null);
+          setConfirmationError(null);
+        }
+        if (errors[field]) {
+          setErrors((prev: Partial<Record<keyof CheckoutAddressValues, string>>) => {
+            const next = { ...prev };
+            delete next[field];
+            return next;
+          });
+        }
+        return;
+      }
+
+      window.setTimeout(async () => {
+        try {
+          const response = await fetch(`https://api.postalpincode.in/pincode/${trimmed}`, {
+            headers: { Accept: "application/json" },
+          });
+
+          if (!response.ok) {
+            return;
+          }
+
+          const result = (await response.json()) as Array<{
+            PostOffice?: Array<{ District?: string; State?: string; Country?: string; Name?: string }>;
+          }>;
+
+          const postOffice = result?.[0]?.PostOffice?.[0];
+          if (!postOffice) {
+            setValues((prev) => ({
+              ...prev,
+              city: "",
+              state: "",
+              country: "",
+            }));
+            return;
+          }
+
+          setValues((prev) => ({
+            ...prev,
+            city: postOffice.District || postOffice.Name || "",
+            state: postOffice.State || "",
+            country: postOffice.Country || prev.country || "India",
+          }));
+        } catch {
+          // Ignore lookup errors silently and allow manual edits.
+        }
+      }, 500);
+
+      if (isConfirmationOpen) {
+        setIsConfirmationOpen(false);
+        setPendingAddress(null);
+        setConfirmationError(null);
+      }
+      if (errors[field]) {
+        setErrors((prev: Partial<Record<keyof CheckoutAddressValues, string>>) => {
+          const next = { ...prev };
+          delete next[field];
+          return next;
+        });
+      }
+      return;
+    }
+
     setValues((prev) => ({ ...prev, [field]: value }));
     if (isConfirmationOpen) {
       setIsConfirmationOpen(false);
@@ -360,14 +433,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
       router.push("/payment/failure?reason=create_order_failed");
     }
   };
-
-  if (!mounted) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
-  }
+  
 
   if (items.length === 0) {
     return (
@@ -390,6 +456,47 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
       <div className="checkout-back-enter flex items-center gap-2 rounded-2xl border border-border bg-card/80 px-4 py-3 text-sm text-muted-foreground">
         <CreditCard className="size-4 text-primary" />
         Secure checkout powered by Razorpay
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-4">
+        <div className="flex items-center gap-3 rounded-[1.5rem] border border-border bg-card p-4 shadow-sm">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-700">
+            <ShieldCheck className="size-5" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">Secure payment</p>
+            <p className="text-xs text-muted-foreground">Protected checkout with trusted gateways</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 rounded-[1.5rem] border border-border bg-card p-4 shadow-sm">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-700">
+            <ShoppingBag className="size-5" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">Fast delivery</p>
+            <p className="text-xs text-muted-foreground">Get your items delivered quickly and safely</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 rounded-[1.5rem] border border-border bg-card p-4 shadow-sm">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <RotateCcw className="size-5" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">Easy returns</p>
+            <p className="text-xs text-muted-foreground">Hassle-free returns and order support</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-[1.5rem] border border-border bg-card p-4 shadow-sm">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <CreditCard className="size-5" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">Receive Card Payments</p>
+            <p className="text-xs text-muted-foreground">Accept credit and debit card payments securely</p>
+          </div>
+        </div>
       </div>
 
       <CheckoutConfirmationSheet

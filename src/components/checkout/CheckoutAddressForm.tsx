@@ -95,6 +95,15 @@ export default function CheckoutAddressForm({
           autoComplete="address-line2"
         />
         <CheckoutField
+          id="postalCode"
+          label="Postal code"
+          placeholder="54000"
+          value={values.postalCode}
+          onChange={(e) => onChange("postalCode", e.target.value)}
+          error={errors.postalCode}
+          autoComplete="postal-code"
+        />
+        <CheckoutField
           id="city"
           label="City"
           placeholder="Gurgaon"
@@ -111,15 +120,6 @@ export default function CheckoutAddressForm({
           onChange={(e) => onChange("state", e.target.value)}
           error={errors.state}
           autoComplete="address-level1"
-        />
-        <CheckoutField
-          id="postalCode"
-          label="Postal code"
-          placeholder="54000"
-          value={values.postalCode}
-          onChange={(e) => onChange("postalCode", e.target.value)}
-          error={errors.postalCode}
-          autoComplete="postal-code"
         />
         <CheckoutField
           id="country"
