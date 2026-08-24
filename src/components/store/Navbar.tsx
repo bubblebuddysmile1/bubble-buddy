@@ -30,6 +30,12 @@ const NAV_LINKS = [
   { label: "About Us", href: "/about" },
   { label: "Offers", href: "/offers" },
 ];
+
+const ANNOUNCEMENTS = [
+  "Free shipping on orders above ₹999",
+  "New arrivals are here: discover your daily glow",
+  "Share your favourites and make someone smile",
+];
 // ============================================================
 
 function UserMenu() {
@@ -206,6 +212,23 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
+      <div className="border-b border-[#D9B98C]/20 bg-[#2B1B24] text-[#FBF4ED]">
+        <div className="overflow-hidden py-2" aria-label="Store announcements">
+          <div className="marquee-track flex w-max items-center" aria-hidden="true">
+            {[...ANNOUNCEMENTS, ...ANNOUNCEMENTS].map((announcement, index) => (
+              <span
+                key={`${announcement}-${index}`}
+                className="flex shrink-0 items-center whitespace-nowrap px-8 text-[10px] font-semibold uppercase tracking-[0.24em] sm:text-xs"
+              >
+                {announcement}
+                <span className="ml-16 text-[#D9B98C]" aria-hidden="true">
+                  ✦
+                </span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
       <div className="container mx-auto px-4">
 
         {/* TOP NAVBAR */}

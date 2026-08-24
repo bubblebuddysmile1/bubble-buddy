@@ -362,3 +362,34 @@
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+@keyframes marquee-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  min-width: max-content;
+  will-change: transform;
+  animation: marquee-left 24s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .marquee-track > span:nth-child(n + 2) {
+    display: none;
+  }
+}
