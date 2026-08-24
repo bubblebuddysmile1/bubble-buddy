@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import AddToCartButton from "@/components/cart/AddToCartButton";
 import CompareButton from "@/components/compare/CompareButton";
+import ShareProductButton from "@/components/store/ShareProductButton";
 import { toCartProduct } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
 import type { CartProduct } from "@/types/cart";
@@ -84,6 +85,7 @@ export default async function ProductList() {
                   <div className="flex items-center gap-2">
                     <AddToCartButton product={cartProduct} size="sm" label="Add" />
                     <CompareButton product={cartProduct} variant="icon" />
+                    <ShareProductButton name={product.name} slug={product.slug} />
                     <Link
                       href={`/shop/${product.slug}`}
                       className="hover:text-primary rounded-full border border-border bg-background px-3 py-1 text-sm font-semibold text-foreground transition hover:bg-muted"

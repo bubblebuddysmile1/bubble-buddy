@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import AddToCartButton from "@/components/cart/AddToCartButton";
+import ShareProductButton from "@/components/store/ShareProductButton";
 import { toCartProduct } from "@/lib/cart";
 import type { CartProduct } from "@/types/cart";
 
@@ -175,6 +176,7 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
                         variant="default"
                         className="w-full"
                       />
+                      <ShareProductButton name={activeProduct.name} slug={activeProduct.slug} className="w-full" />
                     </div>
                   </article>
                 ) : null}
@@ -256,6 +258,7 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
                           >
                             View
                           </Link>
+                          <ShareProductButton name={product.name} slug={product.slug} />
                         </div>
                       </div>
                     </div>

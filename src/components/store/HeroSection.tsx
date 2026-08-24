@@ -38,7 +38,7 @@ export default function HeroSection({ products = [] }: { products?: Product[] })
     <section
       role="region"
       aria-label="Featured collection"
-      className="relative w-full overflow-hidden h-[450px] md:h-[550px] bg-[#2B1B24]"
+      className="relative w-full overflow-hidden h-112.5 md:h-137.5 bg-[#2B1B24]"
     >
       {/* Background video */}
       {!reducedMotion && (
@@ -67,8 +67,8 @@ export default function HeroSection({ products = [] }: { products?: Product[] })
       )}
 
       {/* Overlay: deep plum wash, stronger on the left where text sits */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#2B1B24]/85 via-[#2B1B24]/45 to-[#2B1B24]/20" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#2B1B24]/60 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-r from-[#2B1B24]/85 via-[#2B1B24]/45 to-[#2B1B24]/20" />
+      <div className="absolute inset-0 bg-linear-to-t from-[#2B1B24]/60 via-transparent to-transparent" />
 
       {/* Main content */}
       <div className="container mx-auto relative z-20 px-6 md:px-10 flex items-center h-full">
@@ -96,13 +96,13 @@ export default function HeroSection({ products = [] }: { products?: Product[] })
           <div className="mt-8 flex flex-wrap items-center gap-6">
             <Link
               href="/shop"
-              className="rounded-full bg-[#C08457] px-7 py-3.5 text-sm font-semibold text-[#2B1B24] transition-colors hover:bg-[#D9B98C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F3DDD2]"
+              className="rounded-full bg-[#C08457] px-7 py-3.5 text-sm font-semibold text-[#2B1B24] transition-colors hover:bg-[#D9B98C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F3DDD2]"
             >
               SHOP NOW
             </Link>
             <Link
               href="/about"
-              className="group relative text-sm font-medium text-[#FBF4ED]/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F3DDD2] pb-1"
+              className="group relative text-sm font-medium text-[#FBF4ED]/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F3DDD2] pb-1"
             >
               LEARN MORE
               <span className="absolute left-0 -bottom-0.5 h-px w-full bg-[#D9B98C]/50 transition-transform duration-300 origin-left group-hover:scale-x-0" />
@@ -114,7 +114,7 @@ export default function HeroSection({ products = [] }: { products?: Product[] })
         {/* Right-side product card */}
         {products.length > 0 && (
           <div className="hidden md:block md:w-[45%]">
-            <div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 w-72 md:w-[19rem] z-30">
+            <div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 w-72 md:w-76 z-30">
               {/* Rotated placard tab, the one signature flourish */}
               <div
                 className="absolute -left-7 top-10 origin-left -rotate-90 text-[10px] uppercase tracking-[0.35em] text-[#F3DDD2]/70 whitespace-nowrap"
@@ -151,9 +151,9 @@ export default function HeroSection({ products = [] }: { products?: Product[] })
                     <SwiperSlide key={p.id}>
                       <Link
                         href={`/shop/${p.slug}`}
-                        className="flex items-center gap-3 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C08457]"
+                        className="flex items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C08457]"
                       >
-                        <div className="relative h-16 w-16 flex-shrink-0 rounded-md overflow-hidden bg-[#2B1B24]/5">
+                        <div className="relative h-16 w-16 shrink-0 rounded-md overflow-hidden bg-[#2B1B24]/5">
                           <Image
                             src={p.thumbnail || "/slider/slider12.png"}
                             alt={p.name}
