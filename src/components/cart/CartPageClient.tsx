@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { ArrowRight, ShoppingBag, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CartItemRow from "@/components/cart/CartItemRow";
@@ -9,28 +10,36 @@ import { formatCartMoney } from "@/lib/cart";
 import { getCheckoutTotals } from "@/lib/checkout";
 import { useCartStore } from "@/store/cart-store";
 
-export default function CartPageClient() {
+type CartPageClientProps = {
+  emptyCartRecommendations?: ReactNode;
+};
+
+export default function CartPageClient({ emptyCartRecommendations }: CartPageClientProps) {
   const items = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clearCart);
   const { subtotal, shipping, total, currency, itemCount } = getCheckoutTotals(items);
 
   if (items.length === 0) {
     return (
-      <div className="cart-empty-enter mx-auto max-w-lg rounded-[2rem] border border-border bg-card p-6 text-center shadow-xl sm:p-10">
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-          <ShoppingBag className="size-9 text-primary" />
+      <div className="space-y-10">
+        <div className="cart-empty-enter mx-auto max-w-lg rounded-[2rem] border border-border bg-card p-6 text-center shadow-xl sm:p-10">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+            <ShoppingBag className="size-9 text-primary" />
+          </div>
+          <h2 className="mt-6 text-2xl font-semibold text-foreground">Your cart is empty</h2>
+          <p className="mt-3 text-sm leading-7 text-muted-foreground">
+            Discover radiant skincare and beauty essentials crafted for your daily ritual.
+          </p>
+          <Link
+            href="/shop"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+          >
+            Browse shop
+            <ArrowRight className="size-4" />
+          </Link>
         </div>
-        <h2 className="mt-6 text-2xl font-semibold text-foreground">Your cart is empty</h2>
-        <p className="mt-3 text-sm leading-7 text-muted-foreground">
-          Discover radiant skincare and beauty essentials crafted for your daily ritual.
-        </p>
-        <Link
-          href="/shop"
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
-        >
-          Browse shop
-          <ArrowRight className="size-4" />
-        </Link>
+
+        {emptyCartRecommendations}
       </div>
     );
   }

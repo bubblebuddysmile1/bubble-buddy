@@ -1,4 +1,5 @@
 import CartPageClient from "@/components/cart/CartPageClient";
+import BestSellingProducts from "@/components/store/BestSellingProducts";
 
 export const metadata = {
   title: "Your cart bubble buddy smile",
@@ -20,7 +21,7 @@ export default function CartPage() {
           </p>
         </div>
 
-        <CartPageClient />
+        <CartPageClient emptyCartRecommendations={<BestSellingProducts />} />
       </div>
     </main>
   );

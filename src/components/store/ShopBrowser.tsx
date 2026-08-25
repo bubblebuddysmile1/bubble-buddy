@@ -1,10 +1,9 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import ShopProductCard from "@/components/store/ShopProductCard";
+import SearchSuggestions from "@/components/store/SearchSuggestions";
 import { toCartProduct } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
-
-type CategoryOption = { id: number; name: string; slug: string };
 
 type ShopBrowserProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -76,14 +75,56 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
     prisma.product.count({ where }),
   ]);
 
+  let suggestedProducts = products;
+  if (query && products.length === 0) {
+    const searchTerms = query
+      .toLowerCase()
+      .split(/\s+/)
+      .map((term) => term.trim())
+      .filter((term) => term.length > 1)
+      .slice(0, 5);
+
+    const suggestionWhere: Prisma.ProductWhereInput = {
+      isActive: true,
+      ...(categorySlug ? { category: { slug: categorySlug, isActive: true } } : {}),
+      ...(searchTerms.length > 0
+        ? {
+            OR: searchTerms.flatMap((term) => [
+              { name: { contains: term, mode: "insensitive" as const } },
+              { description: { contains: term, mode: "insensitive" as const } },
+              { benefits: { contains: term, mode: "insensitive" as const } },
+            ]),
+          }
+        : {}),
+    };
+
+    suggestedProducts = await prisma.product.findMany({
+      where: suggestionWhere,
+      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+      take: 4,
+      include: { category: { select: { name: true, slug: true } } },
+    });
+
+    if (suggestedProducts.length === 0) {
+      suggestedProducts = await prisma.product.findMany({
+        where: {
+          isActive: true,
+          ...(categorySlug ? { category: { slug: categorySlug, isActive: true } } : {}),
+        },
+        orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+        take: 4,
+        include: { category: { select: { name: true, slug: true } } },
+      });
+    }
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / perPage));
   const safePage = Math.min(page, totalPages);
 
   return (
     <section className="space-y-8">
-      <form method="get" action="/shop" className="flex flex-col gap-3 rounded-[2rem] border border-border bg-card p-4 sm:p-6 shadow-sm sm:flex-row sm:items-end sm:justify-between">
-        <div className="grid grid-cols-2 gap-2 flex-1 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_240px]">
-          <label className="space-y-2">
+      <form method="get" action="/shop" className="grid gap-4 rounded-[2rem] border border-border bg-card p-4 shadow-sm sm:p-6 lg:grid-cols-[minmax(0,1fr)_240px_minmax(310px,auto)] lg:items-end">
+        <label className="space-y-2">
             <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
               Search products
             </span>
@@ -94,28 +135,27 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
               placeholder="Search by name, description, or SKU"
               className="w-full rounded-3xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
-          </label>
+        </label>
 
-          <label className="space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-              Category
-            </span>
-            <select
-              name="category"
-              defaultValue={categorySlug}
-              className="w-full rounded-3xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="">All categories</option>
-              {categories.map((item) => (
-                <option key={item.id} value={item.slug}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+        <label className="space-y-2">
+          <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+            Category
+          </span>
+          <select
+            name="category"
+            defaultValue={categorySlug}
+            className="w-full rounded-3xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="">All categories</option>
+            {categories.map((item) => (
+              <option key={item.id} value={item.slug}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </label>
 
-        <div className="flex w-full max-w-xs flex-col gap-2 sm:gap-3">
+        <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
           <label className="space-y-2">
             <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
               Sort by
@@ -133,7 +173,7 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
             </select>
           </label>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 pb-0.5">
             <button
               type="submit"
               className="inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 sm:w-auto"
@@ -148,8 +188,16 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
       </form>
 
       {products.length === 0 ? (
-        <div className="rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">
-          No products found for the selected filters.
+        <div className="space-y-6">
+          <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center sm:p-10">
+            <p className="text-lg font-semibold text-foreground">
+              No products found for &quot;{query}&quot;.
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Try another search or explore these products you may like.
+            </p>
+          </div>
+          <SearchSuggestions query={query} products={suggestedProducts} />
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">

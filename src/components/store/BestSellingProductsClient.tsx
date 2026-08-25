@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import AddToCartButton from "@/components/cart/AddToCartButton";
 import ShareProductButton from "@/components/store/ShareProductButton";
 import { toCartProduct } from "@/lib/cart";
@@ -38,72 +38,6 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
 
   const activeProduct = products[activeIndex];
   const hasProducts = products.length > 0;
-
-  const productCards = useMemo(
-    () => products.map((product) => {
-      const cartProduct: CartProduct = toCartProduct({
-        ...product,
-        currency: product.currency,
-        price: product.price.toString(),
-      });
-
-      return (
-        <article
-          key={product.id}
-          className="min-w-[82vw] max-w-[82vw] snap-start shrink-0 rounded-[2rem] border border-border bg-card p-4 shadow-lg shadow-black/5"
-        >
-          <div className="flex items-center justify-between gap-3">
-            <span className="rounded-full bg-secondary/10 px-3 py-1 text-[11px] uppercase tracking-[0.32em] text-secondary-foreground">
-              Best Seller
-            </span>
-            <span className="rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground">
-              {product.stockQuantity > 0 ? "In stock" : "Out of stock"}
-            </span>
-          </div>
-
-          <div className="mt-4 overflow-hidden rounded-[1.75rem] bg-muted p-3">
-            <div className="relative aspect-square overflow-hidden rounded-[1.5rem]">
-              <Image
-                src={product.thumbnail ?? "/category/1.jpg"}
-                alt={product.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-          </div>
-
-          <div className="mt-4 space-y-4">
-            <div>
-              <p className="text-sm uppercase tracking-[0.25em] text-muted-foreground">
-                {product.category?.name ?? "Uncategorized"}
-              </p>
-              <h3 className="mt-2 text-base font-semibold text-foreground">{product.name}</h3>
-            </div>
-
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-lg font-semibold text-foreground">
-                ₹{cartProduct.price.toFixed(2)}
-              </p>
-              <Link
-                href={`/shop/${product.slug}`}
-                className="inline-flex items-center justify-center rounded-full border border-border bg-background px-3 py-2 text-sm font-semibold text-foreground"
-              >
-                View
-              </Link>
-            </div>
-            <AddToCartButton
-              product={cartProduct}
-              size="sm"
-              label="Add"
-              variant="default"
-              className="w-full"
-            />
-          </div>
-        </article>
-      );
-    }),
-    [products],
-  );
 
   return (
     <section className="relative overflow-hidden bg-background py-4">
@@ -192,7 +126,7 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
               </div>
             </div>
 
-            <div className="hidden grid-cols-2 gap-6 sm:grid xl:grid-cols-3">
+            <div className="hidden grid-cols-2 gap-5 sm:grid xl:grid-cols-4">
               {products.map((product) => {
                 const cartProduct: CartProduct = toCartProduct({
                   ...product,
@@ -202,23 +136,23 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
                 return (
                   <article
                     key={product.id}
-                    className="group relative overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-lg shadow-black/5 transition duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10"
+                    className="group relative overflow-hidden rounded-[1.5rem] border border-border bg-card p-4 shadow-lg shadow-black/5 transition duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10"
                   >
                     <div className="pointer-events-none absolute -right-10 top-8 h-32 w-32 rounded-full bg-primary/10 blur-3xl" />
                     <div className="pointer-events-none absolute -left-12 bottom-6 h-28 w-28 rounded-full bg-accent/10 blur-3xl" />
                     <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-primary via-accent to-secondary" />
 
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="rounded-full bg-secondary/10 px-3 py-1 text-[11px] uppercase tracking-[0.32em] text-secondary-foreground">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="rounded-full bg-secondary/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.24em] text-secondary-foreground">
                         Best Seller
                       </span>
-                      <span className="rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground">
+                      <span className="rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] text-muted-foreground">
                         {product.stockQuantity > 0 ? "In stock" : "Out of stock"}
                       </span>
                     </div>
 
-                    <div className="mt-5 overflow-hidden rounded-[1.75rem] bg-muted p-4 transition duration-500 group-hover:-translate-y-1">
-                      <div className="relative aspect-square overflow-hidden rounded-[1.5rem]">
+                    <div className="mt-4 overflow-hidden rounded-[1.25rem] bg-muted p-2 transition duration-500 group-hover:-translate-y-1">
+                      <div className="relative h-44 overflow-hidden rounded-[1rem]">
                         <Image
                           src={product.thumbnail ?? "/category/1.jpg"}
                           alt={product.name}
@@ -229,32 +163,34 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
                       </div>
                     </div>
 
-                    <div className="mt-5 space-y-4">
-                      <div>
-                        <p className="text-sm uppercase tracking-[0.25em] text-muted-foreground">
+                    <div className="mt-4 space-y-3">
+                      <div className="flex min-h-12 items-start gap-2">
+                        <p className="shrink-0 pt-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                           {product.category?.name ?? "Uncategorized"}
                         </p>
-                        <h3 className="mt-3 text-lg font-semibold text-foreground">{product.name}</h3>
+                        <h3 className="line-clamp-2 text-base font-semibold leading-5 text-foreground"><Link href={`/shop/${product.slug}`}>
+                          {product.name}
+                        </Link></h3>
                       </div>
 
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-center justify-between gap-2">
                         <div>
-                          <p className="text-sm text-muted-foreground">Price</p>
-                          <p className="text-xl font-semibold text-foreground">
+                          <p className="text-xs text-muted-foreground">Price</p>
+                          <p className="text-lg font-semibold text-foreground">
                             ₹{cartProduct.price.toFixed(2)}
                           </p>
                         </div>
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <div className="flex items-center gap-1.5">
                           <AddToCartButton
                             product={cartProduct}
                             size="sm"
-                            label="Add to cart"
+                            label="Add"
                             variant="default"
-                            className="w-full sm:w-auto"
+                            className="px-2.5"
                           />
                           <Link
                             href={`/shop/${product.slug}`}
-                            className="inline-flex items-center justify-center rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted"
+                            className="inline-flex items-center justify-center rounded-full border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
                           >
                             View
                           </Link>
