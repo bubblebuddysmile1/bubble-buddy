@@ -7,8 +7,10 @@ type ReviewRecord = {
   rating: number;
   title: string | null;
   body: string | null;
+  verifiedPurchase: boolean;
   approved: boolean;
   user: { id: number; name: string | null; email: string | null } | null;
+  product?: { id: number; name: string; slug: string; thumbnail: string | null };
   productId: number;
   createdAt: Date;
   updatedAt: Date;
@@ -20,8 +22,10 @@ function normalizeReview(r: ReviewRecord) {
     rating: r.rating,
     title: r.title,
     body: r.body,
+    verifiedPurchase: r.verifiedPurchase,
     approved: r.approved,
     user: r.user ? { id: r.user.id, name: r.user.name, email: r.user.email } : null,
+    product: r.product,
     productId: r.productId,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
@@ -32,6 +36,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const productId = searchParams.has("productId") ? Number(searchParams.get("productId")) : null;
   const productSlug = searchParams.get("productSlug") ?? null;
+  const allReviews = searchParams.get("all") === "true";
   const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
   const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit") ?? "10")));
 
@@ -42,11 +47,11 @@ export async function GET(req: NextRequest) {
     pid = p.id;
   }
 
-  if (!pid) {
+  if (!pid && !allReviews) {
     return NextResponse.json({ error: "productId or productSlug is required." }, { status: 400 });
   }
 
-  const where = { productId: pid, approved: true };
+  const where = allReviews ? { approved: true } : { productId: pid!, approved: true };
 
   const total = await prisma.review.count({ where });
   const agg = await prisma.review.aggregate({
@@ -57,10 +62,13 @@ export async function GET(req: NextRequest) {
 
   const reviews = await prisma.review.findMany({
     where,
-    include: { user: { select: { id: true, name: true, email: true } } },
+    include: {
+      user: { select: { id: true, name: true, email: true } },
+      product: { select: { id: true, name: true, slug: true, thumbnail: true } },
+    },
     orderBy: { createdAt: "desc" },
-    skip: (page - 1) * limit,
-    take: limit,
+    skip: allReviews ? undefined : (page - 1) * limit,
+    take: allReviews ? undefined : limit,
   });
 
   return NextResponse.json({

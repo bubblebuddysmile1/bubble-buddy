@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import CategoriesSection from "@/components/store/CategoriesSection";
+import BeautyBannerSection from "@/components/store/BeautyBannerSection";
 import HeroSection from "@/components/store/HeroSection";
 import BestSellingProducts from "@/components/store/BestSellingProducts";
 import OfferDiscountSection from "@/components/store/OfferDiscountSection";
 import AdvancedPromoSection from "@/components/store/AdvancedPromoSection";
 import ProductList from "@/components/store/ProductList";
 import PromoBannerSection from "@/components/store/PromoBannerSection";
+import ReviewsCarousel from "@/components/store/ReviewsCarousel";
 
 export const metadata: Metadata = {
   title: "Bubble Buddy Smile | Premium Skincare, Haircare & Beauty Essentials Online",
@@ -88,10 +90,14 @@ export default async function Home() {
       <HeroSection products={latestProductsNormalized} />
       <CategoriesSection />
       <BestSellingProducts />
-      <OfferDiscountSection />
-      
+    
       <ProductList />
+      <BeautyBannerSection />
+            <OfferDiscountSection />
+
       <AdvancedPromoSection />
+            <ReviewsCarousel />
+
       <PromoBannerSection/>
     </div>
   );

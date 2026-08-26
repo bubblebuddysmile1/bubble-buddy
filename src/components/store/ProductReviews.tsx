@@ -9,6 +9,7 @@ type Review = {
   title?: string | null;
   body?: string | null;
   user?: { id: number; name?: string | null } | null;
+  verifiedPurchase?: boolean;
   createdAt: string;
 };
 
@@ -20,6 +21,8 @@ export default function ProductReviews({ productId, averageRating, reviewCount }
   const [total, setTotal] = useState(0);
   const [displayReviewCount, setDisplayReviewCount] = useState(reviewCount ?? 0);
   const [displayAverageRating, setDisplayAverageRating] = useState(averageRating ?? 0);
+  const [error, setError] = useState<string | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
   const perPage = 4;
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState("");
@@ -55,10 +58,11 @@ export default function ProductReviews({ productId, averageRating, reviewCount }
     return () => {
       ignore = true;
     };
-  }, [averageRating, page, productId]);
+  }, [averageRating, page, productId, reloadToken]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
     const res = await fetch(`/api/reviews`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -68,11 +72,11 @@ export default function ProductReviews({ productId, averageRating, reviewCount }
       setTitle("");
       setBody("");
       setRating(5);
+      setReloadToken((token) => token + 1);
       setPage(1);
-      
     } else {
       const err = await res.json();
-      alert(err?.error ?? "Failed to submit review");
+      setError(err?.error ?? "Failed to submit review");
     }
   }
 
@@ -109,6 +113,11 @@ export default function ProductReviews({ productId, averageRating, reviewCount }
         <div>
           <h3 className="font-semibold">Customer reviews</h3>
           <div className="mt-4 space-y-4">
+            {error && (
+              <p className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+                {error}
+              </p>
+            )}
             {loading ? (
               <div className="space-y-4">
                 {Array.from({ length: 2 }).map((_, index) => (
@@ -124,18 +133,25 @@ export default function ProductReviews({ productId, averageRating, reviewCount }
                 ))}
               </div>
             ) : reviews.length === 0 ? (
-              <div className="rounded-[1.25rem] border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">              </div>
+              <div className="rounded-[1.25rem] border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+                No reviews yet. Be the first to review this product.
+              </div>
             ) : null}
             {reviews.map((r) => (
-              <div key={r.id} className="rounded border p-3">
+              <article key={r.id} className="rounded-[1.25rem] border border-border bg-card p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div className="font-semibold">{r.user?.name ?? "Anonymous"}</div>
+                  <div>
+                    <div className="font-semibold">{r.user?.name ?? "Anonymous"}</div>
+                    {r.verifiedPurchase && (
+                      <div className="mt-1 text-xs font-medium text-green-600">Verified purchase</div>
+                    )}
+                  </div>
                   <StarRating value={r.rating} readOnly size={14} />
                 </div>
                 {r.title && <div className="mt-2 font-medium">{r.title}</div>}
                 {r.body && <div className="mt-1 text-sm text-muted-foreground">{r.body}</div>}
                 <div className="mt-2 text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</div>
-              </div>
+              </article>
             ))}
           </div>
 
