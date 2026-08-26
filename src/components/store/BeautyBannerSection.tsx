@@ -6,7 +6,7 @@ export default function BeautyBannerSection() {
     <section aria-label="Featured beauty collections" className="w-full overflow-hidden bg-[#fff1f4]">
       <div className="group relative aspect-2048/760 min-h-62.5 w-full overflow-hidden sm:min-h-90 lg:min-h-0">
         <Image
-          src="/slider/slider1.png"
+          src="/slider/index-banner.png"
           alt="Bubble Buddy skincare essentials for naturally glowing skin"
           fill
           priority
