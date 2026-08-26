@@ -109,7 +109,7 @@ export default function OfferDiscountSectionClient({ promotions }: OfferDiscount
 
   return (
     <section className="bg-background py-16">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto px-4">
         <div className="mb-10 text-center">
           <p className="text-xs uppercase tracking-[0.32em] text-primary">Offers & Discounts</p>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">

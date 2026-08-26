@@ -51,9 +51,9 @@ export default function PromoBannerSection() {
   }, []);
 
   return (
-    <section className="py-14 bg-pink-50">
+    <section className="py-14 ">
 
-      <div className="container mx-auto px-4">
+      <div className="mx-auto px-4">
         <div className="mb-10 text-center">
           <p className="text-xs uppercase tracking-[0.32em] text-primary">Promotional categories</p>
           <h2 className="mt-4 text-3xl font-semibold text-foreground sm:text-4xl">

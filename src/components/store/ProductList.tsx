@@ -34,7 +34,7 @@ export default async function ProductList() {
 
   return (
     <section className="bg-background py-16">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto px-4">
         <div className="mb-10 flex flex-col items-center gap-4 text-center">
           <p className="text-xs uppercase tracking-[0.32em] text-primary">Product List</p>
           <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
