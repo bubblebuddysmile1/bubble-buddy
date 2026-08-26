@@ -39,82 +39,75 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 :root {
-  --background: #f5f1eb;
-  --foreground: #241f1a;
-  --card: #fbf7f1;
-  --card-foreground: #241f1a;
-  --popover: #fbf7f1;
-  --popover-foreground: #241f1a;
-  --primary: #a67c52;
+  --background: #f7eae0;
+  --foreground: #5e3122;
+  --card: #fffaf7;
+  --card-foreground: #5e3122;
+  --popover: #fffaf7;
+  --popover-foreground: #5e3122;
+  --primary: #1d4533;
   --primary-foreground: #ffffff;
-  --secondary: #d9c9b1;
-  --secondary-foreground: #241f1a;
-  --muted: #ece5dc;
-  --muted-foreground: #6f6256;
-  --accent: #b99a6b;
-  --accent-foreground: #241f1a;
-  --destructive: #b25840;
-  --border: #d8c8b4;
-  --input: #f4ede3;
-  --ring: #b99a6b;
-  --chart-1: #b99a6b;
-  --chart-2: #8f7658;
-  --chart-3: #736050;
-  --chart-4: #544a3f;
-  --chart-5: #342f2a;
+  --secondary: #f9d2ba;
+  --secondary-foreground: #5e3122;
+  --muted: #f9d2ba;
+  --muted-foreground: #795849;
+  --accent: #f9d2ba;
+  --accent-foreground: #5e3122;
+  --destructive: #a33d32;
+  --border: #e8bca5;
+  --input: #fffaf7;
+  --ring: #1d4533;
+  --chart-1: #1d4533;
+  --chart-2: #5e3122;
+  --chart-3: #f9d2ba;
+  --chart-4: #b8755c;
+  --chart-5: #8b503d;
   --radius: 0.625rem;
-  --sidebar: #f4ede3;
-  --sidebar-foreground: #241f1a;
-  --sidebar-primary: #a67c52;
+  --sidebar: #f9d2ba;
+  --sidebar-foreground: #5e3122;
+  --sidebar-primary: #1d4533;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #b99a6b;
-  --sidebar-accent-foreground: #241f1a;
-  --sidebar-border: #d8c8b4;
-  --sidebar-ring: #b99a6b;
+  --sidebar-accent: #f7eae0;
+  --sidebar-accent-foreground: #5e3122;
+  --sidebar-border: #e8bca5;
+  --sidebar-ring: #1d4533;
 }
 
 .dark {
-  --background: #121116;
-  --foreground: #f3eee5;
-  --card: #191a1f;
-  --card-foreground: #f3eee5;
-  --popover: #1f2127;
-  --popover-foreground: #f3eee5;
-  --primary: #d4af37;
-  --primary-foreground: #121116;
-  --secondary: #796654;
-  --secondary-foreground: #f3eee5;
-  --muted: #2b2e35;
-  --muted-foreground: #b5aa9f;
-  --accent: #b99a6b;
-  --accent-foreground: #121116;
-  --destructive: #c04a40;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.08);
-  --ring: #d4af37;
-  --chart-1: #d4af37;
-  --chart-2: #b99a6b;
-  --chart-3: #8b745c;
-  --chart-4: #665744;
-  --chart-5: #3d3834;
-  --sidebar: #191a1f;
-  --sidebar-foreground: #f3eee5;
-  --sidebar-primary: #ad8a4c;
-  --sidebar-primary-foreground: #121116;
-  --sidebar-accent: #b99a6b;
-  --sidebar-accent-foreground: #f3eee5;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #d4af37;
+  --background: #1d4533;
+  --foreground: #f7eae0;
+  --card: #5e3122;
+  --card-foreground: #f7eae0;
+  --popover: #5e3122;
+  --popover-foreground: #f7eae0;
+  --primary: #f9d2ba;
+  --primary-foreground: #5e3122;
+  --secondary: #5e3122;
+  --secondary-foreground: #f7eae0;
+  --muted: #28583f;
+  --muted-foreground: #e8bca5;
+  --accent: #f9d2ba;
+  --accent-foreground: #5e3122;
+  --destructive: #f08a76;
+  --border: rgba(249, 210, 186, 0.28);
+  --input: rgba(247, 234, 224, 0.12);
+  --ring: #f9d2ba;
+  --chart-1: #f9d2ba;
+  --chart-2: #e8bca5;
+  --chart-3: #5e3122;
+  --chart-4: #b8755c;
+  --chart-5: #1d4533;
+  --sidebar: #5e3122;
+  --sidebar-foreground: #f7eae0;
+  --sidebar-primary: #f9d2ba;
+  --sidebar-primary-foreground: #5e3122;
+  --sidebar-accent: #1d4533;
+  --sidebar-accent-foreground: #f7eae0;
+  --sidebar-border: rgba(249, 210, 186, 0.28);
+  --sidebar-ring: #f9d2ba;
 }
 
 @layer base {
@@ -134,6 +127,98 @@
 
   html::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@layer components {
+  .cursor-effect-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    pointer-events: none;
+    border-radius: 9999px;
+    transform: translate3d(-100px, -100px, 0);
+    will-change: transform;
+  }
+
+  .cursor-effect-dot {
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    background: #1d4533;
+  }
+
+  @media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+    .cursor-effect-dot {
+      display: none;
+    }
+  }
+
+  .admin-shell form label:has(input:not([type="checkbox"]):not([type="radio"])),
+  .admin-shell form label:has(textarea),
+  .admin-shell form label:has(select) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .admin-shell form label:has(input[type="checkbox"]),
+  .admin-shell form label:has(input[type="radio"]) {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .admin-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  .admin-shell textarea,
+  .admin-shell select {
+    display: block;
+    min-height: 2.75rem;
+    width: 100%;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #e8bca5 !important;
+    background-color: color-mix(in srgb, var(--card) 78%, var(--secondary));
+    color: var(--foreground);
+    padding: 0.625rem 0.875rem;
+    transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+  }
+
+  .admin-shell textarea {
+    min-height: 7rem;
+    resize: vertical;
+  }
+
+  .admin-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"])::placeholder,
+  .admin-shell textarea::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.8;
+  }
+
+  .admin-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+  .admin-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus-visible,
+  .admin-shell textarea:focus,
+  .admin-shell textarea:focus-visible,
+  .admin-shell select:focus {
+    border-color: #1d4533 !important;
+    outline: 2px solid color-mix(in srgb, #1d4533 35%, transparent);
+    outline-offset: 1px;
+  }
+
+  .admin-shell select:focus-visible {
+    border-color: #1d4533 !important;
+  }
+
+  .admin-shell input[type="checkbox"],
+  .admin-shell input[type="radio"] {
+    accent-color: var(--primary);
+  }
+
+  .admin-shell input[type="file"]::file-selector-button {
+    border: 0;
+    background: var(--primary);
+    color: var(--primary-foreground);
   }
 }
 

@@ -16,7 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   });
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="admin-shell flex min-h-screen bg-background">
       <div className="sticky top-0 hidden h-screen shrink-0 md:flex">
         <AdminSidebar userName={user?.name} userEmail={user?.email ?? session.email} />
       </div>

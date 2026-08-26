@@ -124,7 +124,7 @@ export default function ProductForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-[2rem] border border-border bg-card p-8 shadow-lg">
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-4xl border border-border bg-card p-8 shadow-lg">
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-2 text-sm md:col-span-2">
           <span className="font-medium">Product name *</span>

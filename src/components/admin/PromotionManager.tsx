@@ -206,7 +206,7 @@ export default function PromotionManager() {
 
   return (
     <div className="grid gap-8 xl:grid-cols-[0.9fr_1.1fr]">
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+      <form onSubmit={handleSubmit} className="space-y-4 rounded-4xl border border-border bg-card p-6 shadow-lg">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-foreground">
             {editingCode ? "Edit promotion" : "Add promotion"}
@@ -360,7 +360,7 @@ export default function PromotionManager() {
         </Button>
       </form>
 
-      <div className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+      <div className="rounded-4xl border border-border bg-card p-6 shadow-lg">
         <h2 className="text-lg font-semibold text-foreground">All promotions</h2>
         {loading ? (
           <p className="mt-4 text-sm text-muted-foreground">Loading…</p>

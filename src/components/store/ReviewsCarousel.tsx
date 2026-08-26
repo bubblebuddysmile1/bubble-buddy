@@ -50,7 +50,7 @@ export default function ReviewsCarousel() {
   if (!loading && (error || reviews.length === 0)) return null;
 
   return (
-    <section aria-labelledby="customer-reviews-heading" className="py-16">
+    <section aria-labelledby="customer-reviews-heading" className="bg-[#f9d2ba]/35 py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 text-center">
           <p className="text-xs uppercase tracking-[0.32em] text-primary">Customer love</p>
@@ -74,7 +74,7 @@ export default function ReviewsCarousel() {
           >
             {reviews.map((review) => (
               <SwiperSlide key={review.id} className="h-auto!">
-                <article className="flex h-full min-h-52 flex-col rounded-3xl border border-[#f0d9d1] bg-white p-6 shadow-sm">
+                <article className="flex h-full min-h-52 flex-col rounded-3xl border border-[#e8bca5] bg-[#fffaf7] p-6 shadow-sm">
                   <div className="flex items-center justify-between gap-3">
                     <StarRating value={review.rating} readOnly size={16} />
                     <time className="text-xs text-muted-foreground" dateTime={review.createdAt}>
@@ -101,11 +101,11 @@ export default function ReviewsCarousel() {
 
       <style jsx global>{`
         .reviews-carousel .swiper-pagination-bullet {
-          background: #b94d6b;
+          background: #1d4533;
           opacity: 0.3;
         }
         .reviews-carousel .swiper-pagination-bullet-active {
-          background: #b94d6b;
+          background: #1d4533;
           opacity: 1;
         }
       `}</style>

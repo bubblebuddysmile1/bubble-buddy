@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import Footer from "@/components/store/Footer";
 import Navbar from "@/components/store/Navbar";
 import TopProgress from "@/components/ui/TopProgress";
+import CursorEffect from "@/components/ui/CursorEffect";
 
 const WelcomePopup = dynamic(() => import("@/components/store/WelcomePopup"), {
   ssr: false,
@@ -15,11 +16,17 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
   const isAdminRoute = pathname.startsWith("/admin");
 
   if (isAdminRoute) {
-    return <>{children}</>;
+    return (
+      <>
+        <CursorEffect />
+        {children}
+      </>
+    );
   }
 
   return (
     <>
+      <CursorEffect />
       <TopProgress />
       <Navbar />
       {children}

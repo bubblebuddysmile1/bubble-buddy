@@ -187,7 +187,10 @@ export default function BlogManager() {
 
   return (
     <div className="grid gap-8 xl:grid-cols-[1fr_0.9fr]">
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 rounded-4xl border border-border bg-card p-6 shadow-lg"
+      >
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-foreground">{editingSlug ? "Edit blog post" : "Add blog post"}</h2>
           {editingSlug && (
@@ -285,7 +288,7 @@ export default function BlogManager() {
         </Button>
       </form>
 
-      <div className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+      <div className="rounded-4xl border border-border bg-card p-6 shadow-lg">
         <h2 className="text-lg font-semibold text-foreground">All blog posts</h2>
         {loading ? <p className="mt-4 text-sm text-muted-foreground">Loading…</p> : posts.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">No blogs yet.</p> : <div className="mt-4 space-y-3">{posts.map((post) => (
           <div key={post.id} className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-border bg-background/80 px-4 py-3">
