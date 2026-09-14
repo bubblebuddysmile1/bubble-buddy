@@ -108,7 +108,7 @@ export default async function CategoryPage({ params }: Props) {
               {category.description ?? "Explore products selected for this category."}
             </p>
           </div>
-          <div className="rounded-[2rem] border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-4xl border border-border bg-card p-6 shadow-sm">
             <p className="text-sm font-semibold text-foreground">Browse filtered products</p>
             <p className="mt-2 text-sm text-muted-foreground">
               All active products in the {category.name} category are shown below.

@@ -87,7 +87,7 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen bg-background py-12 text-foreground">
       <div className="mx-auto max-w-7xl px-4 contrast-more:mt-12 sm:px-6 lg:px-8">
-        <section className="mb-8 overflow-hidden rounded-[2rem] border border-border bg-card p-8 shadow-lg sm:p-10 lg:p-12" aria-labelledby="about-hero-title">
+        <section className="mb-8 overflow-hidden rounded-4xl border border-border bg-card p-8 shadow-lg sm:p-10 lg:p-12" aria-labelledby="about-hero-title">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">About Us</p>
           <h1 id="about-hero-title" className="mt-3 text-4xl font-bold leading-tight sm:text-5xl">
             We are a team of passionate beauty enthusiasts who are dedicated to providing the best products for your beauty needs.
@@ -97,7 +97,7 @@ export default function AboutPage() {
           </p>
         </section>
 
-        <section id="our-story" className="mb-8 grid gap-8 rounded-[2rem] border border-border bg-card/80 p-6 shadow-sm sm:p-8 lg:grid-cols-[1.1fr_0.9fr] lg:p-10" aria-labelledby="our-story-title">
+        <section id="our-story" className="mb-8 grid gap-8 rounded-4xl border border-border bg-card/80 p-6 shadow-sm sm:p-8 lg:grid-cols-[1.1fr_0.9fr] lg:p-10" aria-labelledby="our-story-title">
           <div>
             <h2 id="our-story-title" className="text-3xl font-semibold tracking-tight text-foreground">
               Our Story
@@ -111,7 +111,7 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
-          <div className="overflow-hidden rounded-[1.75rem] border border-border bg-background/70">
+          <div className="overflow-hidden rounded-3xl border border-border bg-background/70">
             <Image
               src="/about-us-hero.svg"
               alt="Illustration of skincare, haircare, and makeup essentials curated by Bubble Buddy Smile"
@@ -122,7 +122,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section id="why-choose-us" className="mb-8 rounded-[2rem] border border-border bg-card/70 p-6 shadow-sm sm:p-8 lg:p-10" aria-labelledby="why-choose-title">
+        <section id="why-choose-us" className="mb-8 rounded-4xl border border-border bg-card/70 p-6 shadow-sm sm:p-8 lg:p-10" aria-labelledby="why-choose-title">
           <div className="max-w-2xl">
             <h2 id="why-choose-title" className="text-3xl font-semibold tracking-tight text-foreground">
               Why Choose Bubble Buddy Smile
@@ -135,7 +135,7 @@ export default function AboutPage() {
             {features.map((feature) => {
               const Icon = feature.icon
               return (
-                <article key={feature.title} className="rounded-[1.5rem] border border-border bg-background/80 p-6 shadow-sm">
+                <article key={feature.title} className="rounded-3xl border border-border bg-background/80 p-6 shadow-sm">
                   <div className="inline-flex rounded-2xl bg-primary/10 p-3 text-primary">
                     <Icon className="h-5 w-5" />
                   </div>
@@ -147,7 +147,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section id="our-values" className="mb-8 rounded-[2rem] border border-border bg-card/70 p-6 shadow-sm sm:p-8 lg:p-10" aria-labelledby="our-values-title">
+        <section id="our-values" className="mb-8 rounded-4xl border border-border bg-card/70 p-6 shadow-sm sm:p-8 lg:p-10" aria-labelledby="our-values-title">
           <div className="max-w-2xl">
             <h2 id="our-values-title" className="text-3xl font-semibold tracking-tight text-foreground">
               What We Stand For
@@ -157,7 +157,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="mt-8 grid gap-6 lg:grid-cols-3">
-            <article className="rounded-[1.5rem] border border-border bg-background/80 p-6">
+            <article className="rounded-3xl border border-border bg-background/80 p-6">
               <div className="inline-flex rounded-2xl bg-primary/10 p-3 text-primary">
                 <Leaf className="h-5 w-5" />
               </div>
@@ -166,7 +166,7 @@ export default function AboutPage() {
                 We champion beauty essentials that feel mindful, refreshing, and supportive of daily self-care rituals.
               </p>
             </article>
-            <article className="rounded-[1.5rem] border border-border bg-background/80 p-6">
+            <article className="rounded-3xl border border-border bg-background/80 p-6">
               <div className="inline-flex rounded-2xl bg-primary/10 p-3 text-primary">
                 <Sparkles className="h-5 w-5" />
               </div>
@@ -175,7 +175,7 @@ export default function AboutPage() {
                 Premium beauty should feel within reach, giving you a polished experience without compromising on quality.
               </p>
             </article>
-            <article className="rounded-[1.5rem] border border-border bg-background/80 p-6">
+            <article className="rounded-3xl border border-border bg-background/80 p-6">
               <div className="inline-flex rounded-2xl bg-primary/10 p-3 text-primary">
                 <Headphones className="h-5 w-5" />
               </div>
@@ -187,7 +187,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section id="faq" className="rounded-[2rem] border border-border bg-card/70 p-6 shadow-sm sm:p-8 lg:p-10" aria-labelledby="faq-title">
+        <section id="faq" className="rounded-4xl border border-border bg-card/70 p-6 shadow-sm sm:p-8 lg:p-10" aria-labelledby="faq-title">
           <div className="max-w-2xl">
             <h2 id="faq-title" className="text-3xl font-semibold tracking-tight text-foreground">
               Frequently Asked Questions
@@ -198,8 +198,8 @@ export default function AboutPage() {
           </div>
           <div className="mt-8 space-y-4">
             {faqItems.map((item, index) => (
-              <details key={item.question} className="group rounded-[1.5rem] border border-border bg-background/80 p-0 shadow-sm">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-[1.5rem] p-5 text-left text-base font-medium text-foreground">
+              <details key={item.question} className="group rounded-3xl border border-border bg-background/80 p-0 shadow-sm">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-3xl p-5 text-left text-base font-medium text-foreground">
                   <span className="flex items-center gap-3">
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                       {index + 1}

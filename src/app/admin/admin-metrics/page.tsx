@@ -174,13 +174,13 @@ export default async function AdminMetricsPage() {
       />
 
       <div className="space-y-6 p-6">
-        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+        <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
           <h2 className="text-xl font-semibold text-foreground">Overview Metrics</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {metrics.map((metric) => {
               const Icon = metric.icon;
               return (
-                <div key={metric.label} className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+                <div key={metric.label} className="rounded-3xl border border-border bg-card p-6 shadow-sm">
                   <div className="rounded-2xl p-3 text-primary">
                     <Icon className={`size-6 ${metric.color}`} />
                   </div>
@@ -194,7 +194,7 @@ export default async function AdminMetricsPage() {
         </section>
 
         <div className="grid gap-6 xl:grid-cols-2">
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <h2 className="text-xl font-semibold text-foreground">Order Performance</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {orderMetrics.map((metric) => {
@@ -217,7 +217,7 @@ export default async function AdminMetricsPage() {
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <h2 className="text-xl font-semibold text-foreground">System Health</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {healthMetrics.map((metric) => {
@@ -240,7 +240,7 @@ export default async function AdminMetricsPage() {
           </section>
         </div>
 
-        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+        <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
           <h2 className="text-xl font-semibold text-foreground">Activity Summary</h2>
           <div className="mt-4 space-y-4">
             <div className="rounded-3xl bg-background/80 px-4 py-4">
@@ -287,7 +287,7 @@ export default async function AdminMetricsPage() {
         </section>
 
         {pendingOrders > 0 && (
-          <section className="rounded-[2rem] border border-orange-200 bg-orange-50 p-6 shadow-lg">
+          <section className="rounded-4xl border border-orange-200 bg-orange-50 p-6 shadow-lg">
             <div className="flex items-center gap-3">
               <AlertCircle className="size-6 text-orange-600" />
               <div>
@@ -300,31 +300,31 @@ export default async function AdminMetricsPage() {
           </section>
         )}
 
-        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+        <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
           <h2 className="text-xl font-semibold text-foreground">Security Monitoring</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-[1.75rem] border border-border bg-background p-6 shadow-sm">
+            <div className="rounded-3xl border border-border bg-background p-6 shadow-sm">
               <div className="rounded-2xl bg-blue-600/10 p-3 text-blue-600">
                 <Clock className="size-6" />
               </div>
               <p className="mt-4 text-sm text-muted-foreground">Successful Logins</p>
               <p className="mt-2 text-3xl font-bold text-foreground">{recentLogins}</p>
             </div>
-            <div className="rounded-[1.75rem] border border-border bg-background p-6 shadow-sm">
+            <div className="rounded-3xl border border-border bg-background p-6 shadow-sm">
               <div className="rounded-2xl bg-red-600/10 p-3 text-red-600">
                 <Activity className="size-6" />
               </div>
               <p className="mt-4 text-sm text-muted-foreground">Failed Login Attempts</p>
               <p className="mt-2 text-3xl font-bold text-foreground">{recentFailedLogins}</p>
             </div>
-            <div className="rounded-[1.75rem] border border-border bg-background p-6 shadow-sm">
+            <div className="rounded-3xl border border-border bg-background p-6 shadow-sm">
               <div className="rounded-2xl bg-purple-600/10 p-3 text-purple-600">
                 <ShieldCheck className="size-6" />
               </div>
               <p className="mt-4 text-sm text-muted-foreground">Admin Actions</p>
               <p className="mt-2 text-3xl font-bold text-foreground">{recentAdminActions}</p>
             </div>
-            <div className="rounded-[1.75rem] border border-border bg-background p-6 shadow-sm">
+            <div className="rounded-3xl border border-border bg-background p-6 shadow-sm">
               <div className="rounded-2xl bg-yellow-600/10 p-3 text-yellow-600">
                 <AlertCircle className="size-6" />
               </div>

@@ -459,7 +459,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
       </div>
 
       <div className="grid gap-4 sm:grid-cols-4">
-        <div className="flex items-center gap-3 rounded-[1.5rem] border border-border bg-card p-4 shadow-sm">
+        <div className="flex items-center gap-3 rounded-3xl border border-border bg-card p-4 shadow-sm">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-700">
             <ShieldCheck className="size-5" />
           </div>
@@ -469,7 +469,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           </div>
         </div>
 
-        <div className="flex items-center gap-3 rounded-[1.5rem] border border-border bg-card p-4 shadow-sm">
+        <div className="flex items-center gap-3 rounded-3xl border border-border bg-card p-4 shadow-sm">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-700">
             <ShoppingBag className="size-5" />
           </div>
@@ -479,7 +479,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           </div>
         </div>
 
-        <div className="flex items-center gap-3 rounded-[1.5rem] border border-border bg-card p-4 shadow-sm">
+        <div className="flex items-center gap-3 rounded-3xl border border-border bg-card p-4 shadow-sm">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <RotateCcw className="size-5" />
           </div>
@@ -488,7 +488,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
             <p className="text-xs text-muted-foreground">Hassle-free returns and order support</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-[1.5rem] border border-border bg-card p-4 shadow-sm">
+        <div className="flex items-center gap-3 rounded-3xl border border-border bg-card p-4 shadow-sm">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <CreditCard className="size-5" />
           </div>
@@ -526,7 +526,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           submitLabel="Review order"
         />
         <div className="space-y-4">
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-xl">
             <div className="mb-4">
               <p className="text-xs uppercase tracking-[0.28em] text-primary">Delivery address</p>
               <h2 className="mt-2 text-lg font-semibold text-foreground">Your delivery details</h2>
@@ -561,7 +561,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+        <section className="rounded-4xl border border-border bg-card p-6 shadow-xl">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <p className="text-xs uppercase tracking-[0.28em] text-primary">Coupon code</p>
@@ -601,7 +601,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           )}
         </section>
         
-        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+        <section className="rounded-4xl border border-border bg-card p-6 shadow-xl">
           <div className="mb-4">
             <p className="text-xs uppercase tracking-[0.28em] text-primary">Loyalty rewards</p>
             <h2 className="mt-2 text-lg font-semibold text-foreground">Redeem your points</h2>

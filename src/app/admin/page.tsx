@@ -44,7 +44,7 @@ export default async function AdminDashboardPage() {
               <Link
                 key={stat.label}
                 href={stat.href}
-                className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm transition hover:border-primary/40 hover:shadow-md"
+                className="rounded-3xl border border-border bg-card p-6 shadow-sm transition hover:border-primary/40 hover:shadow-md"
               >
                 <div className="flex items-center justify-between gap-4">
                   <div>
@@ -61,7 +61,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-xl font-semibold text-foreground">Recent orders</h2>
               <Link href="/admin/orders" className="text-sm font-semibold text-primary hover:underline">
@@ -92,7 +92,7 @@ export default async function AdminDashboardPage() {
             )}
           </section>
 
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <h2 className="text-xl font-semibold text-foreground">Quick actions</h2>
             <div className="mt-4 space-y-3">
               <Link

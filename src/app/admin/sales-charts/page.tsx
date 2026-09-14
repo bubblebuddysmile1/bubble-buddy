@@ -71,7 +71,7 @@ export default async function AdminSalesChartsPage() {
 
       <div className="space-y-6 p-6">
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                 <DollarSign className="size-6" />
@@ -82,7 +82,7 @@ export default async function AdminSalesChartsPage() {
               </div>
             </div>
           </div>
-          <div className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                 <BarChart3 className="size-6" />
@@ -93,7 +93,7 @@ export default async function AdminSalesChartsPage() {
               </div>
             </div>
           </div>
-          <div className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                 <TrendingUp className="size-6" />
@@ -109,7 +109,7 @@ export default async function AdminSalesChartsPage() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-2">
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-xl font-semibold text-foreground">Daily Sales (Last 7 Days)</h2>
               <Calendar className="size-5 text-muted-foreground" />
@@ -139,7 +139,7 @@ export default async function AdminSalesChartsPage() {
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-xl font-semibold text-foreground">Weekly Sales (Last 4 Weeks)</h2>
               <Calendar className="size-5 text-muted-foreground" />
@@ -169,7 +169,7 @@ export default async function AdminSalesChartsPage() {
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg xl:col-span-2">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg xl:col-span-2">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-xl font-semibold text-foreground">Monthly Sales (Last 6 Months)</h2>
               <Calendar className="size-5 text-muted-foreground" />

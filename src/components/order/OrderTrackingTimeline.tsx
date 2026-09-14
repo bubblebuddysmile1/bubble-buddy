@@ -25,7 +25,7 @@ const statusLabels: Record<OrderStatus, string> = {
 export default function OrderTrackingTimeline({ events }: OrderTrackingTimelineProps) {
   if (events.length === 0) {
     return (
-      <div className="rounded-[1.75rem] border border-border bg-background/80 p-6 text-sm text-muted-foreground">
+      <div className="rounded-3xl border border-border bg-background/80 p-6 text-sm text-muted-foreground">
         <p>No tracking updates are available for this order yet.</p>
       </div>
     );
@@ -34,7 +34,7 @@ export default function OrderTrackingTimeline({ events }: OrderTrackingTimelineP
   return (
     <div className="space-y-4">
       {events.map((event, index) => (
-        <div key={event.id} className="flex gap-4 rounded-[1.75rem] border border-border bg-card p-5 shadow-sm">
+        <div key={event.id} className="flex gap-4 rounded-3xl border border-border bg-card p-5 shadow-sm">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
             <span className="text-sm font-semibold">{index + 1}</span>
           </div>

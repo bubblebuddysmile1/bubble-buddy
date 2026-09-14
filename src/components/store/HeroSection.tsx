@@ -123,7 +123,7 @@ export default function HeroSection({ products = [] }: { products?: Product[] })
                 Today&rsquo;s edit
               </div>
 
-              <div className="rounded-[1.5rem] overflow-hidden border border-[#D9B98C]/40 bg-[#FBF4ED] p-5 shadow-2xl shadow-black/40">
+              <div className="rounded-3xl overflow-hidden border border-[#D9B98C]/40 bg-[#FBF4ED] p-5 shadow-2xl shadow-black/40">
                 <div className="mb-4 flex items-center justify-between gap-2 border-b border-[#2B1B24]/10 pb-3">
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.3em] text-[#C08457]">

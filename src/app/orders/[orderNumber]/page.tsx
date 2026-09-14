@@ -57,7 +57,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
   return (
     <main className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4">
-        <div className="mb-8 rounded-[2rem] border border-border bg-card p-8 shadow-lg">
+        <div className="mb-8 rounded-4xl border border-border bg-card p-8 shadow-lg">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">Order tracking</p>
@@ -95,21 +95,21 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-          <section className="rounded-[2rem] border border-border bg-card p-8 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-8 shadow-lg">
             <div className="grid gap-6 sm:grid-cols-2">
-              <div className="rounded-[1.75rem] bg-background/80 p-6">
+              <div className="rounded-3xl bg-background/80 p-6">
                 <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Order status</p>
                 <p className="mt-3 text-2xl font-semibold text-foreground">{order.status}</p>
                 <p className="mt-2 text-sm text-muted-foreground">Payment: {order.paymentStatus}</p>
               </div>
-              <div className="rounded-[1.75rem] bg-background/80 p-6">
+              <div className="rounded-3xl bg-background/80 p-6">
                 <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Placed on</p>
                 <p className="mt-3 text-2xl font-semibold text-foreground">{formatOrderDate(order.placedAt)}</p>
                 <p className="mt-2 text-sm text-muted-foreground">Total: {formatCurrency(order.totalAmount.toString())}</p>
               </div>
             </div>
 
-            <div className="mt-8 rounded-[1.75rem] border border-border bg-background/80 p-6">
+            <div className="mt-8 rounded-3xl border border-border bg-background/80 p-6">
               <h2 className="text-xl font-semibold text-foreground">Tracking timeline</h2>
               <p className="mt-2 text-sm text-muted-foreground">
                 Follow each step of your order, from placement to delivery.
@@ -126,7 +126,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
           </section>
 
           <aside className="space-y-6">
-            <div className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+            <div className="rounded-4xl border border-border bg-card p-6 shadow-lg">
               <h2 className="text-lg font-semibold">Order details</h2>
               <div className="mt-6 space-y-4 text-sm text-muted-foreground">
                 <div>
@@ -144,7 +144,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+            <div className="rounded-4xl border border-border bg-card p-6 shadow-lg">
               <h2 className="text-lg font-semibold">Items</h2>
               <div className="mt-4 space-y-4">
                 {order.items.map((item, index) => (

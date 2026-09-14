@@ -123,7 +123,7 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
 
   return (
     <section className="space-y-8">
-      <form method="get" action="/shop" className="grid gap-4 rounded-[2rem] border border-border bg-card p-4 shadow-sm sm:p-6 lg:grid-cols-[minmax(0,1fr)_240px_minmax(310px,auto)] lg:items-end">
+      <form method="get" action="/shop" className="grid gap-4 rounded-4xl border border-border bg-card p-4 shadow-sm sm:p-6 lg:grid-cols-[minmax(0,1fr)_240px_minmax(310px,auto)] lg:items-end">
         <label className="space-y-2">
             <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
               Search products
@@ -189,7 +189,7 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
 
       {products.length === 0 ? (
         <div className="space-y-6">
-          <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center sm:p-10">
+          <div className="rounded-4xl border border-dashed border-border bg-card p-8 text-center sm:p-10">
             <p className="text-lg font-semibold text-foreground">
               No products found for &quot;{query}&quot;.
             </p>
@@ -215,7 +215,7 @@ export default async function ShopBrowser({ searchParams }: ShopBrowserProps) {
         </div>
       )}
 
-       <div className="flex flex-col gap-4 rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+       <div className="flex flex-col gap-4 rounded-4xl border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-muted-foreground">
             Showing <span className="font-semibold text-foreground">{products.length}</span> of <span className="font-semibold text-foreground">{total}</span> products

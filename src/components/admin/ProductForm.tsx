@@ -22,6 +22,7 @@ export type ProductFormValues = {
   details: string;
   price: string;
   compareAtPrice: string;
+  discountPercent: string;
   currency: string;
   stockQuantity: number;
   categorySlug: string;
@@ -48,6 +49,7 @@ const defaultValues: ProductFormValues = {
   details: "",
   price: "",
   compareAtPrice: "",
+  discountPercent: "",
   currency: "USD",
   stockQuantity: 0,
   categorySlug: "",
@@ -70,6 +72,19 @@ export default function ProductForm({
 
   const categoryOptions = useMemo(() => categories, [categories]);
 
+  const computedPrice = useMemo(() => {
+    const mrp = Number.parseFloat(values.compareAtPrice || "0");
+    const discountPercent = Number.parseFloat(values.discountPercent || "0");
+
+    if (!mrp || discountPercent <= 0) {
+      return mrp ? Number(mrp.toFixed(2)) : 0;
+    }
+
+    const safeDiscount = Math.min(Math.max(discountPercent, 0), 100);
+    const price = mrp - (mrp * safeDiscount) / 100;
+    return Number(price.toFixed(2));
+  }, [values.compareAtPrice, values.discountPercent]);
+
   const updateField = <K extends keyof ProductFormValues>(key: K, value: ProductFormValues[K]) => {
     setValues((prev) => {
       const next = { ...prev, [key]: value };
@@ -85,10 +100,12 @@ export default function ProductForm({
     setError(null);
     setIsSaving(true);
 
+    const computed = Math.max(0, computedPrice);
     const payload = {
       ...values,
-      price: values.price,
-      compareAtPrice: values.compareAtPrice || null,
+      price: computed,
+      compareAtPrice: values.compareAtPrice ? Number(values.compareAtPrice) : null,
+      discountPercent: values.discountPercent ? Number(values.discountPercent) : null,
       thumbnail: values.thumbnail || null,
       benefits: values.benefits || null,
       howToApply: values.howToApply || null,
@@ -195,24 +212,33 @@ export default function ProductForm({
           />
         </label>
         <label className="space-y-2 text-sm">
-          <span className="font-medium">Price *</span>
-          <Input
-            type="number"
-            min="0"
-            step="0.01"
-            value={values.price}
-            onChange={(e) => updateField("price", e.target.value)}
-            required
-          />
-        </label>
-        <label className="space-y-2 text-sm">
-          <span className="font-medium">Compare at price</span>
+          <span className="font-medium">MRP / Compare at price</span>
           <Input
             type="number"
             min="0"
             step="0.01"
             value={values.compareAtPrice}
             onChange={(e) => updateField("compareAtPrice", e.target.value)}
+          />
+        </label>
+        <label className="space-y-2 text-sm">
+          <span className="font-medium">Discount %</span>
+          <Input
+            type="number"
+            min="0"
+            max="100"
+            step="1"
+            value={values.discountPercent}
+            onChange={(e) => updateField("discountPercent", e.target.value)}
+          />
+        </label>
+        <label className="space-y-2 text-sm">
+          <span className="font-medium">Price</span>
+          <Input
+            type="text"
+            value={computedPrice ? computedPrice.toFixed(2) : "0.00"}
+            readOnly
+            className="opacity-90"
           />
         </label>
         <label className="space-y-2 text-sm">

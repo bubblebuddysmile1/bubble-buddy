@@ -134,7 +134,7 @@ export default function ProductImageUpload({
   };
 
   return (
-    <div className="space-y-6 rounded-[2rem] border border-border bg-card p-8 shadow-lg">
+    <div className="space-y-6 rounded-4xl border border-border bg-card p-8 shadow-lg">
       <div>
         <h3 className="text-xl font-semibold text-foreground">Upload product images</h3>
         <p className="mt-2 text-sm text-muted-foreground">

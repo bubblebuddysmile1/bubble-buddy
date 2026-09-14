@@ -19,14 +19,14 @@ export default function CartItemRow({ item, index }: CartItemRowProps) {
 
   return (
     <article
-      className="cart-item-enter group relative flex gap-4 rounded-[1.75rem] border border-border bg-card p-4 shadow-lg transition duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:gap-6 sm:p-5"
+      className="cart-item-enter group relative flex gap-4 rounded-3xl border border-border bg-card p-4 shadow-lg transition duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:gap-6 sm:p-5"
       style={{ animationDelay: `${index * 80}ms` }}
     >
       <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl transition group-hover:bg-primary/20" />
 
       <Link
         href={`/shop/${item.slug}`}
-        className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[1.25rem] bg-muted sm:h-28 sm:w-28"
+        className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-muted sm:h-28 sm:w-28"
       >
         <Image src={item.image} alt={item.name} fill className="object-cover transition duration-500 group-hover:scale-105" sizes="112px" />
       </Link>

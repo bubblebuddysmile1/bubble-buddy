@@ -67,7 +67,7 @@ export default async function InventoryReportsPage() {
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.label} className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+              <div key={stat.label} className="rounded-3xl border border-border bg-card p-6 shadow-sm">
                 <div className="rounded-2xl p-3 text-primary">
                   <Icon className={`size-6 ${stat.color}`} />
                 </div>
@@ -79,7 +79,7 @@ export default async function InventoryReportsPage() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-2">
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <h2 className="text-xl font-semibold text-foreground">Stock Value Summary</h2>
             <div className="mt-4 space-y-4">
               <div className="rounded-3xl bg-background/80 px-4 py-3">
@@ -105,7 +105,7 @@ export default async function InventoryReportsPage() {
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <h2 className="text-xl font-semibold text-foreground">Stock Alerts</h2>
             <div className="mt-4 space-y-3">
               {outOfStockProducts.length > 0 && (
@@ -136,7 +136,7 @@ export default async function InventoryReportsPage() {
           </section>
         </div>
 
-        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+        <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
           <h2 className="text-xl font-semibold text-foreground">Inventory Details</h2>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-190 text-left text-sm">

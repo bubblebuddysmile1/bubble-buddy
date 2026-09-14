@@ -17,7 +17,7 @@ export default function CheckoutOrderSummary({ items, totals }: CheckoutOrderSum
 
   return (
     <aside className="checkout-summary-enter lg:sticky lg:top-24">
-      <div className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-xl">
+      <div className="overflow-hidden rounded-4xl border border-border bg-card shadow-xl">
         <div className="bg-linear-to-r from-primary/15 via-accent/10 to-secondary/20 px-6 py-5">
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-primary">
             <Sparkles className="size-4" />

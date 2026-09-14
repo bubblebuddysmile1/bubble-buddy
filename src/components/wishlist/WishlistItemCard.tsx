@@ -18,12 +18,12 @@ export default function WishlistItemCard({ product, index }: WishlistItemCardPro
 
   return (
     <article
-      className="wishlist-item-enter group relative overflow-hidden rounded-[1.75rem] border border-border bg-card shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="wishlist-item-enter group relative overflow-hidden rounded-3xl border border-border bg-card shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl"
       style={{ animationDelay: `${index * 70}ms` }}
     >
       <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-primary/10 blur-2xl transition group-hover:bg-primary/20" />
 
-      <Link href={`/shop/${product.slug}`} className="relative block aspect-[4/3] overflow-hidden bg-muted">
+      <Link href={`/shop/${product.slug}`} className="relative block aspect-4/3 overflow-hidden bg-muted">
         <Image
           src={product.image}
           alt={product.name}

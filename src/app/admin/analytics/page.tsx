@@ -77,7 +77,7 @@ export default async function AdminAnalyticsPage() {
             return (
               <div
                 key={stat.label}
-                className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm"
+                className="rounded-3xl border border-border bg-card p-6 shadow-sm"
               >
                 <div className="flex items-center justify-between gap-4">
                   <div className="rounded-2xl bg-primary/10 p-3 text-primary">
@@ -96,7 +96,7 @@ export default async function AdminAnalyticsPage() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <h2 className="text-xl font-semibold text-foreground">Recent Orders</h2>
             <div className="mt-4 space-y-3">
               {recentOrders.length === 0 ? (
@@ -122,7 +122,7 @@ export default async function AdminAnalyticsPage() {
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <h2 className="text-xl font-semibold text-foreground">Quick Stats</h2>
             <div className="mt-4 space-y-4">
               <div className="rounded-3xl bg-background/80 px-4 py-3">

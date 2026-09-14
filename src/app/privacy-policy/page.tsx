@@ -183,7 +183,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           {/* Contact Information */}
-          <section className="space-y-4 rounded-[2rem] border border-border bg-card/50 p-8 backdrop-blur-lg">
+          <section className="space-y-4 rounded-4xl border border-border bg-card/50 p-8 backdrop-blur-lg">
             <h2 className="text-3xl font-bold">11. Contact Us</h2>
             <p className="text-muted-foreground">
               If you have questions about this Privacy Policy or our privacy practices, please contact us at:

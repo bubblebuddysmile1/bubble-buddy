@@ -56,7 +56,7 @@ export default function OfferDiscountSectionClient({ promotions }: OfferDiscount
       return (
         <article
           key={promotion.id}
-          className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-lg shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+          className="overflow-hidden rounded-4xl border border-border bg-card p-6 shadow-lg shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
         >
           <div className="mb-5 flex items-center justify-between gap-3">
             <div className="text-sm font-bold leading-tight text-foreground">{promotion.title}</div>
@@ -66,13 +66,13 @@ export default function OfferDiscountSectionClient({ promotions }: OfferDiscount
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-[1.5rem] border border-border bg-muted p-5">
+            <div className="rounded-3xl border border-border bg-muted p-5">
               <p className="text-sm text-muted-foreground">
                 {promotion.description ?? "Use this coupon for instant savings on your order."}
               </p>
             </div>
 
-            <div className="rounded-[1.5rem] border border-border bg-background p-5">
+            <div className="rounded-3xl border border-border bg-background p-5">
               <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Offer</p>
               <p className="mt-2 text-xl font-semibold text-foreground">{badge}</p>
               {minOrderAmount > 0 && (
@@ -118,7 +118,7 @@ export default function OfferDiscountSectionClient({ promotions }: OfferDiscount
         </div>
 
         {!hasPromotions ? (
-          <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          <div className="rounded-4xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
             No active promotions available yet. Add coupons in admin to populate this section.
           </div>
         ) : (
@@ -128,7 +128,7 @@ export default function OfferDiscountSectionClient({ promotions }: OfferDiscount
             </div>
 
             <div className="space-y-6 md:hidden">
-              <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-lg shadow-black/5">
+              <div className="relative overflow-hidden rounded-4xl border border-border bg-card p-6 shadow-lg shadow-black/5">
                 <div className="absolute inset-x-0 top-0 z-10 flex justify-center gap-2 pt-4">
                   {promotions.map((promotion, index) => (
                     <span
@@ -148,7 +148,7 @@ export default function OfferDiscountSectionClient({ promotions }: OfferDiscount
                         </span>
                       </div>
 
-                      <div className="space-y-4 rounded-[1.5rem] border border-border bg-muted p-5">
+                      <div className="space-y-4 rounded-3xl border border-border bg-muted p-5">
                         <p className="text-sm text-muted-foreground">
                           {activePromotion.description ?? "Use this coupon for instant savings on your order."}
                         </p>

@@ -9,6 +9,7 @@ type BestSellingProduct = {
   slug: string;
   thumbnail: string | null;
   price: number;
+  compareAtPrice?: number | null;
   currency: string;
   category: { name: string; slug: string } | null;
   stockQuantity: number;
@@ -30,6 +31,7 @@ export default async function BestSellingProducts() {
     slug: product.slug,
     thumbnail: product.thumbnail,
     price: Number(product.price.toString()),
+    compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice.toString()) : null,
     currency: "₹",
     category: product.category,
     stockQuantity: product.stockQuantity,

@@ -201,16 +201,16 @@ export async function POST(req: NextRequest) {
   const currency = String(body?.currency ?? "USD").trim();
   const thumbnail = body?.thumbnail ? String(body.thumbnail).trim() : null;
   const categorySlug = String(body?.categorySlug ?? "").trim();
-  const price = body?.price ? String(body.price) : null;
-  const compareAtPrice = body?.compareAtPrice ? String(body.compareAtPrice) : null;
+  const compareAtPrice = body?.compareAtPrice ? Number(body.compareAtPrice) : null;
+  const discountPercent = Number.isFinite(Number(body?.discountPercent)) ? Number(body.discountPercent) : null;
   const stockQuantity = Number(body?.stockQuantity ?? 0);
   const featured = Boolean(body?.featured ?? false);
   const isActive = Boolean(body?.isActive ?? true);
   const images = Array.isArray(body?.images) ? (body.images as Array<Record<string, unknown>>) : [];
 
-  if (!name || !sku || !slug || !description || !price || !categorySlug) {
+  if (!name || !sku || !slug || !description || !compareAtPrice || !categorySlug) {
     return NextResponse.json(
-      { error: "Product name, sku, slug, description, price, and categorySlug are required." },
+      { error: "Product name, sku, slug, description, MRP, and categorySlug are required." },
       { status: 400 },
     );
   }
@@ -225,6 +225,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Product with this slug already exists." }, { status: 409 });
   }
 
+  const safeDiscount = Math.min(Math.max(Number(discountPercent ?? 0), 0), 100);
+  const computedPrice = compareAtPrice - (compareAtPrice * safeDiscount) / 100;
+  const finalPrice = Math.max(0, computedPrice).toFixed(2);
+
+  let dealConnect: { connect: { id: number } } | undefined;
+  if (safeDiscount > 0) {
+    const deal = await prisma.deal.create({
+      data: {
+        title: `${name} Discount`,
+        description: `${name} discounted price offer`,
+        dealType: "FLASH_SALE",
+        urgencyLevel: "NORMAL",
+        discountPercent: Math.round(safeDiscount),
+        isActive: true,
+        startsAt: new Date(),
+      },
+    });
+
+    dealConnect = { connect: { id: deal.id } };
+  }
+
   const product = await prisma.product.create({
     data: {
       name,
@@ -235,7 +256,7 @@ export async function POST(req: NextRequest) {
       howToApply,
       faq,
       details,
-      price,
+      price: finalPrice,
       compareAtPrice: compareAtPrice ?? undefined,
       currency,
       stockQuantity,
@@ -243,6 +264,7 @@ export async function POST(req: NextRequest) {
       isActive,
       thumbnail,
       category: { connect: { id: category.id } },
+      ...(dealConnect ? { deal: dealConnect } : {}),
       images: {
         create: images
           .filter((item): item is ProductCreateImage => Boolean(item?.url))

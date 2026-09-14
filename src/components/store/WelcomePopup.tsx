@@ -195,7 +195,7 @@ export default function WelcomePopup() {
         aria-label="Welcome popup"
         tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
-        className="relative flex max-h-[90vh] w-full max-w-155 flex-col overflow-hidden rounded-[2rem] border border-border/70 bg-background shadow-[0_30px_100px_rgba(0,0,0,0.35)]"
+        className="relative flex max-h-[90vh] w-full max-w-155 flex-col overflow-hidden rounded-4xl border border-border/70 bg-background shadow-[0_30px_100px_rgba(0,0,0,0.35)]"
       >
         <div className="relative overflow-hidden border-b border-border/70 bg-linear-to-r from-primary/10 via-background to-accent/10 px-5 py-5 sm:px-7">
           <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-[radial-gradient(circle,rgba(192,132,87,0.2),transparent_70%)]" />
@@ -224,17 +224,17 @@ export default function WelcomePopup() {
           {isLoading ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="h-56 animate-pulse rounded-[1.5rem] border border-border/60 bg-muted/70" />
+                <div key={index} className="h-56 animate-pulse rounded-3xl border border-border/60 bg-muted/70" />
               ))}
             </div>
           ) : products.length === 0 ? (
-            <div className="rounded-[1.5rem] border border-dashed border-border bg-card/80 p-6 text-center text-sm text-muted-foreground">
+            <div className="rounded-3xl border border-dashed border-border bg-card/80 p-6 text-center text-sm text-muted-foreground">
               No featured products are available right now. Please check back soon.
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="overflow-hidden rounded-[1.5rem] border border-border/60 bg-card/90 px-2 py-1 shadow-sm shadow-black/5">
-                <div className="relative overflow-hidden rounded-[1.25rem] bg-muted/60">
+              <div className="overflow-hidden rounded-3xl border border-border/60 bg-card/90 px-2 py-1 shadow-sm shadow-black/5">
+                <div className="relative overflow-hidden rounded-2xl bg-muted/60">
                   <div className="absolute inset-0 bg-linear-to-b from-transparent via-background/20 to-background/40" />
                   <Image
                     src={products[activeIndex]?.image ?? "/category/1.jpg"}

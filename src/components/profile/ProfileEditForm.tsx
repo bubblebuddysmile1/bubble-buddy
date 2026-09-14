@@ -48,7 +48,7 @@ export default function ProfileEditForm({ initialName, initialPhone }: ProfileEd
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-[1.75rem] border border-border bg-background/80 p-6">
+    <form onSubmit={handleSubmit} className="rounded-3xl border border-border bg-background/80 p-6">
       <h2 className="text-xl font-semibold">Edit profile</h2>
       <p className="mt-2 text-sm text-muted-foreground">Update your display name and phone number.</p>
 

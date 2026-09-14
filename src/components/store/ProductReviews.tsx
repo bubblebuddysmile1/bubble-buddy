@@ -121,7 +121,7 @@ export default function ProductReviews({ productId, averageRating, reviewCount }
             {loading ? (
               <div className="space-y-4">
                 {Array.from({ length: 2 }).map((_, index) => (
-                  <div key={index} className="rounded-[1.25rem] border border-border bg-card p-4 shadow-sm">
+                  <div key={index} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                     <div className="flex items-center justify-between gap-3">
                       <Skeleton className="h-4 w-24 rounded-full" />
                       <Skeleton className="h-4 w-20 rounded-full" />
@@ -133,12 +133,12 @@ export default function ProductReviews({ productId, averageRating, reviewCount }
                 ))}
               </div>
             ) : reviews.length === 0 ? (
-              <div className="rounded-[1.25rem] border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+              <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
                 No reviews yet. Be the first to review this product.
               </div>
             ) : null}
             {reviews.map((r) => (
-              <article key={r.id} className="rounded-[1.25rem] border border-border bg-card p-4 shadow-sm">
+              <article key={r.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-semibold">{r.user?.name ?? "Anonymous"}</div>

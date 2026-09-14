@@ -22,7 +22,7 @@ export default function CartPageClient({ emptyCartRecommendations }: CartPageCli
   if (items.length === 0) {
     return (
       <div className="space-y-10">
-        <div className="cart-empty-enter mx-auto max-w-lg rounded-[2rem] border border-border bg-card p-6 text-center shadow-xl sm:p-10">
+        <div className="cart-empty-enter mx-auto max-w-lg rounded-4xl border border-border bg-card p-6 text-center shadow-xl sm:p-10">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
             <ShoppingBag className="size-9 text-primary" />
           </div>
@@ -72,7 +72,7 @@ export default function CartPageClient({ emptyCartRecommendations }: CartPageCli
       </section>
 
       <aside className="cart-summary-enter w-full lg:sticky lg:top-24">
-        <div className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-xl">
+        <div className="overflow-hidden rounded-4xl border border-border bg-card shadow-xl">
           <div className="bg-linear-to-r from-primary/15 via-accent/10 to-secondary/20 px-6 py-5">
             <div className="flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-primary">
               <Sparkles className="size-4" />

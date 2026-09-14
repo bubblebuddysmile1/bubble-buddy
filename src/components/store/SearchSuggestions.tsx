@@ -23,7 +23,7 @@ export default function SearchSuggestions({ query, products }: SearchSuggestions
   if (products.length === 0) return null;
 
   return (
-    <section aria-labelledby="search-suggestions-title" className="relative overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-sm sm:p-8">
+    <section aria-labelledby="search-suggestions-title" className="relative overflow-hidden rounded-4xl border border-border bg-card p-5 shadow-sm sm:p-8">
       <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
       <div className="relative mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>

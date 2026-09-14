@@ -4,7 +4,7 @@ import Skeleton from "@/components/ui/Skeleton";
 
 export default function SkeletonProductCard() {
   return (
-    <article className="group overflow-hidden rounded-[2rem] border border-border bg-card p-0 shadow-lg">
+    <article className="group overflow-hidden rounded-4xl border border-border bg-card p-0 shadow-lg">
       <div className="relative h-80 overflow-hidden bg-muted">
         <Skeleton className="h-full w-full" />
       </div>

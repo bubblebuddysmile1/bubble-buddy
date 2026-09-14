@@ -49,7 +49,7 @@ export default async function BestSellingProductsPage() {
 
       <div className="space-y-6 p-6">
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                 <Package className="size-6" />
@@ -60,7 +60,7 @@ export default async function BestSellingProductsPage() {
               </div>
             </div>
           </div>
-          <div className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                 <DollarSign className="size-6" />
@@ -71,7 +71,7 @@ export default async function BestSellingProductsPage() {
               </div>
             </div>
           </div>
-          <div className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                 <TrendingUp className="size-6" />
@@ -86,7 +86,7 @@ export default async function BestSellingProductsPage() {
           </div>
         </div>
 
-        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+        <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
           <h2 className="text-xl font-semibold text-foreground">Top 10 Best Selling Products</h2>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-190 text-left text-sm">

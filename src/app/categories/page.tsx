@@ -65,7 +65,7 @@ export default async function CategoriesPage() {
             <Link
               key={category.id}
               href={`/categories/${category.slug}`}
-              className="group overflow-hidden rounded-[2rem] border border-border bg-card p-6 transition hover:-translate-y-1 hover:border-primary"
+              className="group overflow-hidden rounded-4xl border border-border bg-card p-6 transition hover:-translate-y-1 hover:border-primary"
             >
               {category.image ? (
                 <div className="relative mb-5 h-44 w-full overflow-hidden rounded-3xl bg-muted">
@@ -89,7 +89,7 @@ export default async function CategoriesPage() {
         </div>
 
         {categories.length === 0 ? (
-          <div className="mt-10 rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">
+          <div className="mt-10 rounded-4xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
             No active categories found.
           </div>
         ) : null}

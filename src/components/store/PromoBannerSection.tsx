@@ -65,15 +65,15 @@ export default function PromoBannerSection() {
         </div>
 
         {error ? (
-          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-destructive">
+          <div className="rounded-4xl border border-border bg-card p-8 text-center text-sm text-destructive">
             {error}
           </div>
         ) : loading ? (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="overflow-hidden rounded-[2rem] border border-border bg-card p-0 shadow-lg">
-                <div className="relative h-72 w-full overflow-hidden rounded-[1.75rem] bg-muted p-6">
-                  <Skeleton className="h-full w-full rounded-[1.5rem]" />
+              <div key={index} className="overflow-hidden rounded-4xl border border-border bg-card p-0 shadow-lg">
+                <div className="relative h-72 w-full overflow-hidden rounded-3xl bg-muted p-6">
+                  <Skeleton className="h-full w-full rounded-3xl" />
                   <div className="absolute inset-0 flex flex-col justify-end gap-3 p-6">
                     <Skeleton className="h-4 w-24 rounded-full" />
                     <Skeleton className="h-8 w-3/4 rounded-md" />
@@ -84,7 +84,7 @@ export default function PromoBannerSection() {
             ))}
           </div>
         ) : banners.length === 0 ? (
-          <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          <div className="rounded-4xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
             No category banners configured yet. Enable the promo banner option from category admin.
           </div>
         ) : (

@@ -317,7 +317,7 @@ export default function OrderManagementTable({ orders }: { orders: AdminOrderRow
 
       <div className="space-y-3 md:hidden">
         {rows.map((order) => (
-          <div key={order.id} className="rounded-[1.5rem] border border-border bg-card p-4 shadow-sm">
+          <div key={order.id} className="rounded-3xl border border-border bg-card p-4 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-foreground">#{order.orderNumber}</p>

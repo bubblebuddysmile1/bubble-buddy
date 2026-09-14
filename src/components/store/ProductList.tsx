@@ -3,7 +3,7 @@ import Link from "next/link";
 import AddToCartButton from "@/components/cart/AddToCartButton";
 import CompareButton from "@/components/compare/CompareButton";
 import ShareProductButton from "@/components/store/ShareProductButton";
-import { toCartProduct } from "@/lib/cart";
+import { getDiscountDetails, toCartProduct } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
 import type { CartProduct } from "@/types/cart";
 
@@ -21,6 +21,7 @@ export default async function ProductList() {
         slug: true,
         description: true,
         price: true,
+        compareAtPrice: true,
         currency: true,
         stockQuantity: true,
         thumbnail: true,
@@ -44,11 +45,17 @@ export default async function ProductList() {
 
         <div className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           {products.map((product) => {
+            const discountDetails = getDiscountDetails(
+              Number(product.price ?? 0),
+              product.compareAtPrice ? Number(product.compareAtPrice) : null,
+            );
+
             const cartProduct: CartProduct = toCartProduct({
               id: product.id,
               slug: product.slug,
               name: product.name,
               price: product.price.toString(),
+              compareAtPrice: product.compareAtPrice ? product.compareAtPrice.toString() : null,
               currency: product.currency,
               thumbnail: product.thumbnail ?? null,
               stockQuantity: product.stockQuantity,
@@ -58,9 +65,9 @@ export default async function ProductList() {
             return (
               <article
                 key={product.id}
-                className="group overflow-hidden rounded-[2rem] border border-border bg-card p-4 shadow-lg shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                className="group overflow-hidden rounded-4xl border border-border bg-card p-4 shadow-lg shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
               >
-                <div className="relative overflow-hidden rounded-[1.75rem] bg-muted">
+                <div className="relative overflow-hidden rounded-3xl bg-muted">
                   <Link href={`/shop/${product.slug}`} className="block h-52 w-full">
                     <Image
                       src={product.thumbnail ?? "/category/1.jpg"}
@@ -81,7 +88,24 @@ export default async function ProductList() {
                 </div>
 
                 <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-lg font-bold text-foreground">{product.price.toString()}</p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-lg font-bold text-foreground">
+                        {product.currency} {Number(product.price).toFixed(2)}
+                      </p>
+                      {discountDetails.mrp ? (
+                        <>
+                          <span className="text-xs text-muted-foreground line-through">
+                            {product.currency} {discountDetails.mrp.toFixed(2)}
+                          </span>
+                          <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">
+                            {discountDetails.discountPercent}% OFF
+                          </span>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+
                   <div className="flex items-center gap-2">
                     <AddToCartButton product={cartProduct} size="sm" label="Add" />
                     <CompareButton product={cartProduct} variant="icon" />

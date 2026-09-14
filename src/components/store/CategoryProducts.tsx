@@ -31,7 +31,7 @@ export default async function CategoryProducts({ categorySlug }: CategoryProduct
 
   if (!category) {
     return (
-      <div className="rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">
+      <div className="rounded-4xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
         No products were found in this category.
       </div>
     );
@@ -41,7 +41,7 @@ export default async function CategoryProducts({ categorySlug }: CategoryProduct
 
   if (products.length === 0) {
     return (
-      <div className="rounded-[2rem] border border-border bg-card p-10 text-center text-sm text-muted-foreground">
+      <div className="rounded-4xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
         No products were found in this category.
       </div>
     );

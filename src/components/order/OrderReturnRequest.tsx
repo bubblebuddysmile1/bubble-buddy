@@ -69,7 +69,7 @@ export default function OrderReturnRequest({ orderNumber, status, returnAllowed,
   };
 
   return (
-    <div className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+    <div className="rounded-4xl border border-border bg-card p-6 shadow-lg">
       <div className="flex items-start gap-3">
         <div className="rounded-full bg-primary/10 p-3 text-primary">
           <ArrowUpRight className="size-5" />

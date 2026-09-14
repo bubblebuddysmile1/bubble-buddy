@@ -61,7 +61,7 @@ export default function OffersPage() {
                 icon: "3️⃣",
               },
             ].map((item) => (
-              <div key={item.title} className="rounded-[2rem] border border-border bg-background p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg sm:p-8">
+              <div key={item.title} className="rounded-4xl border border-border bg-background p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg sm:p-8">
                 <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-3xl bg-primary/10 text-2xl">
                   {item.icon}
                 </div>
@@ -76,7 +76,7 @@ export default function OffersPage() {
       {/* CTA Section */}
       <div className="border-t border-border px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-6xl">
-          <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-primary/5 p-8 shadow-lg sm:p-12">
+          <div className="relative overflow-hidden rounded-4xl border border-primary/20 bg-primary/5 p-8 shadow-lg sm:p-12">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.25),transparent_40%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(236,72,153,0.2),transparent_35%)]" />
             <div className="relative grid gap-8 text-center sm:grid-cols-[1.5fr_1fr] sm:items-center sm:text-left">

@@ -30,7 +30,7 @@ export default function ProductTabs({
   ];
 
   return (
-    <section className="mt-12 space-y-6 rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+    <section className="mt-12 space-y-6 rounded-4xl border border-border bg-card p-6 shadow-lg">
       {/* Tab Headers */}
       <div className="flex flex-wrap gap-2 border-b border-border">
         {tabs.map((tab) => (

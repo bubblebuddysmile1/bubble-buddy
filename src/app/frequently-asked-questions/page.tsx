@@ -531,7 +531,7 @@ export default function FAQPage() {
           {/* Legal & Other */}
           <section
             id="legal"
-            className="space-y-6 scroll-mt-24 rounded-[2rem] border border-border bg-card/30 p-8 backdrop-blur-lg"
+            className="space-y-6 scroll-mt-24 rounded-4xl border border-border bg-card/30 p-8 backdrop-blur-lg"
           >
             <div className="flex items-center gap-4">
               <div className="rounded-xl bg-blue-500/10 p-3">

@@ -10,7 +10,8 @@ import PromoBannerSection from "@/components/store/PromoBannerSection";
 import ReviewsCarousel from "@/components/store/ReviewsCarousel";
 
 export const metadata: Metadata = {
-  title: "Bubble Buddy Smile | Premium Skincare, Haircare & Beauty Essentials Online",
+  title:
+    "Bubble Buddy Smile | Premium Skincare, Haircare & Beauty Essentials Online",
   description:
     "Shop premium skincare, haircare & makeup essentials at Bubble Buddy Smile. Clean, effective beauty products with fast delivery & secure checkout.",
   keywords: [
@@ -18,7 +19,11 @@ export const metadata: Metadata = {
     "beauty store online india",
     "skincare products",
     "haircare essentials",
-    "makeup online","bubble beauty","bubble buddy","face care product","skin product"
+    "makeup online",
+    "bubble beauty",
+    "bubble buddy",
+    "face care product",
+    "skin product",
   ],
   alternates: { canonical: "https://bubblebuddysmile.com/" },
   openGraph: {
@@ -44,7 +49,6 @@ export const metadata: Metadata = {
   },
 };
 
-
 export const revalidate = 60;
 
 export default async function Home() {
@@ -54,7 +58,14 @@ export default async function Home() {
     where: { isActive: true },
     orderBy: { createdAt: "desc" },
     take: 5,
-    select: { id: true, name: true, slug: true, thumbnail: true, price: true, currency: true },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      thumbnail: true,
+      price: true,
+      currency: true,
+    },
   });
 
   function decimalToNumber(value: unknown): number | null {
@@ -78,7 +89,8 @@ export default async function Home() {
             "@context": "https://schema.org",
             "@type": "Store",
             name: "Bubble Buddy Smile",
-            url: process.env.NEXT_PUBLIC_APP_URL || "https://bubblebuddysmile.com",
+            url:
+              process.env.NEXT_PUBLIC_APP_URL || "https://bubblebuddysmile.com",
             description:
               "Bubble Buddy offers premium skincare, haircare, and makeup essentials with secure checkout and fast delivery.",
             areaServed: "India",
@@ -90,15 +102,15 @@ export default async function Home() {
       <HeroSection products={latestProductsNormalized} />
       <CategoriesSection />
       <BestSellingProducts />
-    
+
       <ProductList />
       <BeautyBannerSection />
-            <OfferDiscountSection />
+      <OfferDiscountSection />
 
       <AdvancedPromoSection />
-            <ReviewsCarousel />
+      <ReviewsCarousel />
 
-      <PromoBannerSection/>
+      <PromoBannerSection />
     </div>
   );
 }

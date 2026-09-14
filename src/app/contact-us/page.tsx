@@ -149,7 +149,7 @@ export default function ContactPage() {
           </div>
 
           <div className="lg:col-span-2">
-            <div className="rounded-[2rem] border border-border bg-card/30 p-6 backdrop-blur-lg sm:p-8">
+            <div className="rounded-4xl border border-border bg-card/30 p-6 backdrop-blur-lg sm:p-8">
               <div className="mb-8">
                 <h2 className="text-3xl font-bold">Send Us a Message</h2>
                 <p className="mt-2 text-muted-foreground">
@@ -300,7 +300,7 @@ export default function ContactPage() {
             </div>
 
             <div className="mt-8 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-              <div className="rounded-[2rem] border border-border bg-card/30 p-6 backdrop-blur-lg">
+              <div className="rounded-4xl border border-border bg-card/30 p-6 backdrop-blur-lg">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h3 className="text-xl font-bold">Need Quick Answers?</h3>
@@ -336,7 +336,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="rounded-[2rem] border border-border bg-card/30 p-6 backdrop-blur-lg">
+              <div className="rounded-4xl border border-border bg-card/30 p-6 backdrop-blur-lg">
                 <h3 className="text-xl font-bold">Find Our Store</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   Visit us at our showroom for product guidance, demos, and personalized smile recommendations.

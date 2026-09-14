@@ -8,7 +8,7 @@ import WishlistButton from "@/components/wishlist/WishlistButton";
 import LimitedOfferBadge from "@/components/store/LimitedOfferBadge";
 import ClaimFastButton from "@/components/store/ClaimFastButton";
 import ShareProductButton from "@/components/store/ShareProductButton";
-import { formatCartMoney } from "@/lib/cart";
+import { formatCartMoney, getDiscountDetails } from "@/lib/cart";
 import type { CartProduct } from "@/types/cart";
 
 interface Deal {
@@ -40,9 +40,10 @@ export default function ShopProductCard({
 }: ShopProductCardProps) {
   const isDealActive = product.deal?.isActive && 
     (!product.deal?.endsAt || new Date(product.deal.endsAt) > new Date());
+  const discount = getDiscountDetails(product.price, product.compareAtPrice ?? null);
 
   return (
-    <article className="group overflow-hidden rounded-[2rem] border border-border bg-card p-0 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+    <article className="group overflow-hidden rounded-4xl border border-border bg-card p-0 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
       <div className="relative h-52 md:h-80 overflow-hidden bg-muted">
         <Link href={`/shop/${product.slug}`} className="relative block h-full">
           <Image
@@ -81,9 +82,21 @@ export default function ShopProductCard({
         <div className="flex items-end justify-between gap-3">
           <div className="shrink-0">
             <p className="text-sm text-muted-foreground">Price</p>
-            <p className="text-lg md:text-xl font-semibold text-foreground">
-              {formatCartMoney(product.price, product.currency)}
-            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-lg md:text-xl font-semibold text-foreground">
+                {formatCartMoney(product.price, product.currency)}
+              </p>
+              {discount.mrp && (
+                <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">
+                  {discount.discountPercent}% OFF
+                </span>
+              )}
+            </div>
+            {discount.mrp && (
+              <p className="text-xs text-muted-foreground line-through">
+                MRP {formatCartMoney(discount.mrp, product.currency)}
+              </p>
+            )}
           </div>
 
           {isDealActive && product.deal && (

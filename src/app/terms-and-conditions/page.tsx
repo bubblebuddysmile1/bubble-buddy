@@ -226,7 +226,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           {/* Governing Law */}
-          <section className="space-y-4 rounded-[2rem] border border-border bg-card/50 p-8 backdrop-blur-lg">
+          <section className="space-y-4 rounded-4xl border border-border bg-card/50 p-8 backdrop-blur-lg">
             <h2 className="text-3xl font-bold">18. Governing Law & Contact</h2>
             <p className="text-muted-foreground mb-6">
               These Terms and Conditions are governed by and construed in accordance with the laws of India, and you irrevocably submit to the exclusive jurisdiction of the courts in that location.

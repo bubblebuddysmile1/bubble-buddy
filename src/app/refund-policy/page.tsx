@@ -50,7 +50,7 @@ export default function RefundPolicyPage() {
             </p>
           </section>
 
-          <section className="space-y-4 rounded-[2rem] border border-border bg-card/50 p-8 backdrop-blur-lg">
+          <section className="space-y-4 rounded-4xl border border-border bg-card/50 p-8 backdrop-blur-lg">
             <h2 className="text-3xl font-bold">4. Contact Us</h2>
             <p className="text-muted-foreground">
               For refund-related questions, email us at bubblebuddysmile.team@gmail.com or call +91 98888 88727.

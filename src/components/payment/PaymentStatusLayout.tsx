@@ -29,7 +29,7 @@ export default function PaymentStatusLayout({
 
       <div className="container relative mx-auto px-4">
         <div
-          className={`checkout-success-enter mx-auto max-w-lg rounded-[2rem] border border-border bg-card p-10 text-center shadow-xl ${
+          className={`checkout-success-enter mx-auto max-w-lg rounded-4xl border border-border bg-card p-10 text-center shadow-xl ${
             variant === "failure" ? "checkout-field-error" : ""
           }`}
         >

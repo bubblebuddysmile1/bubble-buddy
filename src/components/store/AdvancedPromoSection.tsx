@@ -42,7 +42,7 @@ export default function AdvancedPromoSection() {
             {/* Feature Cards - Responsive Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 mt-4 sm:mt-6">
               {/* Card 1 */}
-              <div className="rounded-2xl sm:rounded-[1.5rem] md:rounded-[1.75rem] border border-border bg-card p-3 sm:p-4 text-center shadow-sm shadow-black/5 transition-all duration-200 hover:shadow-md hover:scale-105">
+              <div className="rounded-2xl sm:rounded-3xl md:rounded-3xl border border-border bg-card p-3 sm:p-4 text-center shadow-sm shadow-black/5 transition-all duration-200 hover:shadow-md hover:scale-105">
                 <p className="text-xs sm:text-sm font-semibold text-foreground">
                   Instant inspiration
                 </p>
@@ -52,7 +52,7 @@ export default function AdvancedPromoSection() {
               </div>
               
               {/* Card 2 */}
-              <div className="rounded-2xl sm:rounded-[1.5rem] md:rounded-[1.75rem] border border-border bg-card p-3 sm:p-4 text-center shadow-sm shadow-black/5 transition-all duration-200 hover:shadow-md hover:scale-105">
+              <div className="rounded-2xl sm:rounded-3xl md:rounded-3xl border border-border bg-card p-3 sm:p-4 text-center shadow-sm shadow-black/5 transition-all duration-200 hover:shadow-md hover:scale-105">
                 <p className="text-xs sm:text-sm font-semibold text-foreground">
                   Engaging stories
                 </p>
@@ -62,7 +62,7 @@ export default function AdvancedPromoSection() {
               </div>
               
               {/* Card 3 */}
-              <div className="rounded-2xl sm:rounded-[1.5rem] md:rounded-[1.75rem] border border-border bg-card p-3 sm:p-4 text-center shadow-sm shadow-black/5 transition-all duration-200 hover:shadow-md hover:scale-105 sm:col-span-2 lg:col-span-1">
+              <div className="rounded-2xl sm:rounded-3xl md:rounded-3xl border border-border bg-card p-3 sm:p-4 text-center shadow-sm shadow-black/5 transition-all duration-200 hover:shadow-md hover:scale-105 sm:col-span-2 lg:col-span-1">
                 <p className="text-xs sm:text-sm font-semibold text-foreground">
                   Shop with confidence
                 </p>
@@ -75,9 +75,9 @@ export default function AdvancedPromoSection() {
 
           {/* RIGHT CONTENT - Video Section */}
           <div className="relative w-full order-1 xl:order-2 mb-6 sm:mb-8 md:mb-10 xl:mb-0">
-            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl md:rounded-[2rem] border border-border bg-card p-1 shadow-2xl shadow-black/10">
+            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl md:rounded-4xl border border-border bg-card p-1 shadow-2xl shadow-black/10">
               {/* Video Container */}
-              <div className="overflow-hidden rounded-2xl sm:rounded-3xl md:rounded-[2rem] bg-black aspect-video w-full">
+              <div className="overflow-hidden rounded-2xl sm:rounded-3xl md:rounded-4xl bg-black aspect-video w-full">
                 <iframe
                   src="https://player.cloudinary.com/embed/?cloud_name=djb7ybhl4&public_id=download_d0jty8&source_types[0]=mp4"
                   className="h-full w-full object-cover"

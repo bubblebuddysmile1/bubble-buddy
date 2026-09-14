@@ -47,7 +47,7 @@ export default async function OrdersPage() {
   return (
     <main className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4">
-        <div className="mb-8 rounded-[2rem] border border-border bg-card p-8 shadow-lg">
+        <div className="mb-8 rounded-4xl border border-border bg-card p-8 shadow-lg">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">
             My Orders
           </p>
@@ -59,7 +59,7 @@ export default async function OrdersPage() {
         </div>
 
         {orders.length === 0 ? (
-          <div className="rounded-[2rem] border border-border bg-card p-10 text-center shadow-lg">
+          <div className="rounded-4xl border border-border bg-card p-10 text-center shadow-lg">
             <p className="text-xl font-semibold text-foreground">
               No orders yet
             </p>
@@ -79,7 +79,7 @@ export default async function OrdersPage() {
             {orders.map((order) => (
               <div
                 key={order.id}
-                className="rounded-[2rem] border border-border bg-card p-6 shadow-sm"
+                className="rounded-4xl border border-border bg-card p-6 shadow-sm"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>

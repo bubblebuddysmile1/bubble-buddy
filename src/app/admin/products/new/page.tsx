@@ -33,6 +33,7 @@ export default async function AdminNewProductPage() {
             details: "",
             price: "",
             compareAtPrice: "",
+            discountPercent: "",
             currency: "USD",
             stockQuantity: 0,
             categorySlug: categories[0]?.slug ?? "",

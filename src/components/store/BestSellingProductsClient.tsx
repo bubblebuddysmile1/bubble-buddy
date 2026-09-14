@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import AddToCartButton from "@/components/cart/AddToCartButton";
 import ShareProductButton from "@/components/store/ShareProductButton";
-import { toCartProduct } from "@/lib/cart";
+import { getDiscountDetails, toCartProduct } from "@/lib/cart";
 import type { CartProduct } from "@/types/cart";
 
 export type BestSellingProduct = {
@@ -14,6 +14,7 @@ export type BestSellingProduct = {
   slug: string;
   thumbnail: string | null;
   price: number;
+  compareAtPrice?: number | null;
   currency: string;
   category: { name: string; slug: string } | null;
   stockQuantity: number;
@@ -42,7 +43,7 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
   return (
     <section className="relative overflow-hidden bg-background py-4">
       <div className="mx-auto w-full px-4">
-        <div className="mb-10 flex flex-col gap-4 rounded-[2rem] border border-border bg-card p-8 shadow-lg shadow-black/5">
+        <div className="mb-10 flex flex-col gap-4 rounded-4xl border border-border bg-card p-8 shadow-lg shadow-black/5">
           <div className="flex items-center gap-3 text-xs uppercase tracking-[0.32em] text-primary">
             <span className="inline-flex rounded-full bg-primary/80 px-3 py-1 text-white">Best Sellers</span>
             <span className="text-muted-foreground">
@@ -52,13 +53,13 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
         </div>
 
         {!hasProducts ? (
-          <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          <div className="rounded-4xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
             No best seller products are available yet. Mark products as best seller in admin to populate this section.
           </div>
         ) : (
           <>
             <div className="overflow-hidden pb-3 sm:hidden">
-              <div className="relative rounded-[2rem] border border-border bg-card p-4 shadow-lg shadow-black/5">
+              <div className="relative rounded-4xl border border-border bg-card p-4 shadow-lg shadow-black/5">
                 {activeProduct ? (
                   <article>
                     <div className="flex items-center justify-between gap-3">
@@ -70,8 +71,8 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
                       </span>
                     </div>
 
-                    <div className="mt-4 overflow-hidden rounded-[1.75rem] bg-muted p-3">
-                      <div className="relative aspect-square overflow-hidden rounded-[1.5rem]">
+                    <div className="mt-4 overflow-hidden rounded-3xl bg-muted p-3">
+                      <div className="relative aspect-square overflow-hidden rounded-3xl">
                         <Image
                           src={activeProduct.thumbnail ?? "/category/1.jpg"}
                           alt={activeProduct.name}
@@ -90,9 +91,21 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
                       </div>
 
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-lg font-semibold text-foreground">
-                          {activeProduct.currency}{activeProduct.price.toFixed(2)}
-                        </p>
+                        <div>
+                          <p className="text-lg font-semibold text-foreground">
+                            {activeProduct.currency}{activeProduct.price.toFixed(2)}
+                          </p>
+                          {getDiscountDetails(activeProduct.price, activeProduct.compareAtPrice ?? null).mrp && (
+                            <div className="mt-1 flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground line-through">
+                                {activeProduct.currency}{(activeProduct.compareAtPrice ?? activeProduct.price).toFixed(2)}
+                              </span>
+                              <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">
+                                {getDiscountDetails(activeProduct.price, activeProduct.compareAtPrice ?? null).discountPercent}% OFF
+                              </span>
+                            </div>
+                          )}
+                        </div>
                         <Link
                           href={`/shop/${activeProduct.slug}`}
                           className="inline-flex items-center justify-center rounded-full border border-border bg-background px-3 py-2 text-sm font-semibold text-foreground"
@@ -136,7 +149,7 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
                 return (
                   <article
                     key={product.id}
-                    className="group relative overflow-hidden rounded-[1.5rem] border border-border bg-card p-4 shadow-lg shadow-black/5 transition duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10"
+                    className="group relative overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-lg shadow-black/5 transition duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10"
                   >
                     <div className="pointer-events-none absolute -right-10 top-8 h-32 w-32 rounded-full bg-primary/10 blur-3xl" />
                     <div className="pointer-events-none absolute -left-12 bottom-6 h-28 w-28 rounded-full bg-accent/10 blur-3xl" />
@@ -151,8 +164,8 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
                       </span>
                     </div>
 
-                    <div className="mt-4 overflow-hidden rounded-[1.25rem] bg-muted p-2 transition duration-500 group-hover:-translate-y-1">
-                      <div className="relative h-44 overflow-hidden rounded-[1rem]">
+                    <div className="mt-4 overflow-hidden rounded-2xl bg-muted p-2 transition duration-500 group-hover:-translate-y-1">
+                      <div className="relative h-44 overflow-hidden rounded-2xl">
                         <Image
                           src={product.thumbnail ?? "/category/1.jpg"}
                           alt={product.name}
@@ -179,6 +192,16 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
                           <p className="text-lg font-semibold text-foreground">
                             ₹{cartProduct.price.toFixed(2)}
                           </p>
+                          {cartProduct.compareAtPrice && cartProduct.compareAtPrice > cartProduct.price && (
+                            <div className="flex flex-wrap items-center gap-1">
+                              <span className="text-[11px] text-muted-foreground line-through">
+                                MRP ₹{cartProduct.compareAtPrice.toFixed(2)}
+                              </span>
+                              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                {getDiscountDetails(cartProduct.price, cartProduct.compareAtPrice).discountPercent}% OFF
+                              </span>
+                            </div>
+                          )}
                         </div>
                         <div className="flex items-center gap-1.5">
                           <AddToCartButton

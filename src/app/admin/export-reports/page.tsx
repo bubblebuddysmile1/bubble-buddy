@@ -135,7 +135,7 @@ export default function ExportReportsPage() {
       />
 
       <div className="space-y-6 p-6">
-        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+        <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
           <h2 className="text-xl font-semibold text-foreground">Available Reports</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Select a report type to view available export options and formats.
@@ -146,7 +146,7 @@ export default function ExportReportsPage() {
           {reportTypes.map((reportType) => {
             const Icon = reportType.icon;
             return (
-              <section key={reportType.title} className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+              <section key={reportType.title} className="rounded-4xl border border-border bg-card p-6 shadow-lg">
                 <div className="flex items-start gap-4">
                   <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                     <Icon className="size-6" />
@@ -208,7 +208,7 @@ export default function ExportReportsPage() {
           })}
         </div>
 
-        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+        <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
           <h2 className="text-xl font-semibold text-foreground">Export History</h2>
           <div className="mt-4">
             <p className="text-sm text-muted-foreground">

@@ -83,7 +83,7 @@ export default async function AdminRevenueReportsPage() {
 
       <div className="space-y-6 p-6">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
             <div className="flex items-center justify-between gap-4">
               <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                 <DollarSign className="size-6" />
@@ -97,7 +97,7 @@ export default async function AdminRevenueReportsPage() {
             <p className="mt-2 text-3xl font-bold text-foreground">${revenue.toFixed(2)}</p>
           </div>
 
-          <div className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
             <div className="rounded-2xl bg-primary/10 p-3 text-primary">
               <TrendingUp className="size-6" />
             </div>
@@ -105,7 +105,7 @@ export default async function AdminRevenueReportsPage() {
             <p className="mt-2 text-3xl font-bold text-foreground">${netRevenue.toFixed(2)}</p>
           </div>
 
-          <div className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
             <div className="rounded-2xl bg-primary/10 p-3 text-primary">
               <Receipt className="size-6" />
             </div>
@@ -113,7 +113,7 @@ export default async function AdminRevenueReportsPage() {
             <p className="mt-2 text-3xl font-bold text-foreground">${totalTax.toFixed(2)}</p>
           </div>
 
-          <div className="rounded-[1.75rem] border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
             <div className="rounded-2xl bg-primary/10 p-3 text-primary">
               <PieChart className="size-6" />
             </div>
@@ -123,7 +123,7 @@ export default async function AdminRevenueReportsPage() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-2">
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <h2 className="text-xl font-semibold text-foreground">Revenue by Order Status</h2>
             <div className="mt-4 space-y-3">
               {revenueByStatus.map((status) => (
@@ -146,7 +146,7 @@ export default async function AdminRevenueReportsPage() {
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
             <h2 className="text-xl font-semibold text-foreground">Financial Breakdown</h2>
             <div className="mt-4 space-y-3">
               <div className="rounded-3xl bg-background/80 px-4 py-3">
@@ -182,7 +182,7 @@ export default async function AdminRevenueReportsPage() {
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg xl:col-span-2">
+          <section className="rounded-4xl border border-border bg-card p-6 shadow-lg xl:col-span-2">
             <h2 className="text-xl font-semibold text-foreground">Recent Revenue Transactions</h2>
             <div className="mt-4 space-y-3">
               {orders.slice(0, 10).map((order) => (

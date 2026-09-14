@@ -14,7 +14,7 @@ export default function WishlistPageClient() {
 
   if (items.length === 0) {
     return (
-      <div className="wishlist-empty-enter mx-auto max-w-lg rounded-[2rem] border border-border bg-card p-10 text-center shadow-xl">
+      <div className="wishlist-empty-enter mx-auto max-w-lg rounded-4xl border border-border bg-card p-10 text-center shadow-xl">
         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
           <Heart className="size-9 text-primary" />
         </div>
@@ -35,7 +35,7 @@ export default function WishlistPageClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.5rem] border border-border bg-card/80 px-5 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-border bg-card/80 px-5 py-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Sparkles className="size-4 text-primary" />
           {items.length} saved {items.length === 1 ? "product" : "products"}

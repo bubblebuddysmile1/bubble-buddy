@@ -50,13 +50,13 @@ export default async function BlogsPage() {
         </div>
 
         {posts.length === 0 ? (
-          <div className="rounded-[2rem] border border-border bg-card p-8 text-sm text-muted-foreground">
+          <div className="rounded-4xl border border-border bg-card p-8 text-sm text-muted-foreground">
             No blog posts published yet.
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {posts.map((post: { id: number; slug: string; title: string; excerpt: string | null; featuredImage: string | null; featuredImageAlt: string | null }) => (
-              <Link key={post.id} href={`/blogs/${post.slug}`} className="group overflow-hidden rounded-[2rem] border border-border bg-card shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+              <Link key={post.id} href={`/blogs/${post.slug}`} className="group overflow-hidden rounded-4xl border border-border bg-card shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                 {post.featuredImage ? (
                   <div className="relative h-48 w-full">
                     <Image

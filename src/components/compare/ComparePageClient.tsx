@@ -13,7 +13,7 @@ export default function ComparePageClient() {
 
   if (compareItems.length === 0) {
     return (
-      <div className="rounded-[2rem] border border-border bg-card p-10 text-center shadow-sm">
+      <div className="rounded-4xl border border-border bg-card p-10 text-center shadow-sm">
         <div className="mx-auto mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
           <ArrowUpRight className="size-6" />
         </div>
@@ -35,7 +35,7 @@ export default function ComparePageClient() {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-[2rem] border border-border bg-card p-6 shadow-sm">
+      <div className="rounded-4xl border border-border bg-card p-6 shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.24em] text-primary">Product comparison</p>
@@ -58,7 +58,7 @@ export default function ComparePageClient() {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-[2rem] border border-border bg-card shadow-sm">
+      <div className="overflow-x-auto rounded-4xl border border-border bg-card shadow-sm">
         <table className="min-w-full border-separate border-spacing-0 text-left">
           <thead>
             <tr>

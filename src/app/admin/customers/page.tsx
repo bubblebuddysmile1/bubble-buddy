@@ -17,7 +17,7 @@ export default async function AdminCustomersPage() {
         description="Browse your customers and review account activity from a single admin view."
       />
       <div className="p-6">
-        <div className="overflow-x-auto rounded-[2rem] border border-border bg-card shadow-lg">
+        <div className="overflow-x-auto rounded-4xl border border-border bg-card shadow-lg">
           <table className="w-full min-w-190 text-left text-sm">
             <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
               <tr>

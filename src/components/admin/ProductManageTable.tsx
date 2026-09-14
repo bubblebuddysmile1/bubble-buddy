@@ -57,7 +57,7 @@ export default function ProductManageTable({ products }: ProductManageTableProps
 
   if (products.length === 0) {
     return (
-      <p className="rounded-[2rem] border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
+      <p className="rounded-4xl border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
         No products found. Create your first product to get started.
       </p>
     );
@@ -67,7 +67,7 @@ export default function ProductManageTable({ products }: ProductManageTableProps
     <div className="space-y-4">
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <div className="overflow-x-auto rounded-[2rem] border border-border bg-card shadow-lg">
+      <div className="overflow-x-auto rounded-4xl border border-border bg-card shadow-lg">
         <table className="w-full min-w-180 text-left text-sm">
           <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
             <tr>

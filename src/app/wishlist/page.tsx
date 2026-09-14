@@ -11,7 +11,7 @@ export default function WishlistPage() {
       <div className="pointer-events-none absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
 
       <div className="container relative mx-auto px-4">
-        <div className="mb-10 rounded-[2rem] border border-border bg-card p-8 shadow-lg">
+        <div className="mb-10 rounded-4xl border border-border bg-card p-8 shadow-lg">
           <p className="text-xs uppercase tracking-[0.32em] text-primary">Saved for later</p>
           <h1 className="mt-3 text-4xl font-semibold text-foreground">Your wishlist</h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">

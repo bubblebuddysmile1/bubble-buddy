@@ -50,7 +50,7 @@ export default function ProductImageGallery({
 
   return (
     <div className="space-y-4">
-      <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-muted">
+      <div className="relative aspect-square overflow-hidden rounded-4xl bg-muted">
         <Image
           key={activeImage.id}
           src={activeImage.url}

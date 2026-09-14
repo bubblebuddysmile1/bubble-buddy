@@ -75,13 +75,13 @@ export default function FlashSaleSection() {
         </div>
 
         {error ? (
-          <div className="rounded-[2rem] border border-border bg-card p-8 text-center text-sm text-destructive">
+          <div className="rounded-4xl border border-border bg-card p-8 text-center text-sm text-destructive">
             {error}
           </div>
         ) : loading ? (
           <div className="grid gap-6 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="rounded-[2rem] border border-border bg-card p-6 shadow-lg shadow-black/5">
+              <div key={index} className="rounded-4xl border border-border bg-card p-6 shadow-lg shadow-black/5">
                 <div className="flex items-center justify-between gap-3">
                   <Skeleton className="h-7 w-24 rounded-full" />
                   <Skeleton className="h-7 w-20 rounded-full" />
@@ -91,7 +91,7 @@ export default function FlashSaleSection() {
                   <Skeleton className="h-4 w-full rounded-md" />
                   <Skeleton className="h-4 w-5/6 rounded-md" />
                 </div>
-                <div className="mt-6 space-y-3 rounded-[1.5rem] border border-border bg-muted p-5">
+                <div className="mt-6 space-y-3 rounded-3xl border border-border bg-muted p-5">
                   <Skeleton className="h-3 w-24 rounded-full" />
                   <Skeleton className="h-8 w-32 rounded-md" />
                   <Skeleton className="h-4 w-40 rounded-md" />
@@ -101,7 +101,7 @@ export default function FlashSaleSection() {
             ))}
           </div>
         ) : flashPromotions.length === 0 ? (
-          <div className="rounded-[2rem] border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          <div className="rounded-4xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
             No flash sale offers are active right now. Explore all current promotions below.
           </div>
         ) : (
@@ -116,7 +116,7 @@ export default function FlashSaleSection() {
               return (
                 <article
                   key={promotion.id}
-                  className="group relative overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-lg shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                  className="group relative overflow-hidden rounded-4xl border border-border bg-card p-6 shadow-lg shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
                 >
                   <div className="mb-5 flex flex-col gap-4">
                     <div className="flex items-center justify-between gap-3">
@@ -136,7 +136,7 @@ export default function FlashSaleSection() {
                     </div>
                   </div>
 
-                  <div className="space-y-4 rounded-[1.5rem] border border-border bg-muted p-5">
+                  <div className="space-y-4 rounded-3xl border border-border bg-muted p-5">
                     <div className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Deal</div>
                     <p className="mt-1 text-3xl font-semibold text-foreground">{badge}</p>
                     {promotion.minOrderAmount > 0 && (

@@ -87,13 +87,15 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   if (body.howToApply !== undefined) updates.howToApply = body.howToApply ? String(body.howToApply).trim() : null;
   if (body.faq !== undefined) updates.faq = body.faq ? String(body.faq).trim() : null;
   if (body.details !== undefined) updates.details = body.details ? String(body.details).trim() : null;
-  if (body.price !== undefined) updates.price = String(body.price);
-  if (body.compareAtPrice !== undefined) updates.compareAtPrice = body.compareAtPrice ? String(body.compareAtPrice) : null;
   if (body.currency !== undefined) updates.currency = String(body.currency).trim();
   if (body.stockQuantity !== undefined) updates.stockQuantity = Number(body.stockQuantity);
   if (body.featured !== undefined) updates.featured = Boolean(body.featured);
   if (body.isActive !== undefined) updates.isActive = Boolean(body.isActive);
   if (body.thumbnail !== undefined) updates.thumbnail = body.thumbnail ? String(body.thumbnail).trim() : null;
+
+  if (body.compareAtPrice !== undefined) {
+    updates.compareAtPrice = body.compareAtPrice ? Number(body.compareAtPrice) : null;
+  }
 
   if (body.categorySlug !== undefined) {
     const categorySlug = String(body.categorySlug).trim();
@@ -106,9 +108,56 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
   const images = Array.isArray(body.images) ? (body.images as ProductImageInput[]) : null;
 
-  const existing = await prisma.product.findUnique({ where: { slug } });
+  const existing = await prisma.product.findUnique({ where: { slug }, include: { deal: true } });
   if (!existing) {
     return NextResponse.json({ error: "Product not found." }, { status: 404 });
+  }
+
+  const incomingCompareAtPrice = body.compareAtPrice !== undefined ? Number(body.compareAtPrice || 0) : Number(existing.compareAtPrice ?? 0);
+  const incomingDiscount = body.discountPercent !== undefined ? Number(body.discountPercent || 0) : (existing.deal?.discountPercent ?? 0);
+  const safeDiscount = Math.min(Math.max(incomingDiscount, 0), 100);
+  const computedSalePrice = Math.max(0, incomingCompareAtPrice - (incomingCompareAtPrice * safeDiscount) / 100).toFixed(2);
+  updates.price = computedSalePrice;
+
+  if (body.discountPercent !== undefined) {
+    const discountPercent = Number(body.discountPercent);
+
+    if (discountPercent > 0) {
+      if (existing.dealId) {
+        await prisma.deal.update({
+          where: { id: existing.dealId },
+          data: {
+            title: `${existing.name} Discount`,
+            dealType: "FLASH_SALE",
+            urgencyLevel: "NORMAL",
+            discountPercent: Math.round(discountPercent),
+            isActive: true,
+          },
+        });
+      } else {
+        const deal = await prisma.deal.create({
+          data: {
+            title: `${existing.name} Discount`,
+            description: `${existing.name} discounted price offer`,
+            dealType: "FLASH_SALE",
+            urgencyLevel: "NORMAL",
+            discountPercent: Math.round(discountPercent),
+            isActive: true,
+            startsAt: new Date(),
+          },
+        });
+
+        updates.deal = { connect: { id: deal.id } };
+      }
+    } else if (existing.dealId) {
+      await prisma.deal.update({
+        where: { id: existing.dealId },
+        data: {
+          discountPercent: null,
+          isActive: false,
+        },
+      });
+    }
   }
 
   const product = await prisma.product.update({
@@ -133,6 +182,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     include: {
       category: { select: { id: true, name: true, slug: true } },
       images: { orderBy: { sortOrder: "asc" } },
+      deal: true,
     },
   });
 

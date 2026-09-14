@@ -134,13 +134,13 @@ export default function AuthForm() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-4">
-      <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card/80 p-6 shadow-2xl shadow-primary/10 ring-1 ring-inset ring-white/5 backdrop-blur-xl">
+      <div className="relative overflow-hidden rounded-4xl border border-border bg-card/80 p-6 shadow-2xl shadow-primary/10 ring-1 ring-inset ring-white/5 backdrop-blur-xl">
         <div className="pointer-events-none absolute right-0 top-8 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
         <div className="pointer-events-none absolute left-0 bottom-0 h-56 w-56 rounded-full bg-accent/10 blur-3xl" />
 
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
           {/* Visual / marketing column */}
-          <div className="relative overflow-hidden rounded-[2rem] border border-primary/10 bg-linear-to-br from-primary/5 to-transparent p-8 shadow-xl shadow-primary/10 transition duration-500 hover:-translate-y-1">
+          <div className="relative overflow-hidden rounded-4xl border border-primary/10 bg-linear-to-br from-primary/5 to-transparent p-8 shadow-xl shadow-primary/10 transition duration-500 hover:-translate-y-1">
             <div className="absolute inset-x-0 top-0 h-48 bg-linear-to-b from-primary/10 to-transparent blur-3xl" />
             <div className="relative space-y-6">
               <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary shadow-sm shadow-primary/10 animate-pulse">
@@ -184,7 +184,7 @@ export default function AuthForm() {
           </div>
 
           {/* Form column */}
-          <div className="relative overflow-hidden rounded-[2rem] border border-border bg-background/95 p-8 shadow-2xl shadow-primary/10">
+          <div className="relative overflow-hidden rounded-4xl border border-border bg-background/95 p-8 shadow-2xl shadow-primary/10">
             <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-primary/10 to-transparent blur-3xl" />
             <div className="relative z-10 space-y-6">
               <div className="mb-4 flex items-center justify-between gap-3">
@@ -220,7 +220,7 @@ export default function AuthForm() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-4 rounded-[2rem] border border-border bg-card/90 p-6 shadow-sm">
+                <div className="space-y-4 rounded-4xl border border-border bg-card/90 p-6 shadow-sm">
                   {mode === "signup" && (
                     <div className="space-y-2">
                       <label className="block text-xs font-medium text-muted-foreground">Full name / Brand name</label>

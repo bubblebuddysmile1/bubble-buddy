@@ -39,7 +39,7 @@ export default async function AdminActivityLogsPage() {
       />
 
       <div className="space-y-6 p-6">
-        <section className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+        <section className="rounded-4xl border border-border bg-card p-6 shadow-lg">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xl font-semibold text-foreground">Admin Activity Logs</h2>
@@ -52,7 +52,7 @@ export default async function AdminActivityLogsPage() {
             </div>
           </div>
 
-          <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-border bg-background">
+          <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-background">
             <table className="min-w-full border-separate border-spacing-0 text-left text-sm">
               <thead className="bg-muted text-muted-foreground">
                 <tr>

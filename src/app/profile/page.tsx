@@ -55,7 +55,7 @@ export default async function ProfilePage() {
     return (
       <main className="min-h-screen bg-background text-foreground py-12">
         <div className="container mx-auto px-4">
-          <div className="rounded-[2rem] border border-border bg-card p-8 shadow-lg">
+          <div className="rounded-4xl border border-border bg-card p-8 shadow-lg">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">Your account</p>
             <h1 className="mt-3 text-4xl font-bold">Welcome</h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -84,7 +84,7 @@ export default async function ProfilePage() {
   return (
     <main className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4">
-        <div className="mb-8 flex flex-col gap-4 rounded-[2rem] border border-border bg-card p-8 shadow-lg md:flex-row md:items-end md:justify-between">
+        <div className="mb-8 flex flex-col gap-4 rounded-4xl border border-border bg-card p-8 shadow-lg md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">Your Account</p>
             <h1 className="mt-3 text-4xl font-bold">{user.name ?? "Welcome back"}</h1>
@@ -109,7 +109,7 @@ export default async function ProfilePage() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-          <section className="rounded-[2rem] border border-border bg-card p-8 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-8 shadow-lg">
             <div className="mb-8 grid gap-4 sm:grid-cols-3">
               <div className="rounded-3xl border border-border bg-background/80 p-5 text-center">
                 <p className="text-sm text-muted-foreground">Joined</p>
@@ -135,7 +135,7 @@ export default async function ProfilePage() {
                 initialPhone={user.phone ?? ""}
               />
 
-              <div className="rounded-[1.75rem] border border-border bg-background/80 p-6">
+              <div className="rounded-3xl border border-border bg-background/80 p-6">
                 <h2 className="text-xl font-semibold">Account details</h2>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <div className="rounded-3xl bg-card p-4 shadow-sm">
@@ -157,7 +157,7 @@ export default async function ProfilePage() {
                 </div>
               </div>
 
-              <div className="rounded-[1.75rem] border border-border bg-background/80 p-6">
+              <div className="rounded-3xl border border-border bg-background/80 p-6">
                 <h2 className="text-xl font-semibold">Complete your account</h2>
                 <p className="mt-3 text-sm text-muted-foreground">
                   If you have not yet verified your email or set a password, complete your account setup here.
@@ -173,7 +173,7 @@ export default async function ProfilePage() {
               </div>
 
               {user.orders.length > 0 && (
-                <div className="rounded-[1.75rem] border border-border bg-background/80 p-6">
+                <div className="rounded-3xl border border-border bg-background/80 p-6">
                   <div className="flex items-center justify-between gap-3">
                     <h2 className="text-xl font-semibold">Recent orders</h2>
                     <Link href="/orders" className="text-sm font-semibold text-primary hover:underline">
@@ -208,7 +208,7 @@ export default async function ProfilePage() {
                 </div>
               )}
 
-              <div className="rounded-[1.75rem] border border-border bg-background/80 p-6">
+              <div className="rounded-3xl border border-border bg-background/80 p-6">
                 <h2 className="text-xl font-semibold">Quick summary</h2>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <div className="rounded-3xl bg-card p-5 shadow-sm">
@@ -225,7 +225,7 @@ export default async function ProfilePage() {
           </section>
 
           <aside className="space-y-6">
-            <div className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+            <div className="rounded-4xl border border-border bg-card p-6 shadow-lg">
               <h2 className="text-lg font-semibold">Need help?</h2>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 Update your profile data or reach out to support for help with orders and wishlist.
@@ -240,7 +240,7 @@ export default async function ProfilePage() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-border bg-card p-6 shadow-lg">
+            <div className="rounded-4xl border border-border bg-card p-6 shadow-lg">
               <h3 className="text-lg font-semibold">Recent favorites</h3>
               <div className="mt-4 space-y-3">
                 {user.favorites.length > 0 ? (

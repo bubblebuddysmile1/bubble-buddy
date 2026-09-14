@@ -192,7 +192,7 @@ export default async function ProductDetailPage({ params }: { params: PageParams
 
         <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
           {/* Left Column: Product Images */}
-          <section className="rounded-[2rem] border border-border bg-card p-8 shadow-lg">
+          <section className="rounded-4xl border border-border bg-card p-8 shadow-lg">
             <ProductImageGallery
               productName={product.name}
               thumbnail={product.thumbnail}
@@ -203,7 +203,7 @@ export default async function ProductDetailPage({ params }: { params: PageParams
           {/* Right Column: Product Details */}
           <section className="space-y-6">
             {/* Product Info Card */}
-            <div className="space-y-4 rounded-[2rem] border border-border bg-card p-8 shadow-lg">
+            <div className="space-y-4 rounded-4xl border border-border bg-card p-8 shadow-lg">
               <div>
                 <p className="text-xs uppercase tracking-[0.32em] text-primary">
                   {product.category?.name ?? "Uncategorized"}
