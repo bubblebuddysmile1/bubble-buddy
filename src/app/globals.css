@@ -58,7 +58,7 @@
   --accent-foreground: #5e3122;
   --destructive: #a33d32;
   --border: #e8bca5;
-  --input: #fffaf7;
+  --input: #efddd3;
   --ring: #1d4533;
   --chart-1: #1d4533;
   --chart-2: #5e3122;
@@ -127,6 +127,14 @@
 
   html::-webkit-scrollbar {
     display: none;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  textarea,
+  select {
+    border: 1px solid var(--border);
+    background-color: var(--card);
+    color: var(--foreground);
   }
 }
 

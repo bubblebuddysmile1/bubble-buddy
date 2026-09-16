@@ -25,7 +25,10 @@ export default function CheckoutField({
       <Input
         id={id}
         aria-invalid={Boolean(error)}
-        className={cn(error && "checkout-field-error")}
+        className={cn(
+          "border-border bg-background shadow-sm focus-visible:border-primary focus-visible:ring-primary/20",
+          error && "checkout-field-error",
+        )}
         {...props}
       />
       {error && (
