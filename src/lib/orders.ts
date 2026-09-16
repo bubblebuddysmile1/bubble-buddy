@@ -232,11 +232,15 @@ export async function cancelOrder(razorpayOrderId: string) {
   const orderNumber = orderNumberFromRazorpay(razorpayOrderId);
   const order = await prisma.order.findUnique({
     where: { orderNumber },
-    select: { id: true, orderNumber: true, userId: true, redeemedLoyaltyPoints: true },
+    select: { id: true, orderNumber: true, userId: true, redeemedLoyaltyPoints: true, status: true, paymentStatus: true },
   });
 
   if (!order) {
     throw new Error("Order not found.");
+  }
+
+  if (order.paymentStatus === "PAID") {
+    return order;
   }
 
   return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -255,7 +259,7 @@ export async function cancelOrder(razorpayOrderId: string) {
         status: "CANCELLED",
         paymentStatus: "FAILED",
       },
-      select: { id: true, orderNumber: true },
+      select: { id: true, orderNumber: true, status: true, paymentStatus: true },
     });
   });
 }

@@ -8,7 +8,9 @@ import PaymentStatusLayout from "@/components/payment/PaymentStatusLayout";
 
 const REASON_MESSAGES: Record<string, string> = {
   cancelled: "You closed the payment window before completing checkout.",
+  payment_declined: "Your payment was declined. No amount was charged.",
   verification_failed: "We could not verify your payment. No amount was charged.",
+  payment_status_unavailable: "We could not confirm your payment status. Please retry or contact support if you were charged.",
   create_order_failed: "We could not start the payment session. Please try again.",
   gateway_unavailable: "Payment gateway failed to load. Check your connection and retry.",
 };

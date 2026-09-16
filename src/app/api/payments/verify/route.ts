@@ -8,7 +8,6 @@ import { isMockPaymentMode, createRazorpayClient } from "@/lib/razorpay";
 import { verifyPaymentSchema } from "@/lib/validations/payment";
 import { prisma } from "@/lib/prisma";
 import { notifyOrderConfirmation, notifyPaymentFailure } from "@/lib/order-notifications";
-import { sendOrderConfirmationEmail, sendPaymentFailureEmail } from "@/lib/order-emails";
 
 export async function POST(request: Request) {
   try {
@@ -74,7 +73,6 @@ export async function POST(request: Request) {
     // Check payment status from Razorpay
     let paymentSuccessful = false;
     let paymentFetchFailed = false;
-
     if (isMockPaymentMode()) {
       paymentSuccessful = true;
     } else {
@@ -88,11 +86,10 @@ export async function POST(request: Request) {
       }
     }
 
-    // Confirm or cancel order based on payment status. If the payment fetch fails after
-    // the Razorpay signature is already verified, use the signature as the primary proof
-    // and confirm the order rather than cancelling a potentially valid payment.
+    // Confirm only when Razorpay explicitly reports a successful payment. A valid
+    // signature alone does not prove capture if the payment lookup failed.
     let finalOrder = savedOrder;
-    if (paymentSuccessful || paymentFetchFailed) {
+    if (paymentSuccessful) {
       finalOrder = await confirmOrder(razorpay_order_id, razorpay_payment_id, razorpay_signature);
       await notifyOrderConfirmation(finalOrder.orderNumber);
       if (verificationRequired && user?.id) {
@@ -101,16 +98,31 @@ export async function POST(request: Request) {
         });
       }
     } else {
-      finalOrder = await cancelOrder(razorpay_order_id);
-      await notifyPaymentFailure(finalOrder.orderNumber);
+      const cancelledOrder = await cancelOrder(razorpay_order_id);
+      if (cancelledOrder.paymentStatus === "PAID") {
+        return NextResponse.json({
+          verified: true,
+          mock: isMockPaymentMode(),
+          orderId: razorpay_order_id,
+          paymentId: razorpay_payment_id,
+          orderNumber: cancelledOrder.orderNumber,
+          dbOrderId: cancelledOrder.id,
+          verificationRequired,
+          email: authUser?.email ?? address.email ?? null,
+        });
+      }
+      await notifyPaymentFailure(cancelledOrder.orderNumber);
       return NextResponse.json({
         verified: false,
         mock: isMockPaymentMode(),
         orderId: razorpay_order_id,
         paymentId: razorpay_payment_id,
-        orderNumber: finalOrder.orderNumber,
-        dbOrderId: finalOrder.id,
-        error: "Payment was not successful",
+        orderNumber: cancelledOrder.orderNumber,
+        dbOrderId: cancelledOrder.id,
+        error: paymentFetchFailed
+          ? "Payment status could not be confirmed. Please retry or contact support if you were charged."
+          : "Payment was not successful.",
+        reason: paymentFetchFailed ? "payment_status_unavailable" : "payment_declined",
       }, { status: 400 });
     }
 

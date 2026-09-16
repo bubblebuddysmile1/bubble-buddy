@@ -28,6 +28,7 @@ type CreateOrderResponse = {
   currency: string;
   keyId: string;
   error?: string;
+  reason?: string;
 };
 
 type AppliedPromotion = {
@@ -220,7 +221,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
 
     if (!verifyRes.ok || !verifyData.verified) {
       const failParams = new URLSearchParams({
-        reason: verifyData.error || "verification_failed",
+        reason: verifyData.reason || "verification_failed",
         order_id: verifyData.orderId || "",
       });
       if (verifyData.orderNumber) failParams.set("order_number", verifyData.orderNumber);
