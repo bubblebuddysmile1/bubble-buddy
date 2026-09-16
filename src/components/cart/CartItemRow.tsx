@@ -19,14 +19,14 @@ export default function CartItemRow({ item, index }: CartItemRowProps) {
 
   return (
     <article
-      className="cart-item-enter group relative flex gap-4 rounded-3xl border border-border bg-card p-4 shadow-lg transition duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:gap-6 sm:p-5"
+      className="cart-item-enter group relative flex min-w-0 gap-3 rounded-3xl border border-border bg-card p-3 shadow-lg transition duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:gap-6 sm:p-5"
       style={{ animationDelay: `${index * 80}ms` }}
     >
       <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl transition group-hover:bg-primary/20" />
 
       <Link
         href={`/shop/${item.slug}`}
-        className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-muted sm:h-28 sm:w-28"
+        className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-muted sm:h-28 sm:w-28"
       >
         <Image src={item.image} alt={item.name} fill className="object-cover transition duration-500 group-hover:scale-105" sizes="112px" />
       </Link>
@@ -37,7 +37,7 @@ export default function CartItemRow({ item, index }: CartItemRowProps) {
             {item.category && (
               <p className="text-[10px] uppercase tracking-[0.28em] text-primary">{item.category}</p>
             )}
-            <Link href={`/shop/${item.slug}`} className="mt-1 block truncate text-lg font-semibold text-foreground hover:text-primary">
+            <Link href={`/shop/${item.slug}`} className="mt-1 block break-words text-base font-semibold text-foreground hover:text-primary sm:text-lg">
               {item.name}
             </Link>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -60,7 +60,7 @@ export default function CartItemRow({ item, index }: CartItemRowProps) {
             quantity={item.quantity}
             stockQuantity={item.stockQuantity}
           />
-          <p className="text-lg font-semibold text-foreground">
+          <p className="shrink-0 text-base font-semibold text-foreground sm:text-lg">
             {formatCartMoney(lineTotal, item.currency)}
           </p>
         </div>

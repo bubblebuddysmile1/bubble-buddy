@@ -46,8 +46,8 @@ export default function CartPageClient({ emptyCartRecommendations }: CartPageCli
 
   return (
     <div className="mx-auto w-full max-w-7xl px-1 sm:px-0">
-      <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
-      <section className="space-y-4">
+      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:gap-8 lg:items-start">
+      <section className="min-w-0 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
             {itemCount} {itemCount === 1 ? "item" : "items"} in your bag
@@ -73,7 +73,7 @@ export default function CartPageClient({ emptyCartRecommendations }: CartPageCli
 
       <aside className="cart-summary-enter w-full lg:sticky lg:top-24">
         <div className="overflow-hidden rounded-4xl border border-border bg-card shadow-xl">
-          <div className="bg-linear-to-r from-primary/15 via-accent/10 to-secondary/20 px-6 py-5">
+          <div className="bg-linear-to-r from-primary/15 via-accent/10 to-secondary/20 px-4 py-4 sm:px-6 sm:py-5">
             <div className="flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-primary">
               <Sparkles className="size-4" />
               Order summary
@@ -81,7 +81,7 @@ export default function CartPageClient({ emptyCartRecommendations }: CartPageCli
             <p className="mt-2 text-sm text-muted-foreground">Review totals before checkout</p>
           </div>
 
-          <div className="space-y-4 p-6">
+          <div className="space-y-4 p-4 sm:p-6">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
               <span className="font-medium">{formatCartMoney(subtotal, currency)}</span>

@@ -48,11 +48,11 @@ export default function CheckoutConfirmationSheet({
 }: CheckoutConfirmationSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="max-w-xl overflow-y-auto p-0">
+      <SheetContent side="right" className="w-[calc(100%-1rem)] max-w-xl overflow-y-auto p-0 sm:w-3/4">
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur-sm px-6 py-5">
-            <div className="flex items-start justify-between gap-4">
+          <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-4 py-4 backdrop-blur-sm sm:px-6 sm:py-5">
+            <div className="flex items-start justify-between gap-3 pr-8 sm:pr-0">
               <div className="flex items-center gap-3">
                 <div className="rounded-full bg-primary/10 p-2">
                   <CheckCircle className="h-5 w-5 text-primary" />
@@ -66,7 +66,7 @@ export default function CheckoutConfirmationSheet({
                   </h2>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center gap-1 sm:gap-2">
                 <Button
                   variant="ghost"
                   onClick={onEdit}
@@ -98,9 +98,9 @@ export default function CheckoutConfirmationSheet({
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+          <div className="flex-1 space-y-6 overflow-y-auto px-3 py-4 sm:px-6">
             {/* Trust Badge */}
-            <div className="flex items-center justify-center gap-6 rounded-2xl bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-2xl bg-primary/5 px-3 py-3 text-xs text-muted-foreground sm:gap-6 sm:px-4">
               <div className="flex items-center gap-2">
                 <Shield className="h-4 w-4 text-primary" />
                 <span>Secure Payment</span>
@@ -154,7 +154,7 @@ export default function CheckoutConfirmationSheet({
               </div>
               <div className="divide-y divide-border">
                 {items.map((item) => (
-                  <div key={item.id} className="flex gap-4 p-4 hover:bg-muted/20 transition-colors">
+                  <div key={item.id} className="flex gap-3 p-3 transition-colors hover:bg-muted/20 sm:gap-4 sm:p-4">
                     <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-muted">
                       <Image
                         src={item.image}
@@ -267,8 +267,8 @@ export default function CheckoutConfirmationSheet({
           </div>
 
           {/* Footer - Mobile Action Buttons */}
-          <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-sm px-6 py-4 md:hidden">
-            <div className="flex gap-3">
+          <div className="sticky bottom-0 border-t border-border bg-background/95 px-3 py-3 backdrop-blur-sm md:hidden sm:px-6 sm:py-4">
+            <div className="flex gap-2 sm:gap-3">
               <Button
                 variant="outline"
                 onClick={onEdit}
