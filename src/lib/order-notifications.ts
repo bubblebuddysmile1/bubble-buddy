@@ -1,38 +1,56 @@
 import { prisma } from "@/lib/prisma";
 import { sendWhatsAppMessage } from "@/lib/whatsapp";
-import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail, sendPaymentFailureEmail } from "@/lib/order-emails";
+import { sendAdminOrderNotificationEmail, sendOrderConfirmationEmail, sendOrderStatusUpdateEmail, sendPaymentFailureEmail } from "@/lib/order-emails";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "info@bubblebuddysmile.com";
 
-type OrderContact = {
-  name?: string | null;
-  email?: string | null;
-  phone?: string | null;
-};
+async function sendOrderFailureAlert(orderNumber: string, event: "received" | "payment_failed" | "status_update", status?: string) {
+  await sendAdminOrderNotificationEmail(orderNumber, event, status).catch((error) => {
+    console.error("[order-notifications] Failed to send admin order alert:", error);
+  });
+}
 
 export async function notifyOrderConfirmation(orderNumber: string) {
-  await sendOrderConfirmationEmail(orderNumber).catch((error) => {
+  const sent = await sendOrderConfirmationEmail(orderNumber).catch((error) => {
     console.error("[order-notifications] Email confirmation failed:", error);
+    return false;
   });
+
+  if (!sent) {
+    await sendOrderFailureAlert(orderNumber, "received");
+  }
+
   await sendOrderWhatsApp(orderNumber, "confirmation").catch((error) => {
     console.error("[order-notifications] WhatsApp confirmation failed:", error);
   });
 }
 
 export async function notifyPaymentFailure(orderNumber: string) {
-  await sendPaymentFailureEmail(orderNumber).catch((error) => {
+  const sent = await sendPaymentFailureEmail(orderNumber).catch((error) => {
     console.error("[order-notifications] Email payment failure failed:", error);
+    return false;
   });
+
+  if (!sent) {
+    await sendOrderFailureAlert(orderNumber, "payment_failed");
+  }
+
   await sendOrderWhatsApp(orderNumber, "payment_failed").catch((error) => {
     console.error("[order-notifications] WhatsApp payment failure failed:", error);
   });
 }
 
 export async function notifyOrderStatusUpdate(orderNumber: string, status: string) {
-  await sendOrderStatusUpdateEmail(orderNumber, status).catch((error) => {
+  const sent = await sendOrderStatusUpdateEmail(orderNumber, status).catch((error) => {
     console.error("[order-notifications] Email status update failed:", error);
+    return false;
   });
+
+  if (!sent) {
+    await sendOrderFailureAlert(orderNumber, "status_update", status);
+  }
+
   await sendOrderWhatsApp(orderNumber, "status_update", status).catch((error) => {
     console.error("[order-notifications] WhatsApp status update failed:", error);
   });

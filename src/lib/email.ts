@@ -26,6 +26,34 @@ function getResendClient(): Resend | null {
   return resendClient;
 }
 
+function normalizeRecipients(raw: string | string[] | undefined | null): string[] {
+  const recipients = Array.isArray(raw) ? raw : raw ? [raw] : [];
+  return recipients
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+function getVerifiedSender(): string | null {
+  const from = readEnvValue("EMAIL_FROM");
+  if (!from) {
+    console.error("[email] EMAIL_FROM is not configured. Set a verified sender such as 'Bubble Buddy <info@bubblebuddysmile.com>'.");
+    return null;
+  }
+
+  if (from.includes("onboarding@resend.dev") || from.includes("resend.dev")) {
+    console.error("[email] EMAIL_FROM is still pointing at the default Resend sender. Verify and configure a production domain sender before delivery.");
+    return null;
+  }
+
+  return from;
+}
+
+function getAdminRecipients(): string[] {
+  const adminEmail = readEnvValue("ADMIN_EMAIL") || readEnvValue("SUPPORT_EMAIL") || "info@bubblebuddysmile.com";
+  return normalizeRecipients(adminEmail.split(","));
+}
+
 export type EmailPayload = {
   to: string | string[];
   subject: string;
@@ -40,20 +68,23 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
     return false;
   }
 
-  const from = readEnvValue("EMAIL_FROM") || "Bubble Buddy <onboarding@resend.dev>";
-  const recipients = Array.isArray(payload.to) ? payload.to : [payload.to];
-  const cleanRecipients = recipients.filter((e) => e && typeof e === "string").map((e) => e.trim());
+  const from = getVerifiedSender();
+  if (!from) {
+    return false;
+  }
 
-  if (!cleanRecipients.length) {
+  const recipients = normalizeRecipients(payload.to);
+
+  if (!recipients.length) {
     console.warn("[email] No recipients provided");
     return false;
   }
 
   try {
-    console.log(`[email] Sending to: ${cleanRecipients.join(", ")}`);
+    console.log(`[email] Sending to: ${recipients.join(", ")}`);
     const response = await resend.emails.send({
       from,
-      to: cleanRecipients,
+      to: recipients,
       subject: payload.subject,
       html: payload.html,
       text: payload.text,
@@ -86,13 +117,8 @@ export async function sendCustomerAndAdminEmail(options: {
   }
 
   if (options.includeAdmin !== false) {
-    const adminEmail = readEnvValue("ADMIN_EMAIL") || readEnvValue("SUPPORT_EMAIL") || "info@bubblebuddysmile.com";
-    if (adminEmail?.trim()) {
-      adminEmail.split(",").forEach((e) => {
-        const trimmed = e.trim();
-        if (trimmed) recipients.push(trimmed);
-      });
-    }
+    const uniqueAdmins = getAdminRecipients();
+    uniqueAdmins.forEach((email) => recipients.push(email));
   }
 
   const uniqueRecipients = [...new Set(recipients)];
