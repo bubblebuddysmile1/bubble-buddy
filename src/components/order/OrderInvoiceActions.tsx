@@ -47,7 +47,7 @@ function buildInvoicePdf(order: OrderInvoiceActionsProps) {
       "Peer Muchalla Rd, Sector 20, Zirakpur ",
       "Sanauli, Punjab 140603",
       "GSTIN: 07AAAAAAAAA1Z5",
-      "support@buddybubble.com",
+      "info@bubblebuddysmile.com",
     ],
     margin,
     cursor,

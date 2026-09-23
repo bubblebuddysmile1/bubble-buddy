@@ -492,7 +492,7 @@ export default function FAQPage() {
                 },
                 {
                   q: "How can I contact customer support?",
-                  a: "We're here for you! You can reach us via email at support@buddybubble.com or call us at +91 98888 88727. Our support hours are from 9 AM to 9 PM, Monday to Saturday. We'll get back to you as soon as possible.",
+                  a: "We're here for you! You can reach us via email at info@bubblebuddysmile.com or call us at +91 98888 88329. Our support hours are from 9 AM to 9 PM, Monday to Saturday. We'll get back to you as soon as possible.",
                 },
               ].map((item, index) => (
                 <details
@@ -625,7 +625,7 @@ export default function FAQPage() {
                   </p>
                   <div className="mt-4 flex flex-wrap items-center justify-center gap-4 sm:justify-start">
                     <a
-                      href="mailto:support@buddybubble.com"
+                      href="mailto:info@bubblebuddysmile.com"
                       className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90"
                     >
                       <svg
@@ -644,7 +644,7 @@ export default function FAQPage() {
                       Email Us
                     </a>
                     <a
-                      href="tel:+919888888727"
+                      href="tel:+919888888329"
                       className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-6 py-2.5 text-sm font-medium transition-all hover:border-primary hover:bg-primary/10"
                     >
                       <svg

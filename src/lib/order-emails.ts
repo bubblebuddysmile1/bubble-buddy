@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sendCustomerAndAdminEmail, sendEmail } from "@/lib/email";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
-const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? "support@bubblebuddy.com";
+const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "info@bubblebuddysmile.com";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? SUPPORT_EMAIL;
 
 type MoneyValue = string | number | Prisma.Decimal;

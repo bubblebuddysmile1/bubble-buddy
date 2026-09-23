@@ -57,7 +57,7 @@ export default function ShippingPolicyPage() {
           <section className="space-y-4 rounded-4xl border border-border bg-card/50 p-8 backdrop-blur-lg">
             <h2 className="text-3xl font-bold">5. Contact Us</h2>
             <p className="text-muted-foreground">
-              For shipping inquiries, email us at bubblebuddysmile.team@gmail.com or call +91 98888 88727.
+              For shipping inquiries, email us at info@bubblebuddysmile.com or call +91 98888 88329.
             </p>
           </section>
         </div>

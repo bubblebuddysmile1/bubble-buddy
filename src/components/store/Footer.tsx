@@ -9,6 +9,7 @@ import Skeleton from "@/components/ui/Skeleton";
 
 import { Mail, MessageCircle } from "lucide-react";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
+import { BUSINESS_EMAIL, BUSINESS_WHATSAPP_LINK } from "@/lib/contact";
 
 type CategoryLink = {
   name: string;
@@ -123,17 +124,17 @@ export default function Footer() {
               </a>
 
               <a
-                href="mailto:bubblebuddysmile.developer@gmail.com"
+                href={BUSINESS_WHATSAPP_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Open chat"
+                aria-label="Open WhatsApp chat"
                 className="flex h-9 w-9 items-center justify-center text-foreground hover:text-primary transition-colors"
               >
                 <MessageCircle className="h-4 w-4" />
               </a>
 
               <a
-                href="mailto:bubblebuddysmile.team@gmail.com"
+                href={`mailto:${BUSINESS_EMAIL}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Send email"

@@ -86,7 +86,7 @@ export async function sendCustomerAndAdminEmail(options: {
   }
 
   if (options.includeAdmin !== false) {
-    const adminEmail = readEnvValue("ADMIN_EMAIL") || readEnvValue("SUPPORT_EMAIL") || "support@bubblebuddy.com";
+    const adminEmail = readEnvValue("ADMIN_EMAIL") || readEnvValue("SUPPORT_EMAIL") || "info@bubblebuddysmile.com";
     if (adminEmail?.trim()) {
       adminEmail.split(",").forEach((e) => {
         const trimmed = e.trim();
@@ -124,7 +124,7 @@ export async function sendLoginNotificationEmail(
       ? "A new sign-in to your Bubble Buddy account was detected."
       : "We detected a failed sign-in attempt to your Bubble Buddy account.";
 
-  const supportEmail = readEnvValue("SUPPORT_EMAIL") || "support@bubblebuddy.com";
+  const supportEmail = readEnvValue("SUPPORT_EMAIL") || "info@bubblebuddysmile.com";
   const appUrl = (readEnvValue("NEXT_PUBLIC_APP_URL") || "http://localhost:3000").replace(/\/+$/, "");
 
   const text =

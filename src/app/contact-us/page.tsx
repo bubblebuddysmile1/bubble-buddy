@@ -2,6 +2,7 @@
 
 
 import { useState } from "react";
+import { BUSINESS_EMAIL, BUSINESS_PHONE, BUSINESS_WHATSAPP_LINK, CONTACT_INFO } from "@/lib/contact";
 
 const initialForm = {
   name: "",
@@ -104,7 +105,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold">Email</h3>
-                      <a href="mailto:bubblebuddysmile.team@gmail.com" className="text-sm text-muted-foreground transition-colors hover:text-primary">bubblebuddysmile.team@gmail.com</a>
+                      <a href={`mailto:${BUSINESS_EMAIL}`} className="text-sm text-muted-foreground transition-colors hover:text-primary">{BUSINESS_EMAIL}</a>
                     </div>
                   </div>
                 </div>
@@ -118,8 +119,22 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold">Phone</h3>
-                      <a href="tel:+919888888329" className="text-sm text-muted-foreground transition-colors hover:text-accent">+91 98888 88329</a>
+                      <a href={`tel:${CONTACT_INFO.phoneHref}`} className="text-sm text-muted-foreground transition-colors hover:text-accent">{BUSINESS_PHONE}</a>
                       <p className="mt-1 text-xs text-muted-foreground">Mon-Sat, 9 AM - 9 PM</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="group rounded-2xl border border-border bg-card/50 p-6 transition-all hover:border-secondary/20 hover:bg-card/70">
+                  <div className="flex items-start gap-4">
+                    <div className="rounded-xl bg-secondary/10 p-3 transition-all group-hover:bg-secondary/20">
+                      <svg className="h-6 w-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5.5A2.5 2.5 0 015.5 3h13A2.5 2.5 0 0121 5.5v13a2.5 2.5 0 01-2.5 2.5h-13A2.5 2.5 0 013 18.5v-13zm0 0l9 7 9-7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">WhatsApp</h3>
+                      <a href={BUSINESS_WHATSAPP_LINK} target="_blank" rel="noreferrer" className="text-sm text-muted-foreground transition-colors hover:text-secondary">Chat with us on WhatsApp</a>
                     </div>
                   </div>
                 </div>

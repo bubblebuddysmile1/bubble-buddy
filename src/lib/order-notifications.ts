@@ -3,7 +3,7 @@ import { sendWhatsAppMessage } from "@/lib/whatsapp";
 import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail, sendPaymentFailureEmail } from "@/lib/order-emails";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
-const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? "support@bubblebuddy.com";
+const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "info@bubblebuddysmile.com";
 
 type OrderContact = {
   name?: string | null;
