@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Copy } from "lucide-react";
 import PaymentStatusLayout from "@/components/payment/PaymentStatusLayout";
+import { trackPurchase } from "@/lib/analytics";
 import { useCartStore } from "@/store/cart-store";
 
 export default function PaymentSuccessClient() {
@@ -30,6 +31,42 @@ export default function PaymentSuccessClient() {
   }, [completeEmail, orderId, orderNumber, paymentId]);
 
   useEffect(() => {
+    const runPurchaseTracking = async () => {
+      const purchaseOrderNumber = orderNumber || orderId;
+      if (!purchaseOrderNumber) return;
+
+      try {
+        const response = await fetch(`/api/orders/analytics?orderNumber=${encodeURIComponent(purchaseOrderNumber)}`);
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as {
+          orderId?: string;
+          transactionId?: string;
+          currency?: string;
+          value?: number;
+          items?: Array<{ id: number | string; name: string; price: number; quantity: number; currency?: string; category?: string | null }>;
+        };
+
+        if (!payload.orderId || !payload.currency || typeof payload.value !== "number") {
+          return;
+        }
+
+        trackPurchase(
+          payload.orderId,
+          payload.currency,
+          payload.value,
+          payload.items ?? [],
+          payload.transactionId,
+        );
+      } catch {
+        // Ignore analytics fetch errors. The order is still stored in the database.
+      }
+    };
+
+    void runPurchaseTracking();
+
     // Clear cart on successful payment
     if (orderNumber || orderId) {
       clearCart();

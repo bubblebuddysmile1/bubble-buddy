@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CreditCard, RotateCcw, ShieldCheck, ShoppingBag } from "lucide-react";
 import CheckoutAddressFormComponent from "@/components/checkout/CheckoutAddressForm";
 import CheckoutConfirmationSheet from "@/components/checkout/CheckoutConfirmationSheet";
 import CheckoutOrderSummary from "@/components/checkout/CheckoutOrderSummary";
+import { trackBeginCheckout } from "@/lib/analytics";
 import { getCheckoutTotals } from "@/lib/checkout";
 import { formatCartMoney } from "@/lib/cart";
 import { loadRazorpayScript, openRazorpayCheckout } from "@/lib/razorpay-client";
@@ -57,12 +58,33 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
   const [appliedPromotion, setAppliedPromotion] = useState<AppliedPromotion | null>(null);
   const [redeemPoints, setRedeemPoints] = useState(0);
   const [redeemError, setRedeemError] = useState<string | null>(null);
+  const beginCheckoutTrackedRef = useRef(false);
 
   useEffect(() => {
     if (items.length === 0 && !isSubmitting && !isConfirmationOpen) {
       router.replace("/cart");
     }
   }, [items.length, isSubmitting, isConfirmationOpen, router]);
+
+  const persistCheckoutSummary = (orderId: string, orderNumber?: string, valueOverride?: number) => {
+    if (typeof window === "undefined") return;
+
+    const payload = {
+      orderId: orderNumber || orderId,
+      currency: items[0]?.currency ?? "INR",
+      value: valueOverride ?? totals.total,
+      items: items.map(({ id, name, price, currency, quantity, category }) => ({
+        id,
+        name,
+        price,
+        currency,
+        quantity,
+        category,
+      })),
+    };
+
+    window.sessionStorage.setItem("bubble-buddy-last-checkout", JSON.stringify(payload));
+  };
 
   const promotionDefinition = useMemo(
     () =>
@@ -76,21 +98,31 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
     [appliedPromotion],
   );
 
-  const baseTotals = useMemo(
-    () => getCheckoutTotals(items, promotionDefinition),
-    [items, promotionDefinition],
-  );
+  const baseTotals = getCheckoutTotals(items, promotionDefinition);
 
-  const maxRedeemablePoints = useMemo(
-    () => getMaxRedeemablePoints(loyaltyPoints, Math.max(0, baseTotals.subtotal - baseTotals.discount)),
-    [loyaltyPoints, baseTotals.subtotal, baseTotals.discount],
+  const maxRedeemablePoints = getMaxRedeemablePoints(
+    loyaltyPoints,
+    Math.max(0, baseTotals.subtotal - baseTotals.discount),
   );
 
   const effectiveRedeemPoints = Math.min(Math.max(redeemPoints, 0), maxRedeemablePoints);
-  const totals = useMemo(
-    () => getCheckoutTotals(items, promotionDefinition, loyaltyDiscountFromRedeem(effectiveRedeemPoints)),
-    [items, promotionDefinition, effectiveRedeemPoints],
+  const totals = getCheckoutTotals(
+    items,
+    promotionDefinition,
+    loyaltyDiscountFromRedeem(effectiveRedeemPoints),
   );
+
+  useEffect(() => {
+    if (items.length === 0) {
+      beginCheckoutTrackedRef.current = false;
+      return;
+    }
+
+    if (beginCheckoutTrackedRef.current) return;
+
+    beginCheckoutTrackedRef.current = true;
+    trackBeginCheckout(items, items[0]?.currency ?? "INR", totals.total);
+  }, [items, totals.total]);
 
   const handleChange = (field: keyof CheckoutAddressValues, value: string) => {
     if (field === "postalCode") {
@@ -246,6 +278,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
       if (verifyData.email) params.set("email", verifyData.email);
     }
 
+    persistCheckoutSummary(verifyData.orderId, verifyData.orderNumber, totals.total);
     setIsSubmitting(false);
     setIsConfirmationOpen(false);
 

@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { AlertCircle, RotateCcw } from "lucide-react";
 import PaymentStatusLayout from "@/components/payment/PaymentStatusLayout";
+import { trackPaymentFailure } from "@/lib/analytics";
 
 const REASON_MESSAGES: Record<string, string> = {
   cancelled: "You closed the payment window before completing checkout.",
@@ -25,6 +26,29 @@ export default function PaymentFailureClient() {
   const message =
     REASON_MESSAGES[reason] ??
     "Something went wrong during payment. You can try again from checkout.";
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      const raw = window.sessionStorage.getItem("bubble-buddy-last-checkout");
+      if (!raw) {
+        trackPaymentFailure(orderId || orderNumber || null, reason);
+        return;
+      }
+
+      const payload = JSON.parse(raw) as {
+        orderId?: string;
+        currency?: string;
+        value?: number;
+        items?: Array<{ id: number | string; name: string; price: number; quantity: number; currency?: string; category?: string | null }>;
+      };
+
+      trackPaymentFailure(payload.orderId || orderId || orderNumber || null, reason, payload.currency, payload.value, payload.items ?? []);
+    } catch {
+      trackPaymentFailure(orderId || orderNumber || null, reason);
+    }
+  }, [orderId, orderNumber, reason]);
 
   const accountSetupUrl = useMemo(() => {
     const params = new URLSearchParams({

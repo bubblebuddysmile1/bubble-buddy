@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackAddToCart } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cart-store";
 import type { CartProduct } from "@/types/cart";
@@ -32,6 +33,7 @@ export default function AddToCartButton({
 
     setStatus("adding");
     addItem(product, quantity);
+    trackAddToCart(product, quantity);
 
     window.setTimeout(() => {
       setStatus("added");

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import ProductImageGallery from "@/components/store/ProductImageGallery";
 import ProductDetailCart from "@/components/store/ProductDetailCart";
 import ProductTabs from "@/components/store/ProductTabs";
+import ProductViewTracker from "@/components/store/ProductViewTracker";
 import RelatedProducts from "@/components/store/RelatedProducts";
 import ProductReviews from "@/components/store/ProductReviews";
 import RecentlyViewedSection from "@/components/store/RecentlyViewedSection";
@@ -193,6 +194,7 @@ export default async function ProductDetailPage({ params }: { params: PageParams
         <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
           {/* Left Column: Product Images */}
           <section className="rounded-4xl border border-border bg-card p-8 shadow-lg">
+            <ProductViewTracker product={cartProduct} />
             <ProductImageGallery
               productName={product.name}
               thumbnail={product.thumbnail}
