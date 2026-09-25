@@ -100,6 +100,8 @@ redirect chains, and orphan commercial pages.
 implementation was found. Add and validate schema where appropriate, without
 publishing inaccurate price, stock, rating, or review data.
 
+
+
 [EXTERNAL] P2 Image alt/performance: Review every product/category/blog image
 for meaningful alt text, dimensions, responsive delivery, lazy loading, and
 Cloudinary/cache behavior. Code presence alone does not prove coverage.

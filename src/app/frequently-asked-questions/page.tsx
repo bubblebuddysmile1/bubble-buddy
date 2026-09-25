@@ -36,7 +36,7 @@ export default function FAQPage() {
               Everything you need to know about Bubble Buddy Smile. Cant find
               what you are looking for?{" "}
               <a
-                href="/contact"
+                href="/contact-us"
                 className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 transition-all hover:gap-2 hover:underline"
               >
                 Contact us

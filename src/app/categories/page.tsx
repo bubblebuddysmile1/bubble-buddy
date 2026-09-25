@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
@@ -71,7 +72,14 @@ export default async function CategoriesPage() {
             >
               {category.image ? (
                 <div className="relative mb-5 h-44 w-full overflow-hidden rounded-3xl bg-muted">
-                  <img src={category.image} alt={category.name} className="h-full w-full object-cover" />
+                  <Image
+                    src={category.image}
+                    alt={category.name}
+                    width={800}
+                    height={500}
+                    unoptimized
+                    className="h-full w-full object-cover"
+                  />
                 </div>
               ) : (
                 <div className="mb-5 h-44 rounded-3xl bg-primary/10" />

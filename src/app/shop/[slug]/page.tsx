@@ -12,8 +12,11 @@ import RecentlyViewedSection from "@/components/store/RecentlyViewedSection";
 import FrequentlyBoughtTogether from "@/components/store/FrequentlyBoughtTogether";
 import { parseProductPrice, toCartProduct } from "@/lib/cart";
 import { prisma } from "@/lib/prisma";
+import { getAppUrl } from "@/lib/site";
 
 type PageParams = Promise<{ slug: string }>;
+
+const siteUrl = getAppUrl();
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -124,37 +127,45 @@ export async function generateMetadata({ params }: { params: PageParams }): Prom
 
   if (!product) {
     return {
-      title: "Product not found",
+      title: "Product not found | Bubble Buddy",
       description: "The product you are looking for could not be found.",
     };
   }
 
-  const description =
-    product.description.length > 160
-      ? `${product.description.slice(0, 157)}...`
-      : product.description;
-  const imageUrl = product.thumbnail ?? product.images[0]?.url ?? "/category/1.jpg";
+  const categoryName = product.category?.name ?? "Beauty";
+  const baseDescription = product.description?.trim() || `Shop ${product.name} by Bubble Buddy for effective ${categoryName.toLowerCase()} care.`;
+  const description = baseDescription.length > 160 ? `${baseDescription.slice(0, 157).trimEnd()}...` : baseDescription;
+  const canonicalUrl = `${siteUrl}/shop/${slug}`;
+  const imageUrl = product.thumbnail ?? product.images[0]?.url ?? `${siteUrl}/category/1.jpg`;
 
   return {
-    title: product.name,
+    title: `${product.name} | ${categoryName} | Bubble Buddy`,
     description,
     keywords: [
       product.name,
-      product.category?.name ?? "beauty",
-      product.sku,
+      `${product.name} ${categoryName}`,
+      categoryName,
       "Bubble Buddy",
+      "beauty essentials",
+      "skincare products",
     ],
+    alternates: { canonical: canonicalUrl },
     openGraph: {
-      title: product.name,
+      title: `${product.name} | Bubble Buddy`,
       description,
+      url: canonicalUrl,
       type: "website",
       images: [{ url: imageUrl, alt: product.name }],
     },
     twitter: {
       card: "summary_large_image",
-      title: product.name,
+      title: `${product.name} | Bubble Buddy`,
       description,
       images: [imageUrl],
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -167,12 +178,88 @@ export default async function ProductDetailPage({ params }: { params: PageParams
     notFound();
   }
 
+  const productReviews = await prisma.review.findMany({
+    where: { productId: product.id, approved: true },
+    take: 5,
+    orderBy: { createdAt: "desc" },
+    select: {
+      rating: true,
+      title: true,
+      body: true,
+      createdAt: true,
+      verifiedPurchase: true,
+      user: { select: { name: true } },
+    },
+  });
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/` },
+      { "@type": "ListItem", position: 2, name: "Shop", item: `${siteUrl}/shop` },
+      ...(product.category?.name
+        ? [{ "@type": "ListItem", position: 3, name: product.category.name, item: `${siteUrl}/categories/${product.category.slug}` }]
+        : []),
+      { "@type": "ListItem", position: product.category?.name ? 4 : 3, name: product.name, item: `${siteUrl}/shop/${product.slug}` },
+    ],
+  };
+
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image: [
+      product.thumbnail,
+      ...product.images.map((image) => image.url),
+    ].filter(Boolean),
+    description: product.description,
+    sku: product.sku,
+    brand: { "@type": "Brand", name: "Bubble Buddy" },
+    category: product.category?.name ?? "Beauty",
+    mpn: product.sku,
+    url: `${siteUrl}/shop/${product.slug}`,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: product.currency || "USD",
+      price: Number(product.price),
+      availability: product.stockQuantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      url: `${siteUrl}/shop/${product.slug}`,
+      seller: { "@type": "Organization", name: "Bubble Buddy" },
+      ...(product.compareAtPrice && Number(product.compareAtPrice) > Number(product.price)
+        ? { priceSpecification: { "@type": "UnitPriceSpecification", price: Number(product.compareAtPrice), priceCurrency: product.currency || "USD" } }
+        : {}),
+    },
+    ...(product.averageRating && product.reviewCount && product.reviewCount > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: Number(product.averageRating.toFixed(1)),
+            reviewCount: product.reviewCount,
+          },
+          review: productReviews.map((review) => ({
+            "@type": "Review",
+            author: { "@type": "Person", name: review.user?.name ?? "Verified Buyer" },
+            reviewRating: {
+              "@type": "Rating",
+              ratingValue: review.rating,
+            },
+            name: review.title ?? `${product.name} review`,
+            reviewBody: review.body ?? undefined,
+            datePublished: review.createdAt.toISOString(),
+          })),
+        }
+      : {}),
+  };
+
   const relatedProducts = await getRelatedProducts(product.categoryId, product.id);
   const frequentlyBoughtTogetherProducts = await getFrequentlyBoughtTogetherProducts(product.id);
   const cartProduct = toCartProduct(product);
 
   return (
     <main className="min-h-screen bg-background text-foreground py-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
       <div className="container mx-auto px-4">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>

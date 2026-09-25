@@ -4,6 +4,7 @@ import Link from "next/link";
 import React from "react";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getAppUrl } from "@/lib/site";
 import AddToCartButton from "@/components/cart/AddToCartButton";
 import { toCartProduct } from "@/lib/cart";
 import type { CartProduct } from "@/types/cart";
@@ -42,7 +43,7 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") || "https://bubblebuddysmile.com";
+const siteUrl = getAppUrl();
 
 function renderTextWithLinks(text: string) {
   const parts: Array<React.ReactNode> = [];
@@ -139,16 +140,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const canonicalUrl = `${siteUrl}/blogs/${slug}`;
-  const description = post.metaDescription ?? post.excerpt ?? `Read ${post.title} on Bubble Buddy.`;
+  const description = post.metaDescription ?? post.excerpt ?? `Read ${post.title} on Bubble Buddy for beauty, skincare, and self-care guidance.`;
   const imageUrl = post.featuredImage ? new URL(post.featuredImage, siteUrl).toString() : `${siteUrl}/category/1.jpg`;
+  const seoTitle = post.metaTitle ?? `${post.title} | Bubble Buddy Beauty Tips`;
+  const seoKeywords = [
+    post.metaKeywords ?? post.title,
+    "Bubble Buddy",
+    "beauty blog",
+    "skincare tips",
+    "haircare advice",
+    "self care routine",
+  ]
+    .flatMap((value) => value ? value.split(/[,|&]/).map((part) => part.trim()).filter(Boolean) : [])
+    .filter((value, index, array) => array.indexOf(value) === index);
 
   return {
-    title: post.metaTitle ?? `${post.title} | Bubble Buddy`,
+    title: seoTitle,
     description,
-    keywords: [post.metaKeywords ?? post.title, "Bubble Buddy", "beauty blog"],
+    keywords: seoKeywords,
     alternates: { canonical: canonicalUrl },
     openGraph: {
-      title: post.metaTitle ?? post.title,
+      title: seoTitle,
       description,
       url: canonicalUrl,
       type: "article",
@@ -156,7 +168,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: post.metaTitle ?? post.title,
+      title: seoTitle,
       description,
       images: [imageUrl],
     },

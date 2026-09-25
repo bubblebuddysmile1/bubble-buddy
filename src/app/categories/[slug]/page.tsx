@@ -39,27 +39,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const canonicalUrl = `${siteUrl}/categories/${slug}`;
-  const description = category.description ?? `Shop products in the ${category.name} category.`;
   const imageUrl = category.image ? new URL(category.image, siteUrl).toString() : `${siteUrl}/category/1.jpg`;
 
+  const seoTitle = `${category.name} Products | Bubble Buddy`;
+  const seoDescription = `Shop ${category.name.toLowerCase()} products at Bubble Buddy. Discover high-quality beauty essentials for your routine with trusted formulas and fast delivery.`;
+
   return {
-    title: `${category.name} - Bubble Buddy`,
-    description,
-    keywords: [category.name, `${category.name} products`, "Bubble Buddy", "beauty products"],
+    title: seoTitle,
+    description: seoDescription,
+    keywords: [
+      category.name,
+      `${category.name} products`,
+      `buy ${category.name.toLowerCase()}`,
+      "Bubble Buddy",
+      "beauty essentials",
+    ],
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: `${category.name} - Bubble Buddy`,
-      description,
+      title: seoTitle,
+      description: seoDescription,
       url: canonicalUrl,
       type: "website",
       images: [{ url: imageUrl, alt: `${category.name} products` }],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${category.name} - Bubble Buddy`,
-      description,
+      title: seoTitle,
+      description: seoDescription,
       images: [imageUrl],
     },
     robots: {
@@ -85,6 +93,14 @@ export default async function CategoryPage({ params }: Props) {
     name: category.name,
     description,
     url: canonicalUrl,
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/` },
+        { "@type": "ListItem", position: 2, name: "Shop", item: `${siteUrl}/shop` },
+        { "@type": "ListItem", position: 3, name: category.name, item: canonicalUrl },
+      ],
+    },
     mainEntity: {
       "@type": "ItemList",
       itemListElement: [
