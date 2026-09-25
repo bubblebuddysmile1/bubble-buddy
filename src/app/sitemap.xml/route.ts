@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+
 import { prisma } from "@/lib/prisma";
+import { getAppUrl } from "@/lib/site";
 
 const blogPrisma = prisma as unknown as {
   blogPost: {
@@ -7,7 +9,7 @@ const blogPrisma = prisma as unknown as {
   };
 };
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
+const APP_URL = getAppUrl();
 
 function formatDate(date: Date) {
   return date.toISOString().split("T")[0];
@@ -43,15 +45,9 @@ export async function GET() {
     { path: "/categories", lastmod: now, changefreq: "weekly", priority: "0.8" },
     { path: "/offers", lastmod: now, changefreq: "weekly", priority: "0.8" },
     { path: "/blogs", lastmod: now, changefreq: "weekly", priority: "0.8" },
-    { path: "/cart", lastmod: now, changefreq: "monthly", priority: "0.3" },
-    { path: "/checkout", lastmod: now, changefreq: "monthly", priority: "0.3" },
-    { path: "/profile", lastmod: now, changefreq: "monthly", priority: "0.4" },
-    { path: "/wishlist", lastmod: now, changefreq: "weekly", priority: "0.5" },
-    { path: "/compare", lastmod: now, changefreq: "weekly", priority: "0.4" },
     { path: "/about", lastmod: now, changefreq: "monthly", priority: "0.6" },
     { path: "/contact-us", lastmod: now, changefreq: "monthly", priority: "0.6" },
     { path: "/frequently-asked-questions", lastmod: now, changefreq: "monthly", priority: "0.5" },
-    { path: "/auth", lastmod: now, changefreq: "monthly", priority: "0.4" },
     { path: "/terms-and-conditions", lastmod: now, changefreq: "yearly", priority: "0.4" },
     { path: "/privacy-policy", lastmod: now, changefreq: "yearly", priority: "0.4" },
     { path: "/shipping-policy", lastmod: now, changefreq: "yearly", priority: "0.4" },

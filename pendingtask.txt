@@ -78,14 +78,6 @@ reconcile analytics revenue with paid database orders.
 Add only after business approval, with consent/privacy handling and deduplication
 between browser and server events.
 
-[EXTERNAL] P1 Search Console: Verify domain ownership, sitemap submission,
-indexing, canonical selection, crawl errors, and important page coverage in
-Google Search Console. No dashboard evidence is in the repository.
-
-[PENDING] P1 Errors: Add a searchable error tracker and alerts for payment,
-checkout, order, database, and server errors. console logging alone is not an
-operational error-monitoring system.
-
 P2 - SEO AND CONVERSION READINESS
 ---------------------------------
 

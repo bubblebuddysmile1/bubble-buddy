@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import { Resend } from "resend";
 
+import { getAppUrl } from "@/lib/site";
+
 function readEnvValue(name: string): string | undefined {
   const fromProcess = process.env[name];
   if (fromProcess) return fromProcess;
@@ -151,7 +153,7 @@ export async function sendLoginNotificationEmail(
       : "We detected a failed sign-in attempt to your Bubble Buddy account.";
 
   const supportEmail = readEnvValue("SUPPORT_EMAIL") || "info@bubblebuddysmile.com";
-  const appUrl = (readEnvValue("NEXT_PUBLIC_APP_URL") || "http://localhost:3000").replace(/\/+$/, "");
+  const appUrl = getAppUrl();
 
   const text =
     `Hi ${user.name || user.email},\n\n` +

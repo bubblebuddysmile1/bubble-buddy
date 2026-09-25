@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
 import { prisma } from "@/lib/prisma";
+import { getAppUrl } from "@/lib/site";
 import CategoryProducts from "@/components/store/CategoryProducts";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") || "https://bubblebuddy.com";
+const siteUrl = getAppUrl();
 
 export const revalidate = 60;
 export const dynamicParams = true;

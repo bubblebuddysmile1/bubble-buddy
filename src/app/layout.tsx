@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 import AppChrome from "@/components/layout/AppChrome";
+import { getAppUrl } from "@/lib/site";
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://bubblebuddy.com";
+const appUrl = getAppUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),

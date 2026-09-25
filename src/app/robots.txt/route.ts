@@ -1,13 +1,22 @@
 import { NextResponse } from "next/server";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
-const host = new URL(APP_URL).host;
+import { getAppHost, getAppUrl } from "@/lib/site";
+
+const APP_URL = getAppUrl();
+const host = getAppHost();
 
 const ROBOTS_TXT = `User-agent: *
 Allow: /
-Allow: /public/
 Disallow: /admin/
 Disallow: /api/
+Disallow: /checkout/
+Disallow: /cart/
+Disallow: /profile/
+Disallow: /payment/
+Disallow: /orders/
+Disallow: /auth/
+Disallow: /wishlist/
+Disallow: /compare/
 Sitemap: ${APP_URL}/sitemap.xml
 Host: ${host}
 `;

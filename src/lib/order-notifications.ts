@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { sendWhatsAppMessage } from "@/lib/whatsapp";
 import { sendAdminOrderNotificationEmail, sendOrderConfirmationEmail, sendOrderStatusUpdateEmail, sendPaymentFailureEmail } from "@/lib/order-emails";
+import { getAppUrl } from "@/lib/site";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
+const APP_URL = getAppUrl();
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "info@bubblebuddysmile.com";
 
 async function sendOrderFailureAlert(orderNumber: string, event: "received" | "payment_failed" | "status_update", status?: string) {

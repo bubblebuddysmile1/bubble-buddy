@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") || "https://bubblebuddy.com";
+import { prisma } from "@/lib/prisma";
+import { getAppUrl } from "@/lib/site";
+
+const siteUrl = getAppUrl();
 
 export const metadata: Metadata = {
   title: "Categories - Bubble Buddy",

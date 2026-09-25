@@ -1,8 +1,10 @@
 import { Prisma } from "@prisma/client";
+
 import { prisma } from "@/lib/prisma";
 import { sendCustomerAndAdminEmail, sendEmail } from "@/lib/email";
+import { getAppUrl } from "@/lib/site";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
+const APP_URL = getAppUrl();
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL ?? process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "info@bubblebuddysmile.com";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? SUPPORT_EMAIL;
 
