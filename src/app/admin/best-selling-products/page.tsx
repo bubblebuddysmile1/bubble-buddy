@@ -1,3 +1,4 @@
+import Image from "next/image";
 import AdminHeader from "@/components/admin/AdminHeader";
 import { prisma } from "@/lib/prisma";
 import { TrendingUp, Package, DollarSign } from "lucide-react";
@@ -108,9 +109,11 @@ export default async function BestSellingProductsPage() {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           {item.thumbnail && (
-                            <img
+                            <Image
                               src={item.thumbnail}
-                              alt={item.productName}
+                              alt={`${item.productName} product thumbnail`}
+                              width={40}
+                              height={40}
                               className="size-10 rounded-lg object-cover"
                             />
                           )}

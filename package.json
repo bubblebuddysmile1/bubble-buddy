@@ -12,6 +12,7 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:seed": "node prisma/seed.js",
+    "crawl:production": "node scripts/production-crawl.mjs",
     "test:notifications": "npx tsc --noEmit src/lib/whatsapp.ts src/lib/order-notifications.ts src/lib/order-emails.ts"
   },
   "dependencies": {

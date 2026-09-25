@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState } from "react";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -119,10 +120,11 @@ export default function CategoryImageUpload({
 
       {preview && (
         <div className="overflow-hidden rounded-2xl border border-border">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={preview}
             alt="Category preview"
+            width={800}
+            height={320}
             className="h-32 w-full object-cover"
           />
         </div>

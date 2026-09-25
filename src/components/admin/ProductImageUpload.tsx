@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImagePlus, Loader2, Star, Trash2 } from "lucide-react";
@@ -189,8 +190,13 @@ export default function ProductImageUpload({
         <div className="rounded-3xl border border-border bg-background/80 p-4">
           <p className="text-sm font-semibold text-foreground">Current thumbnail</p>
           <div className="mt-3 overflow-hidden rounded-2xl border border-border">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={thumbnail} alt={`${productName} thumbnail`} className="max-h-64 w-full object-cover" />
+            <Image
+              src={thumbnail}
+              alt={`${productName} thumbnail preview`}
+              width={1200}
+              height={800}
+              className="max-h-64 w-full object-cover"
+            />
           </div>
         </div>
       )}
@@ -203,8 +209,13 @@ export default function ProductImageUpload({
               className="overflow-hidden rounded-3xl border border-border bg-background/80"
             >
               <div className="aspect-square overflow-hidden bg-muted">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={image.url} alt={image.altText ?? productName} className="h-full w-full object-cover" />
+                <Image
+                  src={image.url}
+                  alt={image.altText ?? `${productName} gallery image`}
+                  width={800}
+                  height={800}
+                  className="h-full w-full object-cover"
+                />
               </div>
               <div className="flex items-center justify-between gap-2 p-3">
                 <button

@@ -46,31 +46,40 @@ export default function ProductImageGallery({
   }, [images, productName, thumbnail]);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const activeImage = galleryImages[activeIndex] ?? galleryImages[0];
+  const [failedImages, setFailedImages] = useState<string[]>([]);
+
+  const markImageAsFailed = (url: string) => {
+    setFailedImages((current) => (current.includes(url) ? current : [...current, url]));
+  };
+
+  const visibleImages = galleryImages.filter((image) => !failedImages.includes(image.url));
+  const safeActiveImage = visibleImages[activeIndex] ?? visibleImages[0] ?? { id: "fallback", url: "/category/1.jpg", alt: productName };
 
   return (
     <div className="space-y-4">
       <div className="relative aspect-square overflow-hidden rounded-4xl bg-muted">
         <Image
-          key={activeImage.id}
-          src={activeImage.url}
-          alt={activeImage.alt}
+          key={safeActiveImage.id}
+          src={safeActiveImage.url}
+          alt={safeActiveImage.alt}
           fill
           priority
+          sizes="(max-width: 768px) 100vw, 50vw"
           className="object-cover transition-opacity duration-300"
+          onError={() => markImageAsFailed(safeActiveImage.url)}
         />
       </div>
 
-      {galleryImages.length > 1 && (
+      {visibleImages.length > 1 && (
         <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
-          {galleryImages.map((image, index) => {
+          {visibleImages.map((image, index) => {
             const isActive = index === activeIndex;
             return (
               <button
                 key={image.id}
                 type="button"
                 onClick={() => setActiveIndex(index)}
-                aria-label={`View image ${index + 1} of ${galleryImages.length}`}
+                aria-label={`View image ${index + 1} of ${visibleImages.length}`}
                 aria-pressed={isActive}
                 className={`relative aspect-square overflow-hidden rounded-2xl bg-muted ring-2 transition ${
                   isActive ? "ring-primary" : "ring-transparent hover:ring-border"
@@ -78,9 +87,13 @@ export default function ProductImageGallery({
               >
                 <Image
                   src={image.url}
+                  
                   alt={image.alt}
                   fill
+                  loading="lazy"
+                  sizes="(max-width: 768px) 25vw, 12vw"
                   className="object-cover"
+                  onError={() => markImageAsFailed(image.url)}
                 />
               </button>
             );

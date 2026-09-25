@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -87,10 +88,11 @@ export default function ProductManageTable({ products }: ProductManageTableProps
                   <div className="flex items-center gap-3">
                     <div className="size-12 shrink-0 overflow-hidden rounded-xl bg-muted">
                       {product.thumbnail ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                           src={product.thumbnail}
-                          alt={product.name}
+                          alt={`${product.name} product thumbnail`}
+                          width={48}
+                          height={48}
                           className="size-full object-cover"
                         />
                       ) : null}
