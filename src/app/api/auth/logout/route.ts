@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { COOKIE_NAME, authCookieOptions, verifyAuthToken } from "@/lib/auth";
-import { logActivity } from "@/lib/activity-log";
+import { getActivityRequestDetails, logActivity } from "@/lib/activity-log";
 
 export async function POST(req: NextRequest) {
   const token = req.cookies.get(COOKIE_NAME)?.value;
@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
 
   if (payload) {
     await logActivity({
+      ...getActivityRequestDetails(req),
       userId: payload.id,
       eventType: "LOGOUT",
       action: "User logged out",

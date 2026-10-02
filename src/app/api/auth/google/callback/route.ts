@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME, authCookieOptions, createAuthToken } from "@/lib/auth";
+import { getActivityRequestDetails, logActivity } from "@/lib/activity-log";
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
@@ -109,6 +110,15 @@ export async function GET(req: NextRequest) {
     email: user.email ?? email,
     name: user.name,
     role: user.role,
+  });
+
+  await logActivity({
+    ...getActivityRequestDetails(req),
+    userId: user.id,
+    eventType: "LOGIN",
+    action: "User signed in with Google",
+    description: `User signed in with ${user.email ?? email}`,
+    metadata: JSON.stringify({ email: user.email ?? email, provider: "google" }),
   });
 
   const response = NextResponse.redirect(sanitizeReturnTo(state, origin));

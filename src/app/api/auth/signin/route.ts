@@ -2,12 +2,13 @@ import bcrypt from "bcrypt";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME, authCookieOptions, createAuthToken, isAccountLocked, getAccountLockoutDuration } from "@/lib/auth";
-import { logActivity } from "@/lib/activity-log";
+import { getActivityRequestDetails, logActivity } from "@/lib/activity-log";
 import { sendLoginNotificationEmail } from "@/lib/email";
 
 const MAX_FAILED_ATTEMPTS = 5;
 
 export async function POST(req: NextRequest) {
+  const requestDetails = getActivityRequestDetails(req);
   const body = await req.json();
   const email = String(body?.email ?? "").trim().toLowerCase();
   const password = String(body?.password ?? "");
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
     const remainingMinutes = Math.ceil((lockoutExpiry.getTime() - Date.now()) / 60000);
 
     await logActivity({
+      ...requestDetails,
       eventType: "SECURITY_ALERT",
       action: "Login attempt on locked account",
       description: `Account locked for ${email}. Locked until ${lockoutExpiry.toISOString()}`,
@@ -54,6 +56,7 @@ export async function POST(req: NextRequest) {
 
   if (!user) {
     await logActivity({
+      ...requestDetails,
       eventType: "FAILED_LOGIN",
       action: "Failed sign-in attempt",
       description: `Invalid credentials for ${email}`,
@@ -87,6 +90,7 @@ export async function POST(req: NextRequest) {
     });
 
     await logActivity({
+      ...requestDetails,
       userId: user.id,
       eventType: "FAILED_LOGIN",
       action: "Failed sign-in attempt",
@@ -96,6 +100,7 @@ export async function POST(req: NextRequest) {
 
     if (shouldLock) {
       await logActivity({
+        ...requestDetails,
         userId: user.id,
         eventType: "SECURITY_ALERT",
         action: "Account locked",
@@ -139,6 +144,7 @@ export async function POST(req: NextRequest) {
   });
 
   await logActivity({
+    ...requestDetails,
     userId: user.id,
     eventType: "LOGIN",
     action: "User signed in",

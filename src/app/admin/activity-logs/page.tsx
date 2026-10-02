@@ -1,6 +1,7 @@
 import AdminHeader from "@/components/admin/AdminHeader";
 import ActivityLogTime from "@/components/admin/ActivityLogTime";
 import { prisma } from "@/lib/prisma";
+import { isLoopbackIp } from "@/lib/activity-log";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import type { ActivityLog } from "@prisma/client";
@@ -66,6 +67,9 @@ export default async function AdminActivityLogsPage({
               <p className="mt-1 text-sm text-muted-foreground">
                 Recent authentication events and administrative actions are displayed here.
               </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Localhost or unavailable means the server did not receive the client IP, which can happen during local testing without a forwarding proxy.
+              </p>
             </div>
             <div className="inline-flex items-center gap-2 rounded-3xl bg-primary/10 px-4 py-3 text-sm font-medium text-primary">
               <ShieldCheck className="size-5" /> Security monitoring
@@ -107,13 +111,14 @@ export default async function AdminActivityLogsPage({
             </nav>
           </div>
 
-          <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-background">
+          <div className="mt-6 overflow-x-auto rounded-3xl border border-border bg-background">
             <table className="min-w-full border-separate border-spacing-0 text-left text-sm">
               <thead className="bg-muted text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3">Time</th>
                   <th className="px-4 py-3">Event</th>
                   <th className="px-4 py-3">User</th>
+                  <th className="px-4 py-3">IP Address</th>
                   <th className="px-4 py-3">Action</th>
                   <th className="px-4 py-3">Details</th>
                 </tr>
@@ -127,6 +132,13 @@ export default async function AdminActivityLogsPage({
                     <td className="px-4 py-3 font-medium text-foreground">{formatEventType(log.eventType)}</td>
                     <td className="px-4 py-3 text-foreground">
                       {log.user ? `${log.user.name ?? log.user.email}` : "Guest"}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                      {log.ip
+                        ? isLoopbackIp(log.ip)
+                          ? "Localhost (client IP unavailable)"
+                          : log.ip
+                        : "Unavailable"}
                     </td>
                     <td className="px-4 py-3 text-foreground">{log.action}</td>
                     <td className="px-4 py-3 text-sm text-muted-foreground wrap-break-word max-w-[24rem]">

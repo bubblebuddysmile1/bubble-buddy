@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME, authCookieOptions, createAuthToken } from "@/lib/auth";
 import { issueVerificationOtp, verifyAccountWithOtp } from "@/lib/account-auth";
-import { logActivity } from "@/lib/activity-log";
+import { getActivityRequestDetails, logActivity } from "@/lib/activity-log";
 
 export async function POST(req: NextRequest) {
+  const requestDetails = getActivityRequestDetails(req);
   const body = await req.json();
   const email = String(body?.email ?? "").trim().toLowerCase();
   const otp = String(body?.otp ?? "").trim();
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
     });
 
     await logActivity({
+      ...requestDetails,
       userId: user.id,
       eventType: "AUDIT_TRAIL",
       action: "OTP requested",
@@ -55,6 +57,7 @@ export async function POST(req: NextRequest) {
   }
 
   await logActivity({
+    ...requestDetails,
     userId: user.id,
     eventType: "LOGIN",
     action: "User signed in with OTP",

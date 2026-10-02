@@ -1,5 +1,57 @@
 import { prisma } from "@/lib/prisma";
 import type { ActivityType } from "@prisma/client";
+import { isIP } from "node:net";
+
+function parseIpAddress(value: string): string | undefined {
+  let ip = value.trim();
+
+  if (ip.startsWith("[")) {
+    const bracketedAddress = ip.match(/^\[([^\]]+)\](?::\d+)?$/);
+    if (!bracketedAddress) return undefined;
+    ip = bracketedAddress[1];
+  } else if (!ip.includes("::")) {
+    const ipv4WithPort = ip.match(/^(.+):\d+$/);
+    if (ipv4WithPort && isIP(ipv4WithPort[1]) === 4) {
+      ip = ipv4WithPort[1];
+    }
+  }
+
+  return isIP(ip) ? ip : undefined;
+}
+
+export function isLoopbackIp(ip: string) {
+  const normalizedIp = ip.toLowerCase();
+  const ipv4MappedAddress = normalizedIp.match(/^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/);
+  const ipv4Address = ipv4MappedAddress?.[1] ?? normalizedIp;
+
+  if (isIP(ipv4Address) === 4) {
+    return Number(ipv4Address.split(".")[0]) === 127;
+  }
+
+  return (
+    normalizedIp === "::1" ||
+    /^(?:0{1,4}:){7}0{0,3}1$/.test(normalizedIp)
+  );
+}
+
+export function getActivityRequestDetails(request: { headers: Headers }) {
+  const headers = request.headers;
+  const ipHeaders = [
+    headers.get("cf-connecting-ip"),
+    headers.get("x-vercel-forwarded-for"),
+    headers.get("x-forwarded-for"),
+    headers.get("x-real-ip"),
+  ];
+  const ip = ipHeaders
+    .flatMap((value) => value?.split(",") ?? [])
+    .map(parseIpAddress)
+    .find((value): value is string => value !== undefined && !isLoopbackIp(value));
+
+  return {
+    ip,
+    userAgent: headers.get("user-agent") ?? undefined,
+  };
+}
 
 export async function logActivity(options: {
   userId?: number;
