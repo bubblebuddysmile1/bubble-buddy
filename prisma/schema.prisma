@@ -42,7 +42,7 @@ model ActivityLog {
   ip          String?
   userAgent   String?
   metadata    String?
-  createdAt   DateTime     @default(now())
+  createdAt   DateTime     @default(now()) @db.Timestamptz(3)
   user        User?        @relation(fields: [userId], references: [id])
 }
 

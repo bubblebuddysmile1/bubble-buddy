@@ -19,6 +19,7 @@ export async function logActivity(options: {
       ip: options.ip,
       userAgent: options.userAgent,
       metadata: options.metadata,
+      createdAt: new Date(),
     },
   });
 }

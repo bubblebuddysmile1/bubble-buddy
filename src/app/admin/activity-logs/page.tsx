@@ -1,6 +1,7 @@
 import AdminHeader from "@/components/admin/AdminHeader";
+import ActivityLogTime from "@/components/admin/ActivityLogTime";
 import { prisma } from "@/lib/prisma";
-import { Activity, Clock, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import type { ActivityLog } from "@prisma/client";
 
 function formatEventType(eventType: ActivityLog["eventType"]) {
@@ -67,7 +68,7 @@ export default async function AdminActivityLogsPage() {
                 {logs.map((log) => (
                   <tr key={log.id} className="border-t border-border hover:bg-muted/40">
                     <td className="px-4 py-3 text-xs text-muted-foreground">
-                      {new Date(log.createdAt).toLocaleString()}
+                      <ActivityLogTime value={log.createdAt.toISOString()} />
                     </td>
                     <td className="px-4 py-3 font-medium text-foreground">{formatEventType(log.eventType)}</td>
                     <td className="px-4 py-3 text-foreground">

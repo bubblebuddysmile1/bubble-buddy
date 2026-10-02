@@ -54,6 +54,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: verification.message }, { status: 400 });
   }
 
+  await logActivity({
+    userId: user.id,
+    eventType: "LOGIN",
+    action: "User signed in with OTP",
+    description: `User signed in with ${user.email ?? email}`,
+    metadata: JSON.stringify({ email: user.email ?? email, authType: user.authType }),
+  });
+
   const token = createAuthToken({
     id: user.id,
     email: user.email ?? email,
