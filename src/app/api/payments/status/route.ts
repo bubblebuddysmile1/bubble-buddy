@@ -28,7 +28,6 @@ export async function POST(request: Request) {
 
     if (
       !order?.razorpayOrderId ||
-      (paymentId && order.razorpayPaymentId && order.razorpayPaymentId !== paymentId) ||
       orderNumberFromRazorpay(order.razorpayOrderId) !== orderNumber
     ) {
       return NextResponse.json({ error: "Payment reference was not found." }, { status: 404 });
@@ -42,11 +41,40 @@ export async function POST(request: Request) {
       });
     }
     const razorpay = createRazorpayClient();
-    const payments = (await razorpay.orders.fetchPayments(order.razorpayOrderId)).items;
-    const matchingPayments = payments.filter(
+    let callbackPayment = null;
+    if (paymentId) {
+      try {
+        callbackPayment = await razorpay.payments.fetch(paymentId);
+      } catch (error) {
+        console.error("[payments/status] Failed to fetch supplied payment:", error);
+      }
+      if (callbackPayment && callbackPayment.order_id !== order.razorpayOrderId) {
+        return NextResponse.json({ error: "Payment does not match this order." }, { status: 400 });
+      }
+      if (callbackPayment?.status === "captured" || callbackPayment?.status === "authorized") {
+        await confirmOrder(
+          order.razorpayOrderId,
+          callbackPayment.id,
+          callbackPayment.id === order.razorpayPaymentId ? order.razorpaySignature : null,
+          mapRazorpayPaymentMethod(callbackPayment.method),
+        );
+        await notifyOrderConfirmation(orderNumber);
+        return NextResponse.json({
+          status: "paid",
+          orderNumber,
+          paymentId: callbackPayment.id,
+        });
+      }
+    }
+
+    const orderPayments = (await razorpay.orders.fetchPayments(order.razorpayOrderId)).items;
+    const matchingPayments = orderPayments.filter(
       (candidate) => candidate.order_id === order.razorpayOrderId,
     );
     const payment =
+      (callbackPayment &&
+        (callbackPayment.status === "captured" || callbackPayment.status === "authorized") &&
+        callbackPayment) ??
       matchingPayments.find(
         (candidate) =>
           (candidate.status === "captured" || candidate.status === "authorized") &&

@@ -87,29 +87,57 @@ export async function POST(request: Request) {
     if (isMockPaymentMode()) {
       paymentSuccessful = true;
     } else {
-      try {
-        const razorpay = createRazorpayClient();
-        const { items: payments } = await razorpay.orders.fetchPayments(razorpay_order_id);
-        const orderPayments = payments.filter((payment) => payment.order_id === razorpay_order_id);
-        const payment =
-          orderPayments.find(
-            (candidate) => candidate.status === "captured" || candidate.status === "authorized",
-          ) ??
-          orderPayments.find((candidate) => candidate.id === razorpay_payment_id) ??
-          orderPayments.sort((left, right) => right.created_at - left.created_at)[0];
+      const razorpay = createRazorpayClient();
+      let callbackPaymentStatus: string | null = null;
+      let orderPaymentsFetched = false;
 
-        if (!payment) {
-          paymentPending = true;
-        } else {
-          paymentSuccessful = payment.status === "captured" || payment.status === "authorized";
-          paymentMethod = mapRazorpayPaymentMethod(payment.method);
-          paymentPending = !paymentSuccessful && payment.status !== "failed";
-          confirmedPaymentId = payment.id;
-          confirmedPaymentSignature = payment.id === razorpay_payment_id ? razorpay_signature : null;
+      try {
+        const callbackPayment = await razorpay.payments.fetch(razorpay_payment_id);
+        if (callbackPayment.order_id !== razorpay_order_id) {
+          return NextResponse.json({ error: "Payment does not match this order." }, { status: 400 });
         }
+        callbackPaymentStatus = callbackPayment.status;
+        paymentSuccessful =
+          callbackPayment.status === "captured" || callbackPayment.status === "authorized";
+        paymentMethod = mapRazorpayPaymentMethod(callbackPayment.method);
       } catch (error) {
-        console.error("[payments/verify] Failed to fetch order payment status:", error);
+        console.error("[payments/verify] Failed to fetch callback payment:", error);
         paymentFetchFailed = true;
+      }
+
+      if (!paymentSuccessful) {
+        try {
+          const { items: payments } = await razorpay.orders.fetchPayments(razorpay_order_id);
+          orderPaymentsFetched = true;
+          const orderPayments = payments.filter((payment) => payment.order_id === razorpay_order_id);
+          const successfulPayment = orderPayments.find(
+            (candidate) => candidate.status === "captured" || candidate.status === "authorized",
+          );
+
+          if (successfulPayment) {
+            paymentSuccessful = true;
+            paymentMethod = mapRazorpayPaymentMethod(successfulPayment.method);
+            confirmedPaymentId = successfulPayment.id;
+            confirmedPaymentSignature =
+              successfulPayment.id === razorpay_payment_id ? razorpay_signature : null;
+          } else if (
+            callbackPaymentStatus === "failed" &&
+            orderPayments.length > 0 &&
+            orderPayments.every((payment) => payment.status === "failed")
+          ) {
+            paymentPending = false;
+          } else {
+            paymentPending = true;
+          }
+        } catch (error) {
+          console.error("[payments/verify] Failed to fetch order payment status:", error);
+          paymentFetchFailed = true;
+          paymentPending = callbackPaymentStatus !== "failed";
+        }
+      }
+
+      if (!paymentSuccessful && callbackPaymentStatus === "failed" && !orderPaymentsFetched) {
+        paymentPending = true;
       }
     }
 
