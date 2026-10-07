@@ -7,7 +7,7 @@ type PaymentStatusLayoutProps = {
   title: string;
   description: ReactNode;
   actions: ReactNode;
-  variant?: "success" | "failure";
+  variant?: "success" | "failure" | "pending";
 };
 
 export default function PaymentStatusLayout({
@@ -22,7 +22,11 @@ export default function PaymentStatusLayout({
     <main className="relative min-h-screen overflow-hidden bg-background py-16 text-foreground">
       <div
         className={`pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full blur-3xl ${
-          variant === "success" ? "bg-emerald-500/10" : "bg-destructive/10"
+          variant === "success"
+            ? "bg-emerald-500/10"
+            : variant === "pending"
+              ? "bg-amber-500/10"
+              : "bg-destructive/10"
         }`}
       />
       <div className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
@@ -35,7 +39,11 @@ export default function PaymentStatusLayout({
         >
           <div
             className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full ${
-              variant === "success" ? "bg-emerald-500/15" : "bg-destructive/10"
+              variant === "success"
+                ? "bg-emerald-500/15"
+                : variant === "pending"
+                  ? "bg-amber-500/15"
+                  : "bg-destructive/10"
             }`}
           >
             {icon}

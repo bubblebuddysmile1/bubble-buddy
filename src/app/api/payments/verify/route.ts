@@ -3,7 +3,12 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 import { issueVerificationOtp } from "@/lib/account-auth";
-import { persistOrderAfterPayment, confirmOrder, cancelOrder } from "@/lib/orders";
+import {
+  persistOrderAfterPayment,
+  confirmOrder,
+  cancelOrder,
+  mapRazorpayPaymentMethod,
+} from "@/lib/orders";
 import { isMockPaymentMode, createRazorpayClient } from "@/lib/razorpay";
 import { verifyPaymentSchema } from "@/lib/validations/payment";
 import { prisma } from "@/lib/prisma";
@@ -63,6 +68,8 @@ export async function POST(request: Request) {
     // Create order with PENDING status
     const savedOrder = await persistOrderAfterPayment({
       razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+      razorpaySignature: razorpay_signature,
       address,
       items,
       user,
@@ -73,15 +80,35 @@ export async function POST(request: Request) {
     // Check payment status from Razorpay
     let paymentSuccessful = false;
     let paymentFetchFailed = false;
+    let paymentPending = false;
+    let paymentMethod: ReturnType<typeof mapRazorpayPaymentMethod> = null;
+    let confirmedPaymentId = razorpay_payment_id;
+    let confirmedPaymentSignature: string | null = razorpay_signature;
     if (isMockPaymentMode()) {
       paymentSuccessful = true;
     } else {
       try {
         const razorpay = createRazorpayClient();
-        const payment = await razorpay.payments.fetch(razorpay_payment_id);
-        paymentSuccessful = payment.status === "captured" || payment.status === "authorized";
+        const { items: payments } = await razorpay.orders.fetchPayments(razorpay_order_id);
+        const orderPayments = payments.filter((payment) => payment.order_id === razorpay_order_id);
+        const payment =
+          orderPayments.find(
+            (candidate) => candidate.status === "captured" || candidate.status === "authorized",
+          ) ??
+          orderPayments.find((candidate) => candidate.id === razorpay_payment_id) ??
+          orderPayments.sort((left, right) => right.created_at - left.created_at)[0];
+
+        if (!payment) {
+          paymentPending = true;
+        } else {
+          paymentSuccessful = payment.status === "captured" || payment.status === "authorized";
+          paymentMethod = mapRazorpayPaymentMethod(payment.method);
+          paymentPending = !paymentSuccessful && payment.status !== "failed";
+          confirmedPaymentId = payment.id;
+          confirmedPaymentSignature = payment.id === razorpay_payment_id ? razorpay_signature : null;
+        }
       } catch (error) {
-        console.error("[payments/verify] Failed to fetch payment status:", error);
+        console.error("[payments/verify] Failed to fetch order payment status:", error);
         paymentFetchFailed = true;
       }
     }
@@ -90,13 +117,30 @@ export async function POST(request: Request) {
     // signature alone does not prove capture if the payment lookup failed.
     let finalOrder = savedOrder;
     if (paymentSuccessful) {
-      finalOrder = await confirmOrder(razorpay_order_id, razorpay_payment_id, razorpay_signature);
+      finalOrder = await confirmOrder(
+        razorpay_order_id,
+        confirmedPaymentId,
+        confirmedPaymentSignature,
+        paymentMethod,
+      );
       await notifyOrderConfirmation(finalOrder.orderNumber);
       if (verificationRequired && user?.id) {
         await issueVerificationOtp(user.id, authUser?.email ?? address.email ?? null).catch((error) => {
           console.error("[payments/verify] Failed to issue verification OTP", error);
         });
       }
+    } else if (paymentFetchFailed || paymentPending) {
+      return NextResponse.json({
+        verified: false,
+        pending: true,
+        mock: false,
+        orderId: razorpay_order_id,
+        paymentId: razorpay_payment_id,
+        orderNumber: savedOrder.orderNumber,
+        dbOrderId: savedOrder.id,
+        error: "Payment was received but its final status is not available yet. Do not pay again while we confirm it.",
+        reason: "payment_status_pending",
+      }, { status: 202 });
     } else {
       const cancelledOrder = await cancelOrder(razorpay_order_id);
       if (cancelledOrder.paymentStatus === "PAID") {
@@ -119,10 +163,8 @@ export async function POST(request: Request) {
         paymentId: razorpay_payment_id,
         orderNumber: cancelledOrder.orderNumber,
         dbOrderId: cancelledOrder.id,
-        error: paymentFetchFailed
-          ? "Payment status could not be confirmed. Please retry or contact support if you were charged."
-          : "Payment was not successful.",
-        reason: paymentFetchFailed ? "payment_status_unavailable" : "payment_declined",
+        error: "Razorpay reported that this payment failed.",
+        reason: "payment_declined",
       }, { status: 400 });
     }
 

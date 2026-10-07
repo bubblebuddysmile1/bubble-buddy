@@ -135,7 +135,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
                 </div>
                 <div>
                   <p className="text-xs uppercase tracking-[0.28em]">Payment method</p>
-                  <p className="mt-2 text-foreground">{order.paymentMethod ?? "Card"}</p>
+                  <p className="mt-2 text-foreground">{order.paymentMethod ?? "Not recorded"}</p>
                 </div>
                 <div>
                   <p className="text-xs uppercase tracking-[0.28em]">Shipping</p>

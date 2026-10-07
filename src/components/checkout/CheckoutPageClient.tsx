@@ -251,11 +251,24 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
 
     const verifyData = await verifyRes.json();
 
+    if (verifyData.pending && verifyData.orderNumber) {
+      const pendingParams = new URLSearchParams({
+        order_id: verifyData.orderId || "",
+        payment_id: verifyData.paymentId || "",
+        order_number: verifyData.orderNumber,
+      });
+      router.push(`/payment/pending?${pendingParams.toString()}`);
+      setIsSubmitting(false);
+      setIsConfirmationOpen(false);
+      return;
+    }
+
     if (!verifyRes.ok || !verifyData.verified) {
       const failParams = new URLSearchParams({
         reason: verifyData.reason || "verification_failed",
         order_id: verifyData.orderId || "",
       });
+      if (verifyData.paymentId) failParams.set("payment_id", verifyData.paymentId);
       if (verifyData.orderNumber) failParams.set("order_number", verifyData.orderNumber);
       if (mock) failParams.set("mock", "1");
       if (verifyData.verificationRequired) {

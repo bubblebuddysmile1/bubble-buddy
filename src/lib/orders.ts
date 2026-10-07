@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, type PaymentMethod } from "@prisma/client";
 import { getCheckoutTotals } from "@/lib/checkout";
 import { getLoyaltyPointsEarned, loyaltyDiscountFromRedeem } from "@/lib/loyalty";
 import { getPromotionByCode, getPromotionDiscountAmount, isPromotionActive } from "@/lib/promotions";
@@ -10,12 +10,29 @@ import type { CartItem } from "@/types/cart";
 
 export type PersistOrderInput = {
   razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
   address: CheckoutAddressForm;
   items: CreatePaymentOrderInput["items"];
   user?: AuthTokenPayload | null;
   couponCode?: string;
   redeemPoints?: number;
 };
+
+export function mapRazorpayPaymentMethod(method: unknown): PaymentMethod | null {
+  switch (typeof method === "string" ? method.toLowerCase() : "") {
+    case "card":
+      return "CARD";
+    case "upi":
+      return "UPI";
+    case "wallet":
+      return "WALLET";
+    case "netbanking":
+      return "BANK_TRANSFER";
+    default:
+      return null;
+  }
+}
 
 export function orderNumberFromRazorpay(razorpayOrderId: string): string {
   const suffix = razorpayOrderId.replace(/^order_(mock_)?/, "").slice(-12).toUpperCase();
@@ -124,9 +141,10 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
         userId: input.user?.id ?? null,
         status: "PENDING",
         paymentStatus: "PENDING",
-        paymentMethod: "CARD",
         couponCode: input.couponCode?.trim().toUpperCase() ?? null,
         razorpayOrderId: input.razorpayOrderId,
+        razorpayPaymentId: input.razorpayPaymentId,
+        razorpaySignature: input.razorpaySignature,
         totalAmount: new Prisma.Decimal(totals.total),
         shippingAmount: new Prisma.Decimal(totals.shipping),
         taxAmount: new Prisma.Decimal(0),
@@ -159,7 +177,12 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
   });
 }
 
-export async function confirmOrder(razorpayOrderId: string, razorpayPaymentId: string, razorpaySignature: string) {
+export async function confirmOrder(
+  razorpayOrderId: string,
+  razorpayPaymentId: string,
+  razorpaySignature: string | null,
+  paymentMethod: PaymentMethod | null,
+) {
   const orderNumber = orderNumberFromRazorpay(razorpayOrderId);
   
   const order = await prisma.order.findUnique({
@@ -184,16 +207,34 @@ export async function confirmOrder(razorpayOrderId: string, razorpayPaymentId: s
   }
 
   return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    const updatedOrder = await tx.order.update({
-      where: { orderNumber },
+    const transitioned = await tx.order.updateMany({
+      where: { orderNumber, paymentStatus: order.paymentStatus },
       data: {
         status: "CONFIRMED",
         paymentStatus: "PAID",
+        paymentMethod,
         razorpayPaymentId,
         razorpaySignature,
       },
-      select: { id: true, orderNumber: true },
     });
+
+    if (transitioned.count === 0) {
+      const currentOrder = await tx.order.findUnique({
+        where: { orderNumber },
+        select: { id: true, orderNumber: true, paymentStatus: true },
+      });
+      if (currentOrder?.paymentStatus === "PAID") {
+        return { id: currentOrder.id, orderNumber: currentOrder.orderNumber };
+      }
+      throw new Error("Order payment status changed before confirmation.");
+    }
+
+    if (order.paymentStatus === "FAILED" && order.userId && order.redeemedLoyaltyPoints > 0) {
+      await tx.user.update({
+        where: { id: order.userId },
+        data: { loyaltyPoints: { decrement: order.redeemedLoyaltyPoints } },
+      });
+    }
 
     if (order.userId && order.loyaltyPointsEarned > 0) {
       await tx.user.update({
@@ -224,7 +265,7 @@ export async function confirmOrder(razorpayOrderId: string, razorpayPaymentId: s
       });
     }
 
-    return updatedOrder;
+    return { id: order.id, orderNumber };
   });
 }
 
@@ -239,11 +280,30 @@ export async function cancelOrder(razorpayOrderId: string) {
     throw new Error("Order not found.");
   }
 
-  if (order.paymentStatus === "PAID") {
+  if (order.paymentStatus === "PAID" || order.paymentStatus === "FAILED") {
     return order;
   }
 
   return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const transitioned = await tx.order.updateMany({
+      where: { orderNumber, paymentStatus: "PENDING" },
+      data: {
+        status: "CANCELLED",
+        paymentStatus: "FAILED",
+      },
+    });
+
+    if (transitioned.count === 0) {
+      const currentOrder = await tx.order.findUnique({
+        where: { orderNumber },
+        select: { id: true, orderNumber: true, status: true, paymentStatus: true },
+      });
+      if (!currentOrder) {
+        throw new Error("Order not found.");
+      }
+      return currentOrder;
+    }
+
     if (order.userId && order.redeemedLoyaltyPoints > 0) {
       await tx.user.update({
         where: { id: order.userId },
@@ -253,12 +313,8 @@ export async function cancelOrder(razorpayOrderId: string) {
       });
     }
 
-    return tx.order.update({
+    return tx.order.findUniqueOrThrow({
       where: { orderNumber },
-      data: {
-        status: "CANCELLED",
-        paymentStatus: "FAILED",
-      },
       select: { id: true, orderNumber: true, status: true, paymentStatus: true },
     });
   });
