@@ -30,6 +30,7 @@ type ProductWithCategory = Prisma.ProductGetPayload<{
 type ProductCreateImage = {
   url: string;
   altText?: string | null;
+  sortOrder?: number;
 };
 
 function normalizeProduct(product: ProductWithCategory) {
@@ -268,7 +269,16 @@ export async function POST(req: NextRequest) {
       images: {
         create: images
           .filter((item): item is ProductCreateImage => Boolean(item?.url))
-          .map((item) => ({ url: String(item.url), altText: item?.altText ? String(item.altText) : null })),
+          .map((item, index) => ({
+            url: String(item.url),
+            altText: item?.altText ? String(item.altText) : null,
+            sortOrder:
+              typeof item.sortOrder === "number" &&
+              Number.isInteger(item.sortOrder) &&
+              item.sortOrder >= 0
+                ? item.sortOrder
+                : index,
+          })),
       },
     },
     include: { 

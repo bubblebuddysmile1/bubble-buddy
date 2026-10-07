@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { ActivePromotion } from "./OfferDiscountSection";
 
-function formatCountdown(target: Date): string {
-  const totalSeconds = Math.max(0, Math.floor((target.getTime() - Date.now()) / 1000));
+function formatCountdown(target: Date, now: number): string {
+  const totalSeconds = Math.max(0, Math.floor((target.getTime() - now) / 1000));
   const days = Math.floor(totalSeconds / 86400);
   const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -26,6 +26,15 @@ type OfferDiscountSectionClientProps = {
 
 export default function OfferDiscountSectionClient({ promotions }: OfferDiscountSectionClientProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [currentTime, setCurrentTime] = useState<number | null>(null);
+
+  useEffect(() => {
+    const updateTime = () => setCurrentTime(Date.now());
+    updateTime();
+
+    const interval = window.setInterval(updateTime, 1000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (promotions.length === 0) {
@@ -83,7 +92,11 @@ export default function OfferDiscountSectionClient({ promotions }: OfferDiscount
               {promotion.activeUntil ? (
                 <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">
                   <span>Ends in</span>
-                  <span>{formatCountdown(new Date(promotion.activeUntil))}</span>
+                  <span>
+                    {currentTime === null
+                      ? "..."
+                      : formatCountdown(new Date(promotion.activeUntil), currentTime)}
+                  </span>
                 </div>
               ) : (
                 <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -104,7 +117,7 @@ export default function OfferDiscountSectionClient({ promotions }: OfferDiscount
         </article>
       );
     }),
-    [promotions],
+    [currentTime, promotions],
   );
 
   return (
@@ -168,7 +181,11 @@ export default function OfferDiscountSectionClient({ promotions }: OfferDiscount
                         {activePromotion.activeUntil ? (
                           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">
                             <span>Ends in</span>
-                            <span>{formatCountdown(new Date(activePromotion.activeUntil))}</span>
+                            <span>
+                              {currentTime === null
+                                ? "..."
+                                : formatCountdown(new Date(activePromotion.activeUntil), currentTime)}
+                            </span>
                           </div>
                         ) : (
                           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">

@@ -78,6 +78,7 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
                           alt={activeProduct.name}
                           fill
                           className="object-cover"
+                          sizes="(max-width: 639px) calc(100vw - 4rem), 100vw"
                         />
                       </div>
                     </div>
@@ -171,6 +172,7 @@ export default function BestSellingProductsClient({ products }: BestSellingProdu
                           alt={product.name}
                           fill
                           className="object-cover transition duration-500 group-hover:scale-105"
+                          sizes="(min-width: 1280px) 25vw, 50vw"
                         />
                         <div className="absolute inset-0 bg-linear-to-b from-transparent via-card/10 to-card/20" />
                       </div>
