@@ -9,7 +9,7 @@ export interface Deal {
   dealType: "LIMITED_STOCK" | "COUPON_CODE" | "FLASH_SALE" | "BUNDLE_DEAL";
   urgencyLevel: "NORMAL" | "URGENT" | "CRITICAL";
   discountPercent?: number | null;
-  discountFixed?: string | number | null;
+  discountFixed?: string | number | { toString(): string } | null;
   limitedQuantity?: number | null;
   claimedQuantity: number;
   maxCoupons?: number | null;
@@ -17,12 +17,25 @@ export interface Deal {
   isActive: boolean;
   endsAt?: Date | string | null;
   startsAt?: Date | string | null;
+  couponCode?: string | null;
 }
 
 /**
  * Check if a deal is currently active
  */
-export function isDealActive(deal: Deal): boolean {
+export function isDealActive(
+  deal: Pick<
+    Deal,
+    | "isActive"
+    | "startsAt"
+    | "endsAt"
+    | "dealType"
+    | "limitedQuantity"
+    | "claimedQuantity"
+    | "maxCoupons"
+    | "usedCoupons"
+  >,
+): boolean {
   if (!deal.isActive) return false;
 
   const now = new Date();
@@ -39,14 +52,14 @@ export function isDealActive(deal: Deal): boolean {
     if (now > endDate) return false;
   }
 
-  return true;
+  return !isDealExhausted(deal);
 }
 
 /**
  * Get remaining quantity for a deal
  */
 export function getRemainingQuantity(deal: Deal): number | null {
-  if (deal.dealType === "LIMITED_STOCK" && deal.limitedQuantity) {
+  if (deal.dealType === "LIMITED_STOCK" && deal.limitedQuantity != null) {
     return Math.max(0, deal.limitedQuantity - deal.claimedQuantity);
   }
   return null;
@@ -56,7 +69,7 @@ export function getRemainingQuantity(deal: Deal): number | null {
  * Get remaining coupons for a deal
  */
 export function getRemainingCoupons(deal: Deal): number | null {
-  if (deal.dealType === "COUPON_CODE" && deal.maxCoupons) {
+  if (deal.dealType === "COUPON_CODE" && deal.maxCoupons != null) {
     return Math.max(0, deal.maxCoupons - deal.usedCoupons);
   }
   return null;
@@ -65,16 +78,49 @@ export function getRemainingCoupons(deal: Deal): number | null {
 /**
  * Check if a deal is exhausted
  */
-export function isDealExhausted(deal: Deal): boolean {
-  if (deal.dealType === "LIMITED_STOCK" && deal.limitedQuantity) {
+export function isDealExhausted(
+  deal: Pick<Deal, "dealType" | "limitedQuantity" | "claimedQuantity" | "maxCoupons" | "usedCoupons">,
+): boolean {
+  if (deal.dealType === "LIMITED_STOCK" && deal.limitedQuantity != null) {
     return deal.claimedQuantity >= deal.limitedQuantity;
   }
 
-  if (deal.dealType === "COUPON_CODE" && deal.maxCoupons) {
+  if (deal.dealType === "COUPON_CODE" && deal.maxCoupons != null) {
     return deal.usedCoupons >= deal.maxCoupons;
   }
 
   return false;
+}
+
+export function hasDealDiscount(
+  deal: Pick<Deal, "discountPercent" | "discountFixed">,
+): boolean {
+  return Number(deal.discountPercent ?? 0) > 0 || Number(deal.discountFixed ?? 0) > 0;
+}
+
+export function getDealDiscountAmount(
+  deal: Pick<Deal, "discountPercent" | "discountFixed">,
+  items: Array<{ id: number; price: number; quantity: number }>,
+  eligibleProductIds: number[],
+): number {
+  const eligibleIds = new Set(eligibleProductIds);
+  const eligibleSubtotal = items.reduce(
+    (sum, item) => sum + (eligibleIds.has(item.id) ? item.price * item.quantity : 0),
+    0,
+  );
+
+  if (eligibleSubtotal <= 0) return 0;
+  if (deal.discountPercent != null && deal.discountPercent > 0) {
+    return Math.min(eligibleSubtotal, eligibleSubtotal * (deal.discountPercent / 100));
+  }
+  if (deal.discountFixed != null && Number(deal.discountFixed) > 0) {
+    const eligibleQuantity = items.reduce(
+      (sum, item) => sum + (eligibleIds.has(item.id) ? item.quantity : 0),
+      0,
+    );
+    return Math.min(eligibleSubtotal, Number(deal.discountFixed) * eligibleQuantity);
+  }
+  return 0;
 }
 
 /**

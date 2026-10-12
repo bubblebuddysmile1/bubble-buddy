@@ -16,7 +16,6 @@ export default async function AdminEditProductPage({ params }: PageProps) {
       where: { slug },
       include: {
         category: { select: { slug: true } },
-        deal: true,
       },
     }),
     prisma.category.findMany({
@@ -61,7 +60,14 @@ export default async function AdminEditProductPage({ params }: PageProps) {
             details: product.details ?? "",
             price: product.price.toString(),
             compareAtPrice: product.compareAtPrice?.toString() ?? "",
-            discountPercent: product.deal?.discountPercent?.toString() ?? "",
+            discountPercent:
+              product.compareAtPrice && Number(product.compareAtPrice) > Number(product.price)
+                ? (
+                    ((Number(product.compareAtPrice) - Number(product.price)) /
+                      Number(product.compareAtPrice)) *
+                    100
+                  ).toFixed(2)
+                : "",
             currency: product.currency,
             stockQuantity: product.stockQuantity,
             categorySlug: product.category.slug,

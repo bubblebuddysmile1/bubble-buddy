@@ -16,6 +16,7 @@ type Deal = {
   usedCoupons: number;
   couponCode: string | null;
   isActive: boolean;
+  startsAt: Date | null;
   endsAt: Date | null;
 };
 
@@ -69,6 +70,7 @@ function normalizeProduct(product: ProductWithCategory) {
       usedCoupons: product.deal.usedCoupons,
       couponCode: product.deal.couponCode,
       isActive: product.deal.isActive,
+      startsAt: product.deal.startsAt,
       endsAt: product.deal.endsAt
     } : null,
     createdAt: product.createdAt,
@@ -85,7 +87,7 @@ export async function GET(req: NextRequest) {
   const adminView = searchParams.get("admin") === "1";
   const sort = String(searchParams.get("sort") ?? "featured");
   const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
-  const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit") ?? "12")));
+  const limit = Math.min(adminView ? 500 : 50, Math.max(1, Number(searchParams.get("limit") ?? "12")));
 
   const requestedSlugs = slugsParam
     ? slugsParam.split(",").map((slug) => slug.trim()).filter(Boolean)
@@ -230,23 +232,6 @@ export async function POST(req: NextRequest) {
   const computedPrice = compareAtPrice - (compareAtPrice * safeDiscount) / 100;
   const finalPrice = Math.max(0, computedPrice).toFixed(2);
 
-  let dealConnect: { connect: { id: number } } | undefined;
-  if (safeDiscount > 0) {
-    const deal = await prisma.deal.create({
-      data: {
-        title: `${name} Discount`,
-        description: `${name} discounted price offer`,
-        dealType: "FLASH_SALE",
-        urgencyLevel: "NORMAL",
-        discountPercent: Math.round(safeDiscount),
-        isActive: true,
-        startsAt: new Date(),
-      },
-    });
-
-    dealConnect = { connect: { id: deal.id } };
-  }
-
   const product = await prisma.product.create({
     data: {
       name,
@@ -265,7 +250,6 @@ export async function POST(req: NextRequest) {
       isActive,
       thumbnail,
       category: { connect: { id: category.id } },
-      ...(dealConnect ? { deal: dealConnect } : {}),
       images: {
         create: images
           .filter((item): item is ProductCreateImage => Boolean(item?.url))

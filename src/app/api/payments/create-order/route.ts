@@ -14,6 +14,7 @@ import {
 import { createPaymentOrderSchema } from "@/lib/validations/payment";
 import { prisma } from "@/lib/prisma";
 import { getPromotionByCode, getPromotionDiscountAmount, getPromotionValidationMessage, isPromotionActive } from "@/lib/promotions";
+import { getDealByCouponCode, getDealCouponDiscount, getDealCouponValidationMessage } from "@/lib/deal-coupons";
 import { authCookieOptions } from "@/lib/auth";
 import type { CartItem } from "@/types/cart";
 
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { address, items, couponCode, redeemPoints = 0 } = parsed.data;
+    const { address, items, couponCode, dealCode, redeemPoints = 0 } = parsed.data;
     const cartItems: CartItem[] = items.map((item) => ({
       ...item,
       image: "",
@@ -148,8 +149,29 @@ export async function POST(request: Request) {
     }
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const promotionDiscount = promotion ? getPromotionDiscountAmount(promotion, subtotal) : 0;
-    const discountedSubtotal = Math.max(0, subtotal - promotionDiscount);
+    const promotionDiscount = promotion ? getPromotionDiscountAmount(promotion, subtotal, cartItems) : 0;
+
+    let deal;
+    if (dealCode) {
+      deal = await getDealByCouponCode(dealCode);
+      if (!deal) {
+        return NextResponse.json({ error: "Deal code is invalid." }, { status: 400 });
+      }
+
+      const dealDiscount = getDealCouponDiscount(deal, cartItems);
+      if (dealDiscount <= 0) {
+        return NextResponse.json(
+          {
+            error: "Deal code cannot be applied to this order.",
+            message: getDealCouponValidationMessage(deal, cartItems),
+          },
+          { status: 400 },
+        );
+      }
+    }
+
+    const dealDiscount = deal ? getDealCouponDiscount(deal, cartItems) : 0;
+    const discountedSubtotal = Math.max(0, subtotal - promotionDiscount - dealDiscount);
 
     const user = payload?.id
       ? await prisma.user.findUnique({
@@ -171,7 +193,7 @@ export async function POST(request: Request) {
       discountType: promotion.discountType,
       discountValue: Number(promotion.discountValue),
       minOrderAmount: Number(promotion.minOrderAmount),
-    }, loyaltyDiscountFromRedeem(redeemPoints));
+    }, loyaltyDiscountFromRedeem(redeemPoints), dealDiscount);
 
     const currency = getPaymentCurrency(totals.currency);
     const amount = toSmallestCurrencyUnit(totals.total);

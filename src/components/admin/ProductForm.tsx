@@ -227,7 +227,7 @@ export default function ProductForm({
             type="number"
             min="0"
             max="100"
-            step="1"
+            step="0.01"
             value={values.discountPercent}
             onChange={(e) => updateField("discountPercent", e.target.value)}
           />

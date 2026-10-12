@@ -12,6 +12,7 @@ export type PromotionDefinition = {
 export type CheckoutTotals = {
   subtotal: number;
   discount: number;
+  dealDiscount: number;
   loyaltyDiscount: number;
   shipping: number;
   total: number;
@@ -34,12 +35,14 @@ export function getCheckoutTotals(
   items: CartItem[],
   promotion?: PromotionDefinition,
   loyaltyDiscount: number = 0,
+  dealDiscount: number = 0,
 ): CheckoutTotals {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const currency = items[0]?.currency ?? "USD";
   const discount = getPromotionDiscount(subtotal, promotion);
-  const discountedSubtotal = Math.max(0, subtotal - discount);
+  const cappedDealDiscount = Math.max(0, Math.min(dealDiscount, subtotal - discount));
+  const discountedSubtotal = Math.max(0, subtotal - discount - cappedDealDiscount);
   const cappedLoyaltyDiscount = Math.max(0, Math.min(loyaltyDiscount, discountedSubtotal));
   const shipping = items.length === 0 ? 0 : Math.max(0, discountedSubtotal - cappedLoyaltyDiscount) >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
   const total = Math.max(0, discountedSubtotal - cappedLoyaltyDiscount) + shipping;
@@ -47,6 +50,7 @@ export function getCheckoutTotals(
   return {
     subtotal,
     discount,
+    dealDiscount: cappedDealDiscount,
     loyaltyDiscount: cappedLoyaltyDiscount,
     shipping,
     total,

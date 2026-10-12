@@ -108,56 +108,24 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
   const images = Array.isArray(body.images) ? (body.images as ProductImageInput[]) : null;
 
-  const existing = await prisma.product.findUnique({ where: { slug }, include: { deal: true } });
+  const existing = await prisma.product.findUnique({ where: { slug } });
   if (!existing) {
     return NextResponse.json({ error: "Product not found." }, { status: 404 });
   }
 
-  const incomingCompareAtPrice = body.compareAtPrice !== undefined ? Number(body.compareAtPrice || 0) : Number(existing.compareAtPrice ?? 0);
-  const incomingDiscount = body.discountPercent !== undefined ? Number(body.discountPercent || 0) : (existing.deal?.discountPercent ?? 0);
-  const safeDiscount = Math.min(Math.max(incomingDiscount, 0), 100);
-  const computedSalePrice = Math.max(0, incomingCompareAtPrice - (incomingCompareAtPrice * safeDiscount) / 100).toFixed(2);
-  updates.price = computedSalePrice;
-
-  if (body.discountPercent !== undefined) {
-    const discountPercent = Number(body.discountPercent);
-
-    if (discountPercent > 0) {
-      if (existing.dealId) {
-        await prisma.deal.update({
-          where: { id: existing.dealId },
-          data: {
-            title: `${existing.name} Discount`,
-            dealType: "FLASH_SALE",
-            urgencyLevel: "NORMAL",
-            discountPercent: Math.round(discountPercent),
-            isActive: true,
-          },
-        });
-      } else {
-        const deal = await prisma.deal.create({
-          data: {
-            title: `${existing.name} Discount`,
-            description: `${existing.name} discounted price offer`,
-            dealType: "FLASH_SALE",
-            urgencyLevel: "NORMAL",
-            discountPercent: Math.round(discountPercent),
-            isActive: true,
-            startsAt: new Date(),
-          },
-        });
-
-        updates.deal = { connect: { id: deal.id } };
-      }
-    } else if (existing.dealId) {
-      await prisma.deal.update({
-        where: { id: existing.dealId },
-        data: {
-          discountPercent: null,
-          isActive: false,
-        },
-      });
-    }
+  if (body.compareAtPrice !== undefined || body.discountPercent !== undefined) {
+    const compareAtPrice =
+      body.compareAtPrice !== undefined
+        ? Number(body.compareAtPrice || 0)
+        : Number(existing.compareAtPrice ?? 0);
+    const existingDiscountPercent =
+      existing.compareAtPrice && Number(existing.compareAtPrice) > Number(existing.price)
+        ? ((Number(existing.compareAtPrice) - Number(existing.price)) / Number(existing.compareAtPrice)) * 100
+        : 0;
+    const discountPercent =
+      body.discountPercent !== undefined ? Number(body.discountPercent || 0) : existingDiscountPercent;
+    const safeDiscount = Math.min(Math.max(discountPercent, 0), 100);
+    updates.price = Math.max(0, compareAtPrice - (compareAtPrice * safeDiscount) / 100).toFixed(2);
   }
 
   const product = await prisma.product.update({

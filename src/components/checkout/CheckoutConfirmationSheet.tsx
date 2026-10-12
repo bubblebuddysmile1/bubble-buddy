@@ -25,6 +25,7 @@ type CheckoutConfirmationSheetProps = {
   items: CartItem[];
   totals: CheckoutTotals;
   couponCode?: string | null;
+  dealCode?: string | null;
   redeemPoints: number;
   isSubmitting: boolean;
   error?: string | null;
@@ -39,6 +40,7 @@ export default function CheckoutConfirmationSheet({
   items,
   totals,
   couponCode,
+  dealCode,
   redeemPoints,
   isSubmitting,
   error,
@@ -200,9 +202,18 @@ export default function CheckoutConfirmationSheet({
                 
                 {totals.discount > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-emerald-600">Discount</span>
+                    <span className="text-emerald-600">Promotion discount</span>
                     <span className="text-emerald-600">
                       -{formatCartMoney(totals.discount, totals.currency)}
+                    </span>
+                  </div>
+                )}
+
+                {totals.dealDiscount > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-emerald-600">Deal discount</span>
+                    <span className="text-emerald-600">
+                      -{formatCartMoney(totals.dealDiscount, totals.currency)}
                     </span>
                   </div>
                 )}
@@ -233,6 +244,13 @@ export default function CheckoutConfirmationSheet({
                   <div className="rounded-xl bg-primary/5 px-3 py-2 text-sm">
                     <span className="text-muted-foreground">Coupon Applied:</span>
                     <span className="ml-2 font-semibold text-primary">{couponCode}</span>
+                  </div>
+                )}
+
+                {dealCode && (
+                  <div className="rounded-xl bg-primary/5 px-3 py-2 text-sm">
+                    <span className="text-muted-foreground">Deal Applied:</span>
+                    <span className="ml-2 font-semibold text-primary">{dealCode}</span>
                   </div>
                 )}
                 

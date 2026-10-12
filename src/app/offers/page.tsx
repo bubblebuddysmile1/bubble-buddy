@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import FlashSaleSection from "@/components/store/FlashSaleSection";
+import DealOffersSection from "@/components/store/DealOffersSection";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -34,6 +35,7 @@ export default function OffersPage() {
       </div>
 
       <FlashSaleSection />
+      <DealOffersSection />
 
       {/* How to Use Coupons */}
       <div className="border-t border-border bg-card/30 py-12 sm:py-16">

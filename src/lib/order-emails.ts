@@ -142,7 +142,7 @@ function buildCustomerOrderEmail(order: OrderWithDetails, heading: string, intro
     `Shipping: ${formatMoney(order.shippingAmount)}\n` +
     `Tax: ${formatMoney(order.taxAmount)}\n` +
     `Discount: ${formatMoney(order.discountAmount)}\n` +
-    `Coupon code: ${order.couponCode ?? "N/A"}\n\n` +
+    `Promotion coupon: ${order.couponCode ?? "N/A"}\n\n` +
     `Items:\n${buildItemsText(order.items)}\n\n` +
     `Shipping address:\n${formatAddress(order.shippingAddress)}\n\n` +
     `Track your order: ${orderUrl(order.orderNumber)}\n\n` +
@@ -155,7 +155,7 @@ function buildCustomerOrderEmail(order: OrderWithDetails, heading: string, intro
     `<p>${intro}</p>` +
     `<p><strong>Order number:</strong> #${order.orderNumber}<br><strong>Status:</strong> ${order.status}<br><strong>Payment status:</strong> ${order.paymentStatus}<br><strong>Payment method:</strong> ${order.paymentMethod ?? "N/A"}</p>` +
     `<table style="width:100%;border-collapse:collapse;margin:16px 0;"><thead><tr><th style="padding:10px;border:1px solid #e2e8f0;text-align:left;">Product</th><th style="padding:10px;border:1px solid #e2e8f0;text-align:center;">Qty</th><th style="padding:10px;border:1px solid #e2e8f0;text-align:right;">Total</th></tr></thead><tbody>${buildItemsHtml(order.items)}</tbody></table>` +
-    `<p><strong>Order total:</strong> ${formatMoney(order.totalAmount)}<br><strong>Shipping:</strong> ${formatMoney(order.shippingAmount)}<br><strong>Tax:</strong> ${formatMoney(order.taxAmount)}<br><strong>Discount:</strong> ${formatMoney(order.discountAmount)}</p>` +
+    `<p><strong>Order total:</strong> ${formatMoney(order.totalAmount)}<br><strong>Shipping:</strong> ${formatMoney(order.shippingAmount)}<br><strong>Tax:</strong> ${formatMoney(order.taxAmount)}<br><strong>Discount:</strong> ${formatMoney(order.discountAmount)}<br><strong>Promotion coupon:</strong> ${order.couponCode ?? "N/A"}</p>` +
     `<p><strong>Shipping address:</strong><br>${formatAddress(order.shippingAddress).replace(/\n/g, "<br>")}</p>` +
     `<p><a href="${orderUrl(order.orderNumber)}" style="display:inline-block;padding:12px 18px;background:#a67c52;color:white;text-decoration:none;border-radius:9999px;">View order details</a></p>` +
     `<p>If you have questions, reply to this email or contact support at ${SUPPORT_EMAIL}.</p>` +
@@ -190,7 +190,7 @@ function buildAdminOrderEmail(order: OrderWithDetails, event: "received" | "paym
     `Shipping: ${formatMoney(order.shippingAmount)}\n` +
     `Tax: ${formatMoney(order.taxAmount)}\n` +
     `Discount: ${formatMoney(order.discountAmount)}\n` +
-    `Coupon code: ${order.couponCode ?? "N/A"}\n` +
+    `Promotion coupon: ${order.couponCode ?? "N/A"}\n` +
     `Razorpay order ID: ${order.razorpayOrderId ?? "N/A"}\n` +
     `Razorpay payment ID: ${order.razorpayPaymentId ?? "N/A"}\n\n` +
     `Items:\n${buildItemsText(order.items)}\n\n` +
@@ -203,7 +203,7 @@ function buildAdminOrderEmail(order: OrderWithDetails, event: "received" | "paym
     `<p>${intro}</p>` +
     `<p><strong>Customer:</strong> ${order.user?.name ?? "Guest"} &lt;${order.user?.email ?? "N/A"}&gt;<br><strong>Order:</strong> #${order.orderNumber}<br><strong>Status:</strong> ${order.status}<br><strong>Payment status:</strong> ${order.paymentStatus}<br><strong>Payment method:</strong> ${order.paymentMethod ?? "N/A"}</p>` +
     `<table style="width:100%;border-collapse:collapse;margin:16px 0;"><thead><tr><th style="padding:10px;border:1px solid #e2e8f0;text-align:left;">Product</th><th style="padding:10px;border:1px solid #e2e8f0;text-align:center;">Qty</th><th style="padding:10px;border:1px solid #e2e8f0;text-align:right;">Total</th></tr></thead><tbody>${buildItemsHtml(order.items)}</tbody></table>` +
-    `<p><strong>Order total:</strong> ${formatMoney(order.totalAmount)}<br><strong>Shipping:</strong> ${formatMoney(order.shippingAmount)}<br><strong>Tax:</strong> ${formatMoney(order.taxAmount)}<br><strong>Discount:</strong> ${formatMoney(order.discountAmount)}</p>` +
+    `<p><strong>Order total:</strong> ${formatMoney(order.totalAmount)}<br><strong>Shipping:</strong> ${formatMoney(order.shippingAmount)}<br><strong>Tax:</strong> ${formatMoney(order.taxAmount)}<br><strong>Discount:</strong> ${formatMoney(order.discountAmount)}<br><strong>Promotion coupon:</strong> ${order.couponCode ?? "N/A"}</p>` +
     `<p><strong>Shipping address:</strong><br>${formatAddress(order.shippingAddress).replace(/\n/g, "<br>")}</p>` +
     `<p><strong>Billing address:</strong><br>${formatAddress(order.billingAddress).replace(/\n/g, "<br>")}</p>` +
     `<p><a href="${orderUrl(order.orderNumber)}" style="display:inline-block;padding:12px 18px;background:#a67c52;color:white;text-decoration:none;border-radius:9999px;">Open order details</a></p>` +

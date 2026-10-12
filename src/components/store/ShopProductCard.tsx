@@ -9,6 +9,7 @@ import LimitedOfferBadge from "@/components/store/LimitedOfferBadge";
 import ClaimFastButton from "@/components/store/ClaimFastButton";
 import ShareProductButton from "@/components/store/ShareProductButton";
 import { formatCartMoney, getDiscountDetails } from "@/lib/cart";
+import { hasDealDiscount, isDealActive } from "@/lib/deals";
 import type { CartProduct } from "@/types/cart";
 
 interface Deal {
@@ -24,7 +25,8 @@ interface Deal {
   usedCoupons: number;
   couponCode?: string | null;
   isActive: boolean;
-  endsAt?: Date | null;
+  startsAt?: Date | string | null;
+  endsAt?: Date | string | null;
 }
 
 type ShopProductCardProps = {
@@ -38,8 +40,9 @@ export default function ShopProductCard({
   description,
   featured,
 }: ShopProductCardProps) {
-  const isDealActive = product.deal?.isActive && 
-    (!product.deal?.endsAt || new Date(product.deal.endsAt) > new Date());
+  const dealIsActive = product.deal
+    ? Boolean(product.deal.couponCode) && hasDealDiscount(product.deal) && isDealActive(product.deal)
+    : false;
   const discount = getDiscountDetails(product.price, product.compareAtPrice ?? null);
 
   return (
@@ -55,7 +58,7 @@ export default function ShopProductCard({
           />
         </Link>
         <WishlistButton product={product} variant="overlay" className="absolute right-4 top-4 z-10" />
-        {isDealActive && product.deal && (
+        {dealIsActive && product.deal && (
           <div className="absolute left-4 top-4 z-10 max-w-[calc(100%-2rem)]">
             <LimitedOfferBadge deal={product.deal} />
           </div>
@@ -100,7 +103,7 @@ export default function ShopProductCard({
           </div>
 
           <div className="flex w-full flex-wrap items-center gap-2">
-            {isDealActive && product.deal && (
+            {dealIsActive && product.deal && (
               <ClaimFastButton dealId={product.deal.id} />
             )}
             <AddToCartButton product={product} size="sm" label="Add" className="shrink-0 px-3" />

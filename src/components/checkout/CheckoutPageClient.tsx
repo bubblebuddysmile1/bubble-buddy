@@ -41,6 +41,12 @@ type AppliedPromotion = {
   minOrderAmount: number;
 };
 
+type AppliedDeal = {
+  code: string;
+  title: string;
+  discount: number;
+};
+
 export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClientProps) {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
@@ -56,6 +62,11 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [appliedPromotion, setAppliedPromotion] = useState<AppliedPromotion | null>(null);
+  const [dealCode, setDealCode] = useState("");
+  const [dealError, setDealError] = useState<string | null>(null);
+  const [dealSuccess, setDealSuccess] = useState<string | null>(null);
+  const [isApplyingDeal, setIsApplyingDeal] = useState(false);
+  const [appliedDeal, setAppliedDeal] = useState<AppliedDeal | null>(null);
   const [redeemPoints, setRedeemPoints] = useState(0);
   const [redeemError, setRedeemError] = useState<string | null>(null);
   const beginCheckoutTrackedRef = useRef(false);
@@ -98,11 +109,12 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
     [appliedPromotion],
   );
 
-  const baseTotals = getCheckoutTotals(items, promotionDefinition);
+  const dealDiscount = appliedDeal?.discount ?? 0;
+  const baseTotals = getCheckoutTotals(items, promotionDefinition, 0, dealDiscount);
 
   const maxRedeemablePoints = getMaxRedeemablePoints(
     loyaltyPoints,
-    Math.max(0, baseTotals.subtotal - baseTotals.discount),
+    Math.max(0, baseTotals.subtotal - baseTotals.discount - baseTotals.dealDiscount),
   );
 
   const effectiveRedeemPoints = Math.min(Math.max(redeemPoints, 0), maxRedeemablePoints);
@@ -110,6 +122,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
     items,
     promotionDefinition,
     loyaltyDiscountFromRedeem(effectiveRedeemPoints),
+    dealDiscount,
   );
 
   useEffect(() => {
@@ -245,6 +258,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           stockQuantity,
         })),
         couponCode: appliedPromotion?.code,
+        dealCode: appliedDeal?.code,
         redeemPoints: effectiveRedeemPoints,
       }),
     });
@@ -353,6 +367,54 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
     }
   };
 
+  const handleApplyDeal = async () => {
+    if (!dealCode.trim()) {
+      setDealError("Enter a Deal code to apply.");
+      setDealSuccess(null);
+      setAppliedDeal(null);
+      return;
+    }
+
+    setDealError(null);
+    setDealSuccess(null);
+    setIsApplyingDeal(true);
+
+    try {
+      const response = await fetch("/api/deals/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: dealCode,
+          items: items.map(({ id, slug, name, price, currency, quantity, stockQuantity }) => ({
+            id,
+            slug,
+            name,
+            price,
+            currency,
+            quantity,
+            stockQuantity,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setDealError(data.message ?? data.error ?? "Unable to apply Deal code.");
+        setAppliedDeal(null);
+        return;
+      }
+
+      setAppliedDeal({ code: data.code, title: data.title, discount: data.discount });
+      setDealSuccess(`Deal applied: ${data.code}`);
+      setDealError(null);
+    } catch {
+      setDealError("Unable to apply Deal code. Please try again.");
+      setAppliedDeal(null);
+    } finally {
+      setIsApplyingDeal(false);
+    }
+  };
+
   const handleSubmit = () => {
     const payload = {
       ...values,
@@ -394,6 +456,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           stockQuantity,
         })),
         couponCode: appliedPromotion?.code,
+        dealCode: appliedDeal?.code,
         redeemPoints: effectiveRedeemPoints,
       };
 
@@ -556,6 +619,7 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
         items={items}
         totals={totals}
         couponCode={appliedPromotion?.code ?? null}
+        dealCode={appliedDeal?.code ?? null}
         redeemPoints={effectiveRedeemPoints}
         isSubmitting={isSubmitting}
         error={confirmationError}
@@ -644,6 +708,44 @@ export default function CheckoutPageClient({ loyaltyPoints }: CheckoutPageClient
           {appliedPromotion && (
             <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
               {appliedPromotion.title} — saved {appliedPromotion.discountType === "PERCENTAGE" ? `${appliedPromotion.discountValue}%` : formatCartMoney(appliedPromotion.discountValue, totals.currency)} off.
+            </div>
+          )}
+        </section>
+
+        <section className="rounded-4xl border border-border bg-card p-4 shadow-xl sm:p-6">
+          <div className="mb-4">
+            <p className="text-xs uppercase tracking-[0.28em] text-primary">Deal code</p>
+            <h2 className="mt-2 text-lg font-semibold text-foreground">Apply a claimed Deal</h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+            <input
+              type="text"
+              value={dealCode}
+              onChange={(event) => {
+                setDealCode(event.target.value);
+                setDealError(null);
+                setDealSuccess(null);
+                if (appliedDeal && event.target.value.trim().toUpperCase() !== appliedDeal.code.toUpperCase()) {
+                  setAppliedDeal(null);
+                }
+              }}
+              placeholder="Enter your Deal code"
+              className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
+            />
+            <button
+              type="button"
+              onClick={handleApplyDeal}
+              disabled={isApplyingDeal}
+              className="inline-flex h-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-background transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isApplyingDeal ? "Applying…" : "Apply Deal"}
+            </button>
+          </div>
+          {dealError && <p className="mt-3 text-sm text-destructive">{dealError}</p>}
+          {dealSuccess && <p className="mt-3 text-sm text-emerald-700">{dealSuccess}</p>}
+          {appliedDeal && (
+            <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+              {appliedDeal.title} — saved {formatCartMoney(totals.dealDiscount, totals.currency)}.
             </div>
           )}
         </section>

@@ -13,7 +13,8 @@ type CheckoutOrderSummaryProps = {
 };
 
 export default function CheckoutOrderSummary({ items, totals }: CheckoutOrderSummaryProps) {
-  const { subtotal, discount, shipping, total, currency, itemCount } = totals;
+  const { subtotal, discount, dealDiscount, shipping, total, currency, itemCount } = totals;
+  const totalDiscount = discount + dealDiscount;
 
   return (
     <aside className="checkout-summary-enter lg:sticky lg:top-24">
@@ -56,8 +57,14 @@ export default function CheckoutOrderSummary({ items, totals }: CheckoutOrderSum
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-sm text-emerald-700">
-              <span className="text-muted-foreground">Coupon discount</span>
+              <span className="text-muted-foreground">Promotion discount</span>
               <span className="font-medium">-{formatCartMoney(discount, currency)}</span>
+            </div>
+          )}
+          {dealDiscount > 0 && (
+            <div className="flex justify-between text-sm text-emerald-700">
+              <span className="text-muted-foreground">Deal discount</span>
+              <span className="font-medium">-{formatCartMoney(dealDiscount, currency)}</span>
             </div>
           )}
           {totals.loyaltyDiscount > 0 && (
@@ -72,9 +79,9 @@ export default function CheckoutOrderSummary({ items, totals }: CheckoutOrderSum
               {shipping === 0 ? "Free" : formatCartMoney(shipping, currency)}
             </span>
           </div>
-          {subtotal > 0 && subtotal - discount < 50 && (
+          {subtotal > 0 && subtotal - totalDiscount < 50 && (
             <p className="rounded-2xl bg-primary/10 px-3 py-2 text-xs text-primary">
-              Add {formatCartMoney(50 - Math.max(0, subtotal - discount), currency)} more on future orders for free shipping
+              Add {formatCartMoney(50 - Math.max(0, subtotal - totalDiscount), currency)} more on future orders for free shipping
             </p>
           )}
           <div className="flex items-end justify-between border-t border-border pt-4">

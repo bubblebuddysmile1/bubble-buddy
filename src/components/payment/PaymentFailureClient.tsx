@@ -11,6 +11,7 @@ const REASON_MESSAGES: Record<string, string> = {
   cancelled: "You closed the payment window before completing checkout.",
   payment_declined: "The payment provider reported that this payment failed. If your bank shows a debit, it may be a temporary authorization and should be reversed by your bank or payment provider.",
   verification_failed: "We could not verify your payment. If your bank shows a debit, it may be a temporary authorization; please contact support with your order reference before trying again.",
+  order_save_failed: "Your payment verification reached the server, but the order could not be saved because the database needs an update. In mock mode no Razorpay charge was made. Otherwise, do not retry if your bank shows a debit; contact support.",
   payment_status_unavailable: "We could not confirm your payment status. Please retry or contact support if you were charged.",
   create_order_failed: "We could not start the payment session. Please try again.",
   gateway_unavailable: "Payment gateway failed to load. Check your connection and retry.",
@@ -20,6 +21,7 @@ export default function PaymentFailureClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const reason = searchParams.get("reason") ?? "unknown";
+  const mock = searchParams.get("mock") === "1";
   const orderId = searchParams.get("order_id") ?? "";
   const paymentId = searchParams.get("payment_id") ?? "";
   const orderNumber = searchParams.get("order_number") ?? "";
@@ -32,8 +34,11 @@ export default function PaymentFailureClient() {
   const redirectToComplete = searchParams.get("redirectToComplete") === "1";
   const email = searchParams.get("email") ?? "";
   const message =
-    REASON_MESSAGES[reason] ??
+    (reason === "order_save_failed" && mock
+      ? "The test order could not be saved because the database needs an update. Mock mode was used, so no Razorpay charge was made."
+      : REASON_MESSAGES[reason]) ??
     "Something went wrong during payment. You can try again from checkout.";
+  const title = reason === "order_save_failed" ? "Order could not be saved" : "Payment failed or cancelled";
 
   useEffect(() => {
     if (!orderNumber) return;
@@ -106,7 +111,7 @@ export default function PaymentFailureClient() {
     <PaymentStatusLayout
       variant="failure"
       badge="Payment not completed"
-      title="Payment failed or cancelled"
+      title={title}
       icon={<AlertCircle className="size-10 text-destructive" />}
       description={
         <>

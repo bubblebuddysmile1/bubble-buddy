@@ -14,6 +14,7 @@ import {
   Tag,
   TrendingUp,
   Users,
+  Zap,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -31,6 +32,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { label: "Blogs", href: "/admin/blogs", icon: Mail },
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
   { label: "Promotions", href: "/admin/promotions", icon: Tag },
+  { label: "Deals", href: "/admin/deals", icon: Zap },
   { label: "Customers", href: "/admin/customers", icon: Users },
   {label: "Reviews", href: "/admin/reviews", icon: ImageIcon },
   { label: "Contact Messages", href: "/admin/contact-messages", icon: MessageSquareText },

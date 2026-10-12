@@ -37,7 +37,7 @@ export default function NewDealPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("/api/products?limit=1000");
+        const response = await fetch("/api/products?admin=1&limit=500");
         const data = await response.json();
         setProducts(data.products || []);
       } catch (error) {
@@ -87,9 +87,8 @@ export default function NewDealPage() {
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create deal");
-      }
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to create deal");
 
       router.push("/admin/deals");
     } catch (error) {
@@ -242,13 +241,14 @@ export default function NewDealPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Coupon Code</label>
+              <label className="block text-sm font-medium mb-2">Deal code *</label>
               <input
                 type="text"
                 name="couponCode"
                 value={formData.couponCode}
                 onChange={handleChange}
                 placeholder="e.g., SUMMER20"
+                required
                 className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none"
               />
             </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin-auth";
+import { hasDealDiscount } from "@/lib/deals";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -9,10 +10,14 @@ export async function GET(
   { params }: RouteContext
 ) {
   const { id } = await params;
+  const dealId = Number(id);
+  if (!Number.isInteger(dealId) || dealId <= 0) {
+    return NextResponse.json({ error: "Invalid deal ID." }, { status: 400 });
+  }
 
   try {
     const deal = await prisma.deal.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: dealId },
       include: {
         products: {
           include: {
@@ -46,6 +51,11 @@ export async function PUT(
   { params }: RouteContext
 ) {
   const { id } = await params;
+  const dealId = Number(id);
+  if (!Number.isInteger(dealId) || dealId <= 0) {
+    return NextResponse.json({ error: "Invalid deal ID." }, { status: 400 });
+  }
+
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) {
     return auth;
@@ -68,9 +78,40 @@ export async function PUT(
       endsAt,
       productIds
     } = body;
+    const normalizedCouponCode = String(couponCode ?? "").trim().toUpperCase() || null;
+
+    if (!normalizedCouponCode) {
+      return NextResponse.json(
+        { error: "A Deal code is required so customers can apply this Deal at checkout." },
+        { status: 400 },
+      );
+    }
+
+    if (!hasDealDiscount({
+      discountPercent: Number(discountPercent ?? 0),
+      discountFixed: Number(discountFixed ?? 0),
+    })) {
+      return NextResponse.json(
+        { error: "Set a percentage or fixed discount before saving a Deal." },
+        { status: 400 },
+      );
+    }
+
+    if (normalizedCouponCode) {
+      const duplicate = await prisma.deal.findFirst({
+        where: {
+          couponCode: { equals: normalizedCouponCode, mode: "insensitive" },
+          id: { not: dealId },
+        },
+        select: { id: true },
+      });
+      if (duplicate) {
+        return NextResponse.json({ error: "This Deal code is already in use." }, { status: 409 });
+      }
+    }
 
     const deal = await prisma.deal.update({
-      where: { id: parseInt(id) },
+      where: { id: dealId },
       data: {
         title,
         description,
@@ -79,7 +120,7 @@ export async function PUT(
         discountPercent,
         discountFixed: discountFixed ? parseFloat(discountFixed) : null,
         limitedQuantity,
-        couponCode,
+        couponCode: normalizedCouponCode,
         maxCoupons,
         isActive,
         startsAt: startsAt ? new Date(startsAt) : null,
@@ -109,6 +150,11 @@ export async function DELETE(
   { params }: RouteContext
 ) {
   const { id } = await params;
+  const dealId = Number(id);
+  if (!Number.isInteger(dealId) || dealId <= 0) {
+    return NextResponse.json({ error: "Invalid deal ID." }, { status: 400 });
+  }
+
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) {
     return auth;
@@ -116,7 +162,7 @@ export async function DELETE(
 
   try {
     await prisma.deal.delete({
-      where: { id: parseInt(id) }
+      where: { id: dealId }
     });
 
     return NextResponse.json({ success: true });

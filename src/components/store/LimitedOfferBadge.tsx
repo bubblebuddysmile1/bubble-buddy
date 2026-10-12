@@ -47,11 +47,11 @@ export default function LimitedOfferBadge({ deal }: LimitedOfferBadgeProps) {
   };
 
   const getRemaining = () => {
-    if (deal.dealType === "LIMITED_STOCK" && deal.limitedQuantity) {
+    if (deal.dealType === "LIMITED_STOCK" && deal.limitedQuantity != null) {
       const remaining = deal.limitedQuantity - deal.claimedQuantity;
       return remaining > 0 ? `Only ${remaining} Left` : "Sold Out";
     }
-    if (deal.dealType === "COUPON_CODE" && deal.maxCoupons) {
+    if (deal.dealType === "COUPON_CODE" && deal.maxCoupons != null) {
       const remaining = deal.maxCoupons - deal.usedCoupons;
       return remaining > 0 ? `${remaining} Coupons Available` : "All Used";
     }

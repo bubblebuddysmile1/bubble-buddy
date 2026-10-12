@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
+import { hasDealDiscount, isDealActive } from "@/lib/deals";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -9,6 +10,10 @@ export async function POST(
   { params }: RouteContext
 ) {
   const { id } = await params;
+  const dealId = Number(id);
+  if (!Number.isInteger(dealId) || dealId <= 0) {
+    return NextResponse.json({ error: "Invalid deal ID." }, { status: 400 });
+  }
 
   try {
     const body = await req.json();
@@ -20,7 +25,7 @@ export async function POST(
     const claimEmail = email || authPayload?.email || null;
 
     const deal = await prisma.deal.findUnique({
-      where: { id: parseInt(id) }
+      where: { id: dealId }
     });
 
     if (!deal) {
@@ -30,46 +35,26 @@ export async function POST(
       );
     }
 
-    // Check if deal is still active
-    if (!deal.isActive || (deal.endsAt && new Date() > deal.endsAt)) {
+    if (!isDealActive(deal)) {
       return NextResponse.json(
         { error: "This deal is no longer active" },
         { status: 400 }
       );
     }
 
-    // Check if limited quantity is exhausted
-    if (deal.limitedQuantity && deal.claimedQuantity >= deal.limitedQuantity) {
+    if (!deal.couponCode || !hasDealDiscount(deal)) {
       return NextResponse.json(
-        { error: "All items have been claimed" },
+        { error: "This Deal does not have an active checkout code." },
         { status: 400 }
       );
     }
 
-    // Check if coupons are exhausted
-    if (deal.maxCoupons && deal.usedCoupons >= deal.maxCoupons) {
-      return NextResponse.json(
-        { error: "All coupons have been used" },
-        { status: 400 }
-      );
-    }
-
-    // Create claim record
     const claim = await prisma.dealClaim.create({
       data: {
-        dealId: parseInt(id),
-        userId: userId || null,
+        dealId: deal.id,
+        userId,
         email: claimEmail,
-      }
-    });
-
-    // Update deal claimed quantity
-    await prisma.deal.update({
-      where: { id: parseInt(id) },
-      data: {
-        claimedQuantity: { increment: 1 },
-        usedCoupons: { increment: 1 }
-      }
+      },
     });
 
     // Return coupon code or claim confirmation

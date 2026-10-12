@@ -2,6 +2,7 @@ import { Prisma, type PaymentMethod } from "@prisma/client";
 import { getCheckoutTotals } from "@/lib/checkout";
 import { getLoyaltyPointsEarned, loyaltyDiscountFromRedeem } from "@/lib/loyalty";
 import { getPromotionByCode, getPromotionDiscountAmount, isPromotionActive } from "@/lib/promotions";
+import { getDealByCouponCode, getDealCouponDiscount } from "@/lib/deal-coupons";
 import { prisma } from "@/lib/prisma";
 import type { AuthTokenPayload } from "@/lib/auth";
 import type { CheckoutAddressForm } from "@/lib/validations/checkout";
@@ -16,6 +17,7 @@ export type PersistOrderInput = {
   items: CreatePaymentOrderInput["items"];
   user?: AuthTokenPayload | null;
   couponCode?: string;
+  dealCode?: string;
   redeemPoints?: number;
 };
 
@@ -71,12 +73,25 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
     }
   }
 
+  let dealDiscount = 0;
+  if (input.dealCode) {
+    const deal = await getDealByCouponCode(input.dealCode);
+    if (!deal) {
+      throw new Error("Invalid Deal code.");
+    }
+
+    dealDiscount = getDealCouponDiscount(deal, cartItems);
+    if (dealDiscount <= 0) {
+      throw new Error("Deal code is not eligible for this order.");
+    }
+  }
+
   const loyaltyDiscount = loyaltyDiscountFromRedeem(input.redeemPoints ?? 0);
   const totals = getCheckoutTotals(cartItems, promotion && {
     discountType: promotion.discountType,
     discountValue: Number(promotion.discountValue),
     minOrderAmount: Number(promotion.minOrderAmount),
-  }, loyaltyDiscount);
+  }, loyaltyDiscount, dealDiscount);
 
   const products = (await prisma.product.findMany({
     where: { id: { in: input.items.map((item) => item.id) } },
@@ -148,7 +163,7 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
         totalAmount: new Prisma.Decimal(totals.total),
         shippingAmount: new Prisma.Decimal(totals.shipping),
         taxAmount: new Prisma.Decimal(0),
-        discountAmount: new Prisma.Decimal(totals.discount),
+        discountAmount: new Prisma.Decimal(totals.discount + totals.dealDiscount),
         redeemedLoyaltyPoints: input.redeemPoints ?? 0,
         loyaltyPointsEarned: getLoyaltyPointsEarned(totals.total),
         returnAllowed: false,

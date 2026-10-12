@@ -1,23 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin-auth";
+import { hasDealDiscount, isDealActive } from "@/lib/deals";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const activeOnly = searchParams.get("active") === "1";
 
   try {
-    const where = activeOnly 
-      ? { 
-          isActive: true,
-          endsAt: { gt: new Date() }
-        }
-      : {};
-
     const deals = await prisma.deal.findMany({
-      where,
       include: {
-        products: true,
+        products: {
+          select: { id: true, name: true, slug: true, thumbnail: true },
+        },
         _count: {
           select: { dealClaims: true }
         }
@@ -26,7 +21,11 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({
-      deals: deals.map(deal => ({
+      deals: (
+        activeOnly
+          ? deals.filter((deal) => isDealActive(deal) && Boolean(deal.couponCode) && hasDealDiscount(deal))
+          : deals
+      ).map(deal => ({
         ...deal,
         claimsCount: deal._count.dealClaims
       }))
@@ -63,6 +62,34 @@ export async function POST(req: NextRequest) {
       endsAt,
       productIds
     } = body;
+    const normalizedCouponCode = String(couponCode ?? "").trim().toUpperCase() || null;
+
+    if (!normalizedCouponCode) {
+      return NextResponse.json(
+        { error: "A Deal code is required so customers can apply this Deal at checkout." },
+        { status: 400 },
+      );
+    }
+
+    if (!hasDealDiscount({
+      discountPercent: Number(discountPercent ?? 0),
+      discountFixed: Number(discountFixed ?? 0),
+    })) {
+      return NextResponse.json(
+        { error: "Set a percentage or fixed discount before creating a Deal." },
+        { status: 400 },
+      );
+    }
+
+    if (normalizedCouponCode) {
+      const duplicate = await prisma.deal.findFirst({
+        where: { couponCode: { equals: normalizedCouponCode, mode: "insensitive" } },
+        select: { id: true },
+      });
+      if (duplicate) {
+        return NextResponse.json({ error: "This Deal code is already in use." }, { status: 409 });
+      }
+    }
 
     const deal = await prisma.deal.create({
       data: {
@@ -73,7 +100,7 @@ export async function POST(req: NextRequest) {
         discountPercent,
         discountFixed: discountFixed ? parseFloat(discountFixed) : null,
         limitedQuantity,
-        couponCode,
+        couponCode: normalizedCouponCode,
         maxCoupons,
         isActive,
         startsAt: startsAt ? new Date(startsAt) : null,

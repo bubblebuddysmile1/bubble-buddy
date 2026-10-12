@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
+import { use, useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -30,7 +30,8 @@ interface Deal {
   products: Product[];
 }
 
-export default function EditDealPage({ params }: { params: { id: string } }) {
+export default function EditDealPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -56,8 +57,8 @@ export default function EditDealPage({ params }: { params: { id: string } }) {
     const fetchData = async () => {
       try {
         const [dealRes, productsRes] = await Promise.all([
-          fetch(`/api/deals/${params.id}`),
-          fetch("/api/products?limit=1000")
+          fetch(`/api/deals/${id}`),
+          fetch("/api/products?admin=1&limit=500")
         ]);
 
         if (dealRes.ok) {
@@ -91,7 +92,7 @@ export default function EditDealPage({ params }: { params: { id: string } }) {
     };
 
     fetchData();
-  }, [params.id]);
+  }, [id]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
@@ -126,15 +127,14 @@ export default function EditDealPage({ params }: { params: { id: string } }) {
         productIds: selectedProducts
       };
 
-      const response = await fetch(`/api/deals/${params.id}`, {
+      const response = await fetch(`/api/deals/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update deal");
-      }
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to update deal");
 
       router.push("/admin/deals");
     } catch (error) {
@@ -291,12 +291,13 @@ export default function EditDealPage({ params }: { params: { id: string } }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Coupon Code</label>
+              <label className="block text-sm font-medium mb-2">Deal code *</label>
               <input
                 type="text"
                 name="couponCode"
                 value={formData.couponCode}
                 onChange={handleChange}
+                required
                 placeholder="e.g., SUMMER20"
                 className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none"
               />

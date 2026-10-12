@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Zap } from "lucide-react";
+import { Check, Copy, Zap } from "lucide-react";
 
 interface ClaimFastButtonProps {
   dealId: number;
@@ -13,6 +13,7 @@ export default function ClaimFastButton({ dealId, onSuccess }: ClaimFastButtonPr
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [couponCode, setCouponCode] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<string | null>(null);
 
   const handleClaim = async () => {
     setIsLoading(true);
@@ -38,11 +39,6 @@ export default function ClaimFastButton({ dealId, onSuccess }: ClaimFastButtonPr
       setShowSuccess(true);
 
       onSuccess?.(data.couponCode);
-
-      // Reset after 3 seconds
-      setTimeout(() => {
-        setShowSuccess(false);
-      }, 3000);
     } catch (error) {
       console.error("Error claiming deal:", error);
       alert("An error occurred while claiming the deal");
@@ -53,8 +49,27 @@ export default function ClaimFastButton({ dealId, onSuccess }: ClaimFastButtonPr
 
   if (showSuccess) {
     return (
-      <div className="rounded-full bg-green-100 px-4 py-2 text-center text-xs font-semibold text-green-700">
-        {couponCode ? `Code: ${couponCode}` : "Deal Claimed! ✓"}
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-green-100 px-3 py-2 text-xs font-semibold text-green-700">
+        <span>{couponCode ? `Deal code: ${couponCode}` : "Deal claimed!"}</span>
+        {couponCode && (
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(couponCode);
+                setCopyError(null);
+              } catch {
+                setCopyError("Could not copy code. Please copy it manually.");
+              }
+            }}
+            className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1 hover:bg-white"
+          >
+            <Copy className="size-3" />
+            Copy
+          </button>
+        )}
+        <Check className="size-4" />
+        {copyError && <span className="basis-full font-normal">{copyError}</span>}
       </div>
     );
   }

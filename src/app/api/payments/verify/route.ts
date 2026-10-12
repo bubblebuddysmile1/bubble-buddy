@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { COOKIE_NAME, verifyAuthToken } from "@/lib/auth";
 import { issueVerificationOtp } from "@/lib/account-auth";
 import {
@@ -30,6 +31,7 @@ export async function POST(request: Request) {
       address,
       items,
       couponCode,
+      dealCode,
       redeemPoints = 0,
     } = parsed.data;
 
@@ -74,6 +76,7 @@ export async function POST(request: Request) {
       items,
       user,
       couponCode,
+      dealCode,
       redeemPoints,
     });
 
@@ -208,6 +211,16 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("[payments/verify]", error);
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2022") {
+      return NextResponse.json(
+        {
+          error: "Unable to save the order because the database schema is missing a required column.",
+          reason: "order_save_failed",
+          mock: isMockPaymentMode(),
+        },
+        { status: 500 },
+      );
+    }
     return NextResponse.json(
       { error: "Unable to verify payment. Please contact support." },
       { status: 500 },
