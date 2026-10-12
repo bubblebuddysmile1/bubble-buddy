@@ -1,7 +1,14 @@
 import { Prisma, type PaymentMethod } from "@prisma/client";
 import { getCheckoutTotals } from "@/lib/checkout";
-import { getLoyaltyPointsEarned, loyaltyDiscountFromRedeem } from "@/lib/loyalty";
-import { getPromotionByCode, getPromotionDiscountAmount, isPromotionActive } from "@/lib/promotions";
+import {
+  getLoyaltyPointsEarned,
+  loyaltyDiscountFromRedeem,
+} from "@/lib/loyalty";
+import {
+  getPromotionByCode,
+  getPromotionDiscountAmount,
+  isPromotionActive,
+} from "@/lib/promotions";
 import { getDealByCouponCode, getDealCouponDiscount } from "@/lib/deal-coupons";
 import { prisma } from "@/lib/prisma";
 import type { AuthTokenPayload } from "@/lib/auth";
@@ -21,7 +28,9 @@ export type PersistOrderInput = {
   redeemPoints?: number;
 };
 
-export function mapRazorpayPaymentMethod(method: unknown): PaymentMethod | null {
+export function mapRazorpayPaymentMethod(
+  method: unknown,
+): PaymentMethod | null {
   switch (typeof method === "string" ? method.toLowerCase() : "") {
     case "card":
       return "CARD";
@@ -37,7 +46,10 @@ export function mapRazorpayPaymentMethod(method: unknown): PaymentMethod | null 
 }
 
 export function orderNumberFromRazorpay(razorpayOrderId: string): string {
-  const suffix = razorpayOrderId.replace(/^order_(mock_)?/, "").slice(-12).toUpperCase();
+  const suffix = razorpayOrderId
+    .replace(/^order_(mock_)?/, "")
+    .slice(-12)
+    .toUpperCase();
   return `BB-${suffix}`;
 }
 
@@ -66,7 +78,10 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
       throw new Error("Invalid coupon code.");
     }
 
-    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = cartItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
     const discount = getPromotionDiscountAmount(promotion, subtotal, cartItems);
     if (discount <= 0) {
       throw new Error("Coupon code is not eligible for this order.");
@@ -87,11 +102,16 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
   }
 
   const loyaltyDiscount = loyaltyDiscountFromRedeem(input.redeemPoints ?? 0);
-  const totals = getCheckoutTotals(cartItems, promotion && {
-    discountType: promotion.discountType,
-    discountValue: Number(promotion.discountValue),
-    minOrderAmount: Number(promotion.minOrderAmount),
-  }, loyaltyDiscount, dealDiscount);
+  const totals = getCheckoutTotals(
+    cartItems,
+    promotion && {
+      discountType: promotion.discountType,
+      discountValue: Number(promotion.discountValue),
+      minOrderAmount: Number(promotion.minOrderAmount),
+    },
+    loyaltyDiscount,
+    dealDiscount,
+  );
 
   const products = (await prisma.product.findMany({
     where: { id: { in: input.items.map((item) => item.id) } },
@@ -163,7 +183,9 @@ export async function persistOrderAfterPayment(input: PersistOrderInput) {
         totalAmount: new Prisma.Decimal(totals.total),
         shippingAmount: new Prisma.Decimal(totals.shipping),
         taxAmount: new Prisma.Decimal(0),
-        discountAmount: new Prisma.Decimal(totals.discount + totals.dealDiscount),
+        discountAmount: new Prisma.Decimal(
+          totals.discount + totals.dealDiscount,
+        ),
         redeemedLoyaltyPoints: input.redeemPoints ?? 0,
         loyaltyPointsEarned: getLoyaltyPointsEarned(totals.total),
         returnAllowed: false,
@@ -199,7 +221,7 @@ export async function confirmOrder(
   paymentMethod: PaymentMethod | null,
 ) {
   const orderNumber = orderNumberFromRazorpay(razorpayOrderId);
-  
+
   const order = await prisma.order.findUnique({
     where: { orderNumber },
     select: {
@@ -244,7 +266,11 @@ export async function confirmOrder(
       throw new Error("Order payment status changed before confirmation.");
     }
 
-    if (order.paymentStatus === "FAILED" && order.userId && order.redeemedLoyaltyPoints > 0) {
+    if (
+      order.paymentStatus === "FAILED" &&
+      order.userId &&
+      order.redeemedLoyaltyPoints > 0
+    ) {
       await tx.user.update({
         where: { id: order.userId },
         data: { loyaltyPoints: { decrement: order.redeemedLoyaltyPoints } },
@@ -288,7 +314,14 @@ export async function cancelOrder(razorpayOrderId: string) {
   const orderNumber = orderNumberFromRazorpay(razorpayOrderId);
   const order = await prisma.order.findUnique({
     where: { orderNumber },
-    select: { id: true, orderNumber: true, userId: true, redeemedLoyaltyPoints: true, status: true, paymentStatus: true },
+    select: {
+      id: true,
+      orderNumber: true,
+      userId: true,
+      redeemedLoyaltyPoints: true,
+      status: true,
+      paymentStatus: true,
+    },
   });
 
   if (!order) {
@@ -311,7 +344,12 @@ export async function cancelOrder(razorpayOrderId: string) {
     if (transitioned.count === 0) {
       const currentOrder = await tx.order.findUnique({
         where: { orderNumber },
-        select: { id: true, orderNumber: true, status: true, paymentStatus: true },
+        select: {
+          id: true,
+          orderNumber: true,
+          status: true,
+          paymentStatus: true,
+        },
       });
       if (!currentOrder) {
         throw new Error("Order not found.");
@@ -330,7 +368,12 @@ export async function cancelOrder(razorpayOrderId: string) {
 
     return tx.order.findUniqueOrThrow({
       where: { orderNumber },
-      select: { id: true, orderNumber: true, status: true, paymentStatus: true },
+      select: {
+        id: true,
+        orderNumber: true,
+        status: true,
+        paymentStatus: true,
+      },
     });
   });
 }
